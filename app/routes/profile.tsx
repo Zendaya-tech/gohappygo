@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
+import FooterMinimal from '~/components/FooterMinimal';
 import {
     CheckIcon,
     MapPinIcon,
@@ -9,14 +9,7 @@ import {
     CheckCircleIcon,
     ChatBubbleLeftIcon,
     ShareIcon,
-    ChartBarIcon,
-    UserIcon,
-    MagnifyingGlassIcon,
-    PlusIcon,
-    QuestionMarkCircleIcon,
-    PaperAirplaneIcon,
-    CubeIcon,
-    ArchiveBoxIcon
+    ChartBarIcon
 } from '@heroicons/react/24/outline';
 
 interface UserProfile {
@@ -67,7 +60,7 @@ interface Stats {
 }
 
 export default function Profile() {
-    const [activeTab, setActiveTab] = useState<'voyages' | 'packages'>('voyages');
+    const [activeTab, setActiveTab] = useState<'voyages' | 'packages' | 'transport'>('voyages');
     const [isEditing, setIsEditing] = useState(false);
 
     // Mock user data
@@ -212,354 +205,139 @@ export default function Profile() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
             <Header />
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Profile Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg p-8 mb-8 text-white">
-                    <div className="flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8">
-                        {/* Avatar */}
-                        <div className="relative">
-                            <img
-                                src={userProfile.avatar}
-                                alt={`${userProfile.firstName} ${userProfile.lastName}`}
-                                className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
-                            />
-                            {userProfile.verified && (
-                                <div className="absolute -bottom-2 -right-2 bg-white text-blue-600 rounded-full p-3 shadow-lg">
-                                    <CheckIcon className="w-6 h-6" />
-                                </div>
-                            )}
-                            <div className="absolute -top-2 -left-2 bg-yellow-400 text-yellow-900 rounded-full px-2 py-1 text-xs font-bold">
-                                TOP
-                            </div>
-                        </div>
-
-                        {/* User Info */}
-                        <div className="flex-1">
-                            <h1 className="text-4xl font-bold mb-3">
-                                {userProfile.firstName} {userProfile.lastName}
-                            </h1>
-                            <div className="flex items-center space-x-2 mb-4">
-                                <MapPinIcon className="w-5 h-5 text-yellow-300" />
-                                <span className="text-blue-100">{userProfile.location}</span>
-                            </div>
-                            <div className="flex items-center space-x-6 mb-4">
-                                <div className="flex items-center space-x-2">
-                                    <StarIcon className="w-6 h-6 text-yellow-300 fill-current" />
-                                    <span className="text-2xl font-bold">{userProfile.rating}</span>
-                                    <span className="text-blue-100">({userProfile.totalTrips} avis)</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <ClockIcon className="w-6 h-6 text-blue-200" />
-                                    <span className="text-blue-100">Répond en {userProfile.responseTime}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                    <CheckCircleIcon className="w-6 h-6 text-green-300" />
-                                    <span className="text-blue-100">{userProfile.completionRate}% de réussite</span>
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-2 mb-4">
-                                <span className={`px-4 py-2 rounded-full text-sm font-semibold ${userProfile.accountType === 'carrier'
-                                    ? 'bg-white text-blue-600'
-                                    : 'bg-white text-green-600'
-                                    }`}>
-                                    {userProfile.accountType === 'carrier' ? ' Transporteur Expert' : ' Expéditeur'}
-                                </span>
+                <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
+                    {/* Sidebar with avatar and info */}
+                    <aside className="space-y-6">
+                        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 text-center">
+                            <div className="relative inline-block">
+                                <img src={userProfile.avatar} alt={`${userProfile.firstName} ${userProfile.lastName}`} className="h-28 w-28 rounded-full object-cover ring-4 ring-white dark:ring-gray-900 shadow" />
                                 {userProfile.verified && (
-                                    <span className="px-4 py-2 rounded-full text-sm font-semibold bg-green-400 text-green-900">
-                                        ✓ Compte Vérifié
+                                    <span className="absolute -right-2 -bottom-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-green-500 text-white shadow">
+                                        <CheckIcon className="h-5 w-5" />
                                     </span>
                                 )}
                             </div>
-                            <p className="text-blue-100 text-lg leading-relaxed">{userProfile.bio}</p>
-                        </div>
-
-                        {/* Quick Actions */}
-                        <div className="flex flex-col space-y-3">
-                            <button className="bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors duration-200 font-semibold shadow-lg flex items-center space-x-2">
-                                <ChatBubbleLeftIcon className="w-5 h-5" />
-                                <span>Contacter</span>
-                            </button>
-                            <button className="border-2 border-white text-white px-6 py-3 rounded-lg hover:bg-white hover:text-blue-600 transition-colors duration-200 font-semibold flex items-center space-x-2">
-                                <ShareIcon className="w-5 h-5" />
-                                <span>Partager</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column - Stats & Info */}
-                    <div className="lg:col-span-1 space-y-6">
-                        {/* Statistics Cards */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                <ChartBarIcon className="w-5 h-5 mr-2 text-blue-600" />
-                                Statistiques
-                            </h3>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="text-center p-4 bg-blue-50 rounded-lg">
-                                    <div className="text-2xl font-bold text-blue-600">{stats.totalEarnings}€</div>
-                                    <div className="text-sm text-gray-600">Gains totaux</div>
+                            <h1 className="mt-4 text-xl font-bold text-gray-900 dark:text-white">{userProfile.firstName} {userProfile.lastName}</h1>
+                            <div className="mt-1 flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                <MapPinIcon className="h-4 w-4" />
+                                <span>{userProfile.location}</span>
+                            </div>
+                            <div className="mt-4 grid grid-cols-3 gap-3 text-center">
+                                <div className="rounded-lg bg-blue-50 dark:bg-blue-400/10 p-3">
+                                    <div className="text-sm font-semibold text-blue-700 dark:text-blue-300">{userProfile.rating}</div>
+                                    <div className="text-[11px] text-blue-700/70 dark:text-blue-300/70">Note</div>
                                 </div>
-                                <div className="text-center p-4 bg-green-50 rounded-lg">
-                                    <div className="text-2xl font-bold text-green-600">{stats.totalPackagesCarried}</div>
-                                    <div className="text-sm text-gray-600">Colis transportés</div>
+                                <div className="rounded-lg bg-green-50 dark:bg-green-400/10 p-3">
+                                    <div className="text-sm font-semibold text-green-700 dark:text-green-300">{userProfile.completionRate}%</div>
+                                    <div className="text-[11px] text-green-700/70 dark:text-green-300/70">Réussite</div>
                                 </div>
-                                <div className="text-center p-4 bg-purple-50 rounded-lg">
-                                    <div className="text-2xl font-bold text-purple-600">{(stats.totalDistance / 1000).toFixed(0)}k km</div>
-                                    <div className="text-sm text-gray-600">Distance parcourue</div>
+                                <div className="rounded-lg bg-purple-50 dark:bg-purple-400/10 p-3">
+                                    <div className="text-sm font-semibold text-purple-700 dark:text-purple-300">{userProfile.responseTime}</div>
+                                    <div className="text-[11px] text-purple-700/70 dark:text-purple-300/70">Réponse</div>
                                 </div>
-                                <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                                    <div className="text-2xl font-bold text-yellow-600">{stats.totalPackagesSent}</div>
-                                    <div className="text-sm text-gray-600">Colis envoyés</div>
-                                </div>
+                            </div>
+                            <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">Membre depuis {formatDate(userProfile.joinDate)}</div>
+                            <div className="mt-4 flex flex-wrap justify-center gap-2">
+                                {userProfile.languages.map((lang, i) => (
+                                    <span key={i} className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-1 text-xs text-gray-700 dark:text-gray-200">{lang}</span>
+                                ))}
+                            </div>
+                            <div className="mt-6 flex flex-col gap-2">
+                                <button className="inline-flex w-full items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"><ChatBubbleLeftIcon className="mr-2 h-4 w-4" />Contacter</button>
+                                <button className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"><ShareIcon className="mr-2 h-4 w-4" />Partager</button>
                             </div>
                         </div>
 
-                        {/* Personal Information */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                    Informations
-                                </h3>
-                                <button
-                                    onClick={() => setIsEditing(!isEditing)}
-                                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                                >
-                                    {isEditing ? 'Annuler' : 'Modifier'}
-                                </button>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="email"
-                                            value={userProfile.email}
-                                            onChange={(e) => setUserProfile({ ...userProfile, email: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-900 text-sm">{userProfile.email}</p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
-                                    {isEditing ? (
-                                        <input
-                                            type="tel"
-                                            value={userProfile.phone}
-                                            onChange={(e) => setUserProfile({ ...userProfile, phone: e.target.value })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                        />
-                                    ) : (
-                                        <p className="text-gray-900 text-sm">{userProfile.phone}</p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Langues parlées</label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {userProfile.languages.map((lang, index) => (
-                                            <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                                                {lang}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Membre depuis</label>
-                                    <p className="text-gray-900 text-sm">{formatDate(userProfile.joinDate)}</p>
-                                </div>
-
-                                {isEditing && (
-                                    <button
-                                        onClick={handleSave}
-                                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
-                                    >
-                                        Sauvegarder
-                                    </button>
-                                )}
+                        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
+                            <h3 className="mb-4 flex items-center text-sm font-semibold text-gray-900 dark:text-white"><ChartBarIcon className="mr-2 h-4 w-4 text-blue-600" />Statistiques</h3>
+                            <div className="grid grid-cols-2 gap-3 text-center text-sm">
+                                <div className="rounded-lg bg-blue-50 dark:bg-blue-400/10 p-3"><div className="font-bold text-blue-700 dark:text-blue-300">{stats.totalEarnings}€</div><div className="text-[11px] text-blue-700/70 dark:text-blue-300/70">Gains</div></div>
+                                <div className="rounded-lg bg-green-50 dark:bg-green-400/10 p-3"><div className="font-bold text-green-700 dark:text-green-300">{stats.totalPackagesCarried}</div><div className="text-[11px] text-green-700/70 dark:text-green-300/70">Colis transportés</div></div>
+                                <div className="rounded-lg bg-purple-50 dark:bg-purple-400/10 p-3"><div className="font-bold text-purple-700 dark:text-purple-300">{(stats.totalDistance / 1000).toFixed(0)}k km</div><div className="text-[11px] text-purple-700/70 dark:text-purple-300/70">Distance</div></div>
+                                <div className="rounded-lg bg-yellow-50 dark:bg-yellow-400/10 p-3"><div className="font-bold text-yellow-700 dark:text-yellow-300">{stats.totalPackagesSent}</div><div className="text-[11px] text-yellow-700/70 dark:text-yellow-300/70">Colis envoyés</div></div>
                             </div>
                         </div>
+                    </aside>
 
-                        {/* Quick Links */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h3>
-                            <div className="space-y-3">
-                                <a href="/annonces" className="flex items-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200">
-                                    <svg className="w-5 h-5 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                    <span className="text-blue-700 font-medium">Voir les annonces</span>
-                                </a>
-                                <button className="flex items-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors duration-200 w-full">
-                                    <svg className="w-5 h-5 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
-                                    <span className="text-green-700 font-medium">Poster une annonce</span>
-                                </button>
-                                <button className="flex items-center p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors duration-200 w-full">
-                                    <svg className="w-5 h-5 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span className="text-purple-700 font-medium">Centre d'aide</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right Column - Tabs Content */}
-                    <div className="lg:col-span-2">
-                        {/* Tabs */}
-                        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                            <div className="border-b border-gray-200">
-                                <nav className="flex space-x-8 px-8">
+                    {/* Main Content: tabs for annonces/colis */}
+                    <section>
+                        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+                            <div className="px-4 py-3">
+                                <nav className="flex flex-wrap gap-2">
                                     {[
-                                        {
-                                            id: 'voyages',
-                                            label: 'Mes Voyages',
-                                            icon: (
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                                </svg>
-                                            ),
-                                            count: trips.length
-                                        },
-                                        {
-                                            id: 'packages',
-                                            label: 'Mes Colis',
-                                            icon: (
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
-                                                </svg>
-                                            ),
-                                            count: packages.length
-                                        }
+                                        { id: 'voyages', label: 'Mes Voyages', count: trips.length },
+                                        { id: 'packages', label: 'Mes Colis', count: packages.length },
+                                        { id: 'transport', label: 'Transport', count: trips.filter(t => t.type === 'carried').length }
                                     ].map((tab) => (
                                         <button
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id as any)}
-                                            className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center space-x-2 ${activeTab === tab.id
-                                                ? 'border-blue-500 text-blue-600'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700'
-                                                }`}
+                                            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors ${activeTab === tab.id ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
                                         >
-                                            {tab.icon}
-                                            <span>{tab.label}</span>
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${activeTab === tab.id
-                                                ? 'bg-blue-100 text-blue-600'
-                                                : 'bg-gray-100 text-gray-600'
-                                                }`}>
-                                                {tab.count}
-                                            </span>
+                                            {tab.label}
+                                            <span className={`rounded-full px-2 py-0.5 text-xs ${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200'}`}>{tab.count}</span>
                                         </button>
                                     ))}
                                 </nav>
                             </div>
 
-                            <div className="p-8">
-                                {/* Voyages Tab */}
+                            <div className="p-6">
                                 {activeTab === 'voyages' && (
-                                    <div className="space-y-6">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="text-xl font-semibold text-gray-900">Mes voyages de transport</h3>
-                                            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-medium">
-                                                + Nouveau voyage
-                                            </button>
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            {trips.map((trip) => (
-                                                <div key={trip.id} className="border border-gray-200 rounded-xl p-6 hover:border-blue-300 hover:shadow-md transition-all duration-200">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center space-x-4">
-                                                            <div className={`w-4 h-4 rounded-full ${getStatusColor(trip.status)}`}></div>
-                                                            <div>
-                                                                <h4 className="font-semibold text-gray-900 text-lg">{trip.route}</h4>
-                                                                <p className="text-sm text-gray-600">
-                                                                    Transporté • {formatDate(trip.date)}
-                                                                </p>
-                                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mt-2 ${trip.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                                    trip.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                                                                        'bg-red-100 text-red-800'
-                                                                    }`}>
-                                                                    {getStatusLabel(trip.status)}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="font-bold text-xl text-gray-900">{trip.price}€</p>
-                                                            <p className="text-sm text-gray-600">{trip.weight}kg transportés</p>
-                                                        </div>
-                                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                        {trips.map((trip) => (
+                                            <div key={trip.id} className="rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                                                <div className="font-semibold text-gray-900 dark:text-white">{trip.route}</div>
+                                                <div className="mt-1 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                                    <span>{formatDate(trip.date)} · {trip.weight}kg</span>
+                                                    <span className={`rounded-full px-2 py-0.5 ${trip.status === 'completed' ? 'bg-green-100 text-green-800' : trip.status === 'in-progress' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}>{getStatusLabel(trip.status)}</span>
                                                 </div>
-                                            ))}
-                                        </div>
+                                                <div className="mt-2 text-right text-sm font-semibold text-gray-900 dark:text-white">{trip.price}€</div>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
 
-                                {/* Packages Tab */}
                                 {activeTab === 'packages' && (
-                                    <div className="space-y-6">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="text-xl font-semibold text-gray-900">Mes demandes d'envoi</h3>
-                                            <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 text-sm font-medium">
-                                                + Nouvelle demande
-                                            </button>
-                                        </div>
-
-                                        <div className="space-y-4">
-                                            {packages.map((pkg) => (
-                                                <div key={pkg.id} className="border border-gray-200 rounded-xl p-6 hover:border-blue-300 hover:shadow-md transition-all duration-200">
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center space-x-4">
-                                                            <div className={`w-4 h-4 rounded-full ${getStatusColor(pkg.status)}`}></div>
-                                                            <div>
-                                                                <h4 className="font-semibold text-gray-900 text-lg">{pkg.title}</h4>
-                                                                <p className="text-sm text-gray-600">
-                                                                    {pkg.route} • {formatDate(pkg.date)}
-                                                                </p>
-                                                                {pkg.carrier && (
-                                                                    <p className="text-sm text-blue-600 font-medium">
-                                                                        Transporteur: {pkg.carrier}
-                                                                    </p>
-                                                                )}
-                                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mt-2 ${pkg.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                                                                    pkg.status === 'accepted' || pkg.status === 'in-transit' ? 'bg-blue-100 text-blue-800' :
-                                                                        pkg.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                                                            'bg-red-100 text-red-800'
-                                                                    }`}>
-                                                                    {getStatusLabel(pkg.status)}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="font-bold text-xl text-gray-900">{pkg.price}€</p>
-                                                            <p className="text-sm text-gray-600">{pkg.weight}kg</p>
-                                                        </div>
-                                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                        {packages.map((pkg) => (
+                                            <div key={pkg.id} className="rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                                                <div className="font-semibold text-gray-900 dark:text-white">{pkg.title}</div>
+                                                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{pkg.route} · {formatDate(pkg.date)}</div>
+                                                {pkg.carrier && (<div className="text-xs text-indigo-600">Transporteur: {pkg.carrier}</div>)}
+                                                <div className="mt-2 flex items-center justify-between">
+                                                    <span className={`rounded-full px-2 py-0.5 text-xs ${pkg.status === 'delivered' ? 'bg-green-100 text-green-800' : pkg.status === 'accepted' || pkg.status === 'in-transit' ? 'bg-blue-100 text-blue-800' : pkg.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>{getStatusLabel(pkg.status)}</span>
+                                                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{pkg.price}€</span>
                                                 </div>
-                                            ))}
-                                        </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {activeTab === 'transport' && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                        {trips.filter(t => t.type === 'carried').map((trip) => (
+                                            <div key={trip.id} className="rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                                                <div className="font-semibold text-gray-900 dark:text-white">{trip.route}</div>
+                                                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{formatDate(trip.date)} · {trip.weight}kg</div>
+                                                <div className="mt-2 flex items-center justify-between">
+                                                    <span className={`rounded-full px-2 py-0.5 text-xs ${trip.status === 'completed' ? 'bg-green-100 text-green-800' : trip.status === 'in-progress' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}`}>{getStatusLabel(trip.status)}</span>
+                                                    <span className="text-sm font-semibold text-gray-900 dark:text-white">{trip.price}€</span>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
             </main>
 
-            <Footer />
+            <FooterMinimal />
         </div>
     );
 }

@@ -1,54 +1,98 @@
 export default function Footer() {
+    const year = new Date().getFullYear();
     return (
-        <footer className="bg-blue-600 text-white px-6 py-12">
+        <footer className="bg-gray-100 text-gray-900 px-6 py-12 dark:bg-gray-900 dark:text-gray-100">
             <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8">
+                    {/* Brand */}
+                    <div className="col-span-2 sm:col-span-3 md:col-span-2">
                         <div className="flex items-center space-x-2 mb-4">
-                            <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center">
-                                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
-                            </div>
+                            <img src="/logo.png" alt="Go Happy Go logo" className="h-10" />
                             <span className="font-bold text-lg">Go Happy Go</span>
                         </div>
-                        <p className="text-blue-100 text-sm">
-                            La plateforme qui connecte voyageurs et expéditeurs pour des envois économiques et écologiques.
+                        <p className="text-gray-900 dark:text-gray-100 text-sm">
+                            Plateforme qui connecte voyageurs et expéditeurs pour des envois économiques et
+                            écologiques.
                         </p>
+                        <div className="mt-4 flex items-center gap-3 text-gray-900 dark:text-gray-100">
+                            <a href="#" aria-label="Twitter" className="hover:text-gray-900 dark:hover:text-gray-100">
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.27 4.27 0 0 0 1.87-2.35 8.54 8.54 0 0 1-2.71 1.04 4.26 4.26 0 0 0-7.26 3.88A12.1 12.1 0 0 1 3.16 4.9a4.25 4.25 0 0 0 1.32 5.68 4.21 4.21 0 0 1-1.93-.53v.05a4.26 4.26 0 0 0 3.42 4.18c-.47.13-.96.2-1.46.08a4.27 4.27 0 0 0 3.98 2.96A8.54 8.54 0 0 1 2 19.54a12.06 12.06 0 0 0 6.56 1.92c7.88 0 12.2-6.53 12.2-12.2v-.56A8.56 8.56 0 0 0 22.46 6z" />
+                                </svg>
+                            </a>
+                            <a href="#" aria-label="Facebook" className="hover:text-gray-900 dark:hover:text-gray-100">
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.57V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z" />
+                                </svg>
+                            </a>
+                            <a href="#" aria-label="Instagram" className="hover:text-gray-900 dark:hover:text-gray-100">
+                                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm10 2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h10zm-5 3a5 5 0 1 0 .001 10.001A5 5 0 0 0 12 7zm0 2.5A2.5 2.5 0 1 1 9.5 12 2.5 2.5 0 0 1 12 9.5zm5.25-2.5a.75.75 0 1 0 .75.75.75.75 0 0 0-.75-.75z" />
+                                </svg>
+                            </a>
+                        </div>
                     </div>
 
+                    {/* Découvrir */}
+                    <div>
+                        <h4 className="font-semibold mb-4">Découvrir</h4>
+                        <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+                            <li><a href="/annonces" className="hover:text-gray-900 dark:hover:text-gray-100">Annonces</a></li>
+                            <li><a href="/transporters" className="hover:text-gray-900 dark:hover:text-gray-100">Transporteurs</a></li>
+                            <li><a href="/how-it-work" className="hover:text-gray-900 dark:hover:text-gray-100">Comment ça marche</a></li>
+                            <li><a href="/logos" className="hover:text-gray-900 dark:hover:text-gray-100">Logos</a></li>
+                        </ul>
+                    </div>
+
+                    {/* Expédier */}
                     <div>
                         <h4 className="font-semibold mb-4">Expédier</h4>
-                        <ul className="space-y-2 text-sm text-blue-100">
-                            <li><a href="#" className="hover:text-white">Poster une demande</a></li>
-                            <li><a href="#" className="hover:text-white">Tarifs</a></li>
-                            <li><a href="#" className="hover:text-white">Assurance colis</a></li>
+                        <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+                            <li><a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Poster une demande</a></li>
+                            <li><a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Tarifs</a></li>
+                            <li><a href="/assurance-colis" className="hover:text-gray-900 dark:hover:text-gray-100">Assurance colis</a></li>
                         </ul>
                     </div>
 
+                    {/* Transporter */}
                     <div>
                         <h4 className="font-semibold mb-4">Transporter</h4>
-                        <ul className="space-y-2 text-sm text-blue-100">
-                            <li><a href="#" className="hover:text-white">Devenir transporteur</a></li>
-                            <li><a href="#" className="hover:text-white">Règles de sécurité</a></li>
-                            <li><a href="#" className="hover:text-white">Vérification d'identité</a></li>
+                        <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+                            <li><a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Devenir transporteur</a></li>
+                            <li><a href="/security-rules" className="hover:text-gray-900 dark:hover:text-gray-100">Règles de sécurité</a></li>
+                            <li><a href="/security-rules#id-check" className="hover:text-gray-900 dark:hover:text-gray-100">Vérification d'identité</a></li>
                         </ul>
                     </div>
 
+                    {/* Support */}
                     <div>
                         <h4 className="font-semibold mb-4">Support</h4>
-                        <ul className="space-y-2 text-sm text-blue-100">
-                            <li><a href="#" className="hover:text-white">Centre d'aide</a></li>
-                            <li><a href="#" className="hover:text-white">Comment ça marche</a></li>
-                            <li><a href="#" className="hover:text-white">Conditions générales</a></li>
+                        <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+                            <li><a href="/help-center" className="hover:text-gray-900 dark:hover:text-gray-100">Centre d'aide</a></li>
+                            <li><a href="/forgot-password" className="hover:text-gray-900 dark:hover:text-gray-100">Mot de passe oublié</a></li>
+                            <li><a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Contact</a></li>
+                        </ul>
+                    </div>
+
+                    {/* Compte & Légal */}
+                    <div>
+                        <h4 className="font-semibold mb-4">Compte</h4>
+                        <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+                            <li><a href="/login" className="hover:text-gray-900 dark:hover:text-gray-100">Se connecter</a></li>
+                            <li><a href="/register" className="hover:text-gray-900 dark:hover:text-gray-100">S’inscrire</a></li>
+
+                        </ul>
+                        <h4 className="font-semibold mt-6 mb-4">Légal</h4>
+                        <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+                            <li><a href="/terms-privacy" className="hover:text-gray-900 dark:hover:text-gray-100">Conditions & Confidentialité</a></li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="border-t border-blue-500 mt-8 pt-8 text-center text-sm text-blue-100">
-                    <p>&copy; 2024 Go Happy Go. Tous droits réservés.</p>
+                <div className="border-t dark:border-gray-700 border-gray-300 mt-10 pt-8 text-center text-sm text-gray-900 dark:text-gray-100">
+                    <p>&copy; {year} Go Happy Go. Tous droits réservés.</p>
                 </div>
             </div>
         </footer>
     );
-} 
+}

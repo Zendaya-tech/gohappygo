@@ -32,8 +32,8 @@ export default function FeaturedProperties() {
     ];
 
     return (
-        <section className="px-6 py-12 max-w-7xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Transporteurs <span className="text-blue-600">vérifiés</span></h2>
+        <section className="px-6 py-12 container mx-auto">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Transporteurs <span className="text-blue-600">vérifiés</span></h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {travelers.map((traveler, index) => (
                     <PropertyCard key={index} {...traveler} featured={true} />

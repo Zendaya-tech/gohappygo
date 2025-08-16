@@ -1,19 +1,34 @@
 import { useState } from 'react';
+import NotificationPopover from './common/popover/NotificationPopover';
+import AppDownloadPopover from './common/popover/AppDownloadPopover';
+import { useRef } from 'react';
+import AvatarMenu from './common/popover/AvatarMenu';
+import SettingsDialog from './common/dialog/SettingsDialog';
+import CreatePackageDialog from './common/dialog/CreatePackageDialog';
+import CreateAnnounceDialog from './common/dialog/CreateAnnounceDialog';
+import { Link } from 'react-router';
+import { useAuthStore, type AuthState } from '../store/auth';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true); // Mock logged in state
+    const isLoggedIn = useAuthStore((s: AuthState) => s.isLoggedIn);
+    const [showNotif, setShowNotif] = useState(false);
+    const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [showCreateAnnounce, setShowCreateAnnounce] = useState(false);
+    const [hoverDownload, setHoverDownload] = useState(false);
+    const [pinnedDownload, setPinnedDownload] = useState(false);
+    const downloadBtnRef = useRef<HTMLElement>({} as HTMLElement);
+    const [showCreatePackage, setShowCreatePackage] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/80  border-b border-gray-200 dark:border-gray-800 shadow-sm">
+            <div className=" mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                            </svg>
+                        <div className=" h-10">
+                            <img src="/logo.png" alt="Logo" className=" h-10 " />
                         </div>
                         <div className="flex flex-col">
                             <a href="/" className="font-bold text-xl text-gray-900">Go Happy Go</a>
@@ -23,45 +38,70 @@ export default function Header() {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center space-x-8">
-                        <a href="/annonces" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+                        <Link to="/annonces" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
                             Voir les annonces
-                        </a>
-                        {/* <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-                            Envoyer un colis
-                        </a>
-                        <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-                            Transporter
-                        </a> */}
-                        <a href="#" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-                            Comment ça marche
-                        </a>
+                        </Link>
+                        <button onClick={() => setShowCreatePackage(true)} className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">Envoyer un colis</button>
+                        <div className="relative">
+                            <button
+                                onClick={() => setHoverDownload((v) => !v)}
+                                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+                                ref={(el) => { (downloadBtnRef as any).current = el; }}
+                            >
+                                Téléchargez l’appli +
+                            </button>
+                            <AppDownloadPopover open={hoverDownload} onClose={() => { setHoverDownload(false); setPinnedDownload(false); }} pinned={pinnedDownload} onTogglePin={() => setPinnedDownload((v) => !v)} triggerRef={downloadBtnRef} />
+                        </div>
+                        <button onClick={() => setShowCreateAnnounce(true)} className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+                            Publier un annonces +
+                        </button>
+
                     </nav>
 
                     {/* Desktop Actions */}
-                    <div className="hidden md:flex items-center space-x-4">
+                    <div className="hidden md:flex items-center space-x-4 relative">
+                        {/* Notifications */}
+                        <div className="relative">
+                            <button
+                                className="text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 relative"
+                                onClick={() => setIsMenuOpen(false)}
+                                aria-label="Notifications"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClickCapture={(e) => {
+                                    e.stopPropagation();
+                                    setShowNotif((v) => !v);
+                                }}
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                                <span className="absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                            </button>
+                            <NotificationPopover open={showNotif} onClose={() => setShowNotif(false)} />
+                        </div>
                         {isLoggedIn ? (
                             <>
-                                <a href="/profile" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-                                    Mon profil
-                                </a>
                                 <div className="w-px h-6 bg-gray-300"></div>
-                                <div className="flex items-center space-x-2">
-                                    <a href="/profile" className="flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200">
+                                <div className="relative">
+                                    <button
+                                        className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-50"
+                                        onClick={() => setShowAvatarMenu((v) => !v)}
+                                        aria-label="Ouvrir le menu du compte"
+                                    >
                                         <img
                                             src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=32&h=32&fit=crop&crop=face"
                                             alt="Profile"
                                             className="w-8 h-8 rounded-full object-cover"
                                         />
-                                        <span className="text-sm font-medium text-gray-700">Marie</span>
-                                    </a>
-                                    <button
-                                        onClick={() => setIsLoggedIn(false)}
-                                        className="text-gray-500 hover:text-gray-700 p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200"
-                                    >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        <svg className="h-4 w-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
                                         </svg>
                                     </button>
+                                    <AvatarMenu
+                                        open={showAvatarMenu}
+                                        onClose={() => setShowAvatarMenu(false)}
+                                        onOpenSettings={() => setShowSettings(true)}
+                                    />
                                 </div>
                             </>
                         ) : (
@@ -106,6 +146,9 @@ export default function Header() {
                             </svg>
                         </button>
                     </div>
+                    <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
+                    <CreatePackageDialog open={showCreatePackage} onClose={() => setShowCreatePackage(false)} />
+                    <CreateAnnounceDialog open={showCreateAnnounce} onClose={() => setShowCreateAnnounce(false)} />
                 </div>
 
                 {/* Mobile Navigation */}
@@ -124,30 +167,7 @@ export default function Header() {
                             <a href="#" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200">
                                 Comment ça marche
                             </a>
-                            <div className="border-t border-gray-200 pt-2">
-                                {isLoggedIn ? (
-                                    <>
-                                        <a href="/profile" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200">
-                                            Mon profil
-                                        </a>
-                                        <button
-                                            onClick={() => setIsLoggedIn(false)}
-                                            className="block w-full text-left px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200"
-                                        >
-                                            Se déconnecter
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <a href="/login" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200">
-                                            Se connecter
-                                        </a>
-                                        <a href="/register" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200">
-                                            S'inscrire
-                                        </a>
-                                    </>
-                                )}
-                            </div>
+
                         </div>
                     </div>
                 )}

@@ -1,6 +1,6 @@
 export default function HostSection() {
     return (
-        <section className="px-6 py-12 max-w-7xl mx-auto">
+        <section className="px-6 py-12 container mx-auto">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     <div className="p-12 text-white">

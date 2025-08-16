@@ -1,6 +1,6 @@
 export default function SupportSection() {
     return (
-        <section className="px-6 py-12 max-w-7xl mx-auto">
+        <section className="px-6 py-12 container mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-blue-600 text-white p-8 rounded-2xl">
                     <h3 className="text-xl font-bold mb-4">Support 24/7</h3>
