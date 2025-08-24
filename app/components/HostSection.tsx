@@ -1,10 +1,10 @@
 export default function HostSection() {
     return (
         <section className="px-6 py-12 container mx-auto">
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-950 to-purple-950 rounded-3xl overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     <div className="p-12 text-white">
-                        <h2 className="text-3xl font-bold mb-6">Devenez <span className="text-yellow-300">transporteur</span> et gagnez de l'argent</h2>
+                        <h2 className="text-4xl font-bold mb-6">Devenez <span className="text-yellow-300 uppercase ">transporteur</span> et gagnez de l'argent</h2>
                         <p className="text-blue-100 mb-8">
                             Rentabilisez vos voyages en transportant des colis pour d'autres personnes. Simple, sécurisé et rémunérateur.
                         </p>

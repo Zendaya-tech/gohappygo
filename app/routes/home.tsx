@@ -1,6 +1,7 @@
 import type { Route } from "./+types/home";
 import Header from "../components/Header";
 import HeroSection from "../components/features/home/HeroSection";
+import FeaturesSection from "../components/features/home/FeaturesSection";
 import PlacesByCategory from "../components/PlacesByCategory";
 import FeaturedProperties from "../components/FeaturedProperties";
 import Recommendations from "../components/Recommendations";
@@ -23,6 +24,7 @@ export default function Home() {
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <Header />
       <HeroSection />
+      <FeaturesSection />
       <PlacesByCategory />
       <FeaturedProperties />
       <Recommendations />

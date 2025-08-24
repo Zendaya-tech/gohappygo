@@ -16,7 +16,7 @@ export default function PopularPlaces() {
                         <img src={route.image} alt={route.name} className="w-full h-48 object-cover" />
                         <div className="p-4">
                             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{route.name}</h3>
-                            <p className="text-blue-600 font-semibold">À partir de {route.price}</p>
+                            <p className="text-blue-600 font-semibold text-xs">À partir de {route.price}</p>
                         </div>
                     </div>
                 ))}

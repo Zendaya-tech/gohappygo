@@ -17,3 +17,7 @@ body {
     color-scheme: dark;
   }
 }
+
+body {
+  @apply font-sans;
+}

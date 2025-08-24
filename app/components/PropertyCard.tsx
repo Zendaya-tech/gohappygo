@@ -15,7 +15,7 @@ export default function PropertyCard({ title, location, price, rating, image, fe
             <div className="relative">
                 <img src={image} alt={title} className="w-full h-48 object-cover" />
                 {featured && (
-                    <div className="absolute top-4 left-4 bg-blue-600/90 text-white px-2 py-1 rounded text-xs">
+                    <div className="absolute top-4 left-4 bg-blue-600/90 text-white px-2 py-1 rounded-full text-xs">
                         Vérifié
                     </div>
                 )}

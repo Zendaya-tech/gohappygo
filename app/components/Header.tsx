@@ -6,6 +6,8 @@ import AvatarMenu from './common/popover/AvatarMenu';
 import SettingsDialog from './common/dialog/SettingsDialog';
 import CreatePackageDialog from './common/dialog/CreatePackageDialog';
 import CreateAnnounceDialog from './common/dialog/CreateAnnounceDialog';
+import LoginDialog from './common/dialog/LoginDialog';
+import RegisterDialog from './common/dialog/RegisterDialog';
 import { Link } from 'react-router';
 import { useAuthStore, type AuthState } from '../store/auth';
 
@@ -20,9 +22,11 @@ export default function Header() {
     const [pinnedDownload, setPinnedDownload] = useState(false);
     const downloadBtnRef = useRef<HTMLElement>({} as HTMLElement);
     const [showCreatePackage, setShowCreatePackage] = useState(false);
+    const [showLogin, setShowLogin] = useState(false);
+    const [showRegister, setShowRegister] = useState(false);
 
     return (
-        <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/80  border-b border-gray-200 dark:border-gray-800 shadow-sm">
+        <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/80  border-b border-gray-200 dark:border-gray-800 ">
             <div className=" mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
@@ -38,21 +42,21 @@ export default function Header() {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center space-x-8">
-                        <Link to="/annonces" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+                        <Link to="/annonces" className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">
                             Voir les annonces
                         </Link>
-                        <button onClick={() => setShowCreatePackage(true)} className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">Envoyer un colis</button>
+                        <button onClick={() => setShowCreatePackage(true)} className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">Envoyer un colis</button>
                         <div className="relative">
                             <button
                                 onClick={() => setHoverDownload((v) => !v)}
-                                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+                                className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200"
                                 ref={(el) => { (downloadBtnRef as any).current = el; }}
                             >
                                 Téléchargez l’appli +
                             </button>
                             <AppDownloadPopover open={hoverDownload} onClose={() => { setHoverDownload(false); setPinnedDownload(false); }} pinned={pinnedDownload} onTogglePin={() => setPinnedDownload((v) => !v)} triggerRef={downloadBtnRef} />
                         </div>
-                        <button onClick={() => setShowCreateAnnounce(true)} className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+                        <button onClick={() => setShowCreateAnnounce(true)} className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">
                             Publier un annonces +
                         </button>
 
@@ -60,61 +64,62 @@ export default function Header() {
 
                     {/* Desktop Actions */}
                     <div className="hidden md:flex items-center space-x-4 relative">
-                        {/* Notifications */}
-                        <div className="relative">
-                            <button
-                                className="text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 relative"
-                                onClick={() => setIsMenuOpen(false)}
-                                aria-label="Notifications"
-                                onMouseDown={(e) => e.preventDefault()}
-                                onClickCapture={(e) => {
-                                    e.stopPropagation();
-                                    setShowNotif((v) => !v);
-                                }}
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                </svg>
-                                <span className="absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
-                            </button>
-                            <NotificationPopover open={showNotif} onClose={() => setShowNotif(false)} />
-                        </div>
-                        {isLoggedIn ? (
-                            <>
-                                <div className="w-px h-6 bg-gray-300"></div>
-                                <div className="relative">
-                                    <button
-                                        className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-50"
-                                        onClick={() => setShowAvatarMenu((v) => !v)}
-                                        aria-label="Ouvrir le menu du compte"
-                                    >
+                        {/* Notifications - Only show if logged in */}
+                        {isLoggedIn && (
+                            <div className="relative">
+                                <button
+                                    className="text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 relative text-sm"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    aria-label="Notifications"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClickCapture={(e) => {
+                                        e.stopPropagation();
+                                        setShowNotif((v) => !v);
+                                    }}
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                    </svg>
+                                    <span className="absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                                </button>
+                                <NotificationPopover open={showNotif} onClose={() => setShowNotif(false)} />
+                            </div>
+                        )}
+                        <>
+                            <div className="w-px h-6 bg-gray-300"></div>
+                            <div className="relative">
+                                <button
+                                    className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-50 text-sm"
+                                    onClick={() => setShowAvatarMenu((v) => !v)}
+                                    aria-label="Ouvrir le menu du compte"
+                                >
+                                    {isLoggedIn ? (
                                         <img
                                             src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=32&h=32&fit=crop&crop=face"
                                             alt="Profile"
                                             className="w-8 h-8 rounded-full object-cover"
                                         />
-                                        <svg className="h-4 w-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
-                                        </svg>
-                                    </button>
-                                    <AvatarMenu
-                                        open={showAvatarMenu}
-                                        onClose={() => setShowAvatarMenu(false)}
-                                        onOpenSettings={() => setShowSettings(true)}
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <a href="/login" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
-                                    Se connecter
-                                </a>
-                                <div className="w-px h-6 bg-gray-300"></div>
-                                <a href="/register" className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200">
-                                    S'inscrire
-                                </a>
-                            </>
-                        )}
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                    <svg className="h-4 w-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+                                    </svg>
+                                </button>
+                                <AvatarMenu
+                                    open={showAvatarMenu}
+                                    onClose={() => setShowAvatarMenu(false)}
+                                    onOpenSettings={() => setShowSettings(true)}
+                                    isLoggedIn={isLoggedIn}
+                                    onOpenLogin={() => setShowLogin(true)}
+                                    onOpenRegister={() => setShowRegister(true)}
+                                />
+                            </div>
+                        </>
                         <button className="text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -149,6 +154,22 @@ export default function Header() {
                     <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
                     <CreatePackageDialog open={showCreatePackage} onClose={() => setShowCreatePackage(false)} />
                     <CreateAnnounceDialog open={showCreateAnnounce} onClose={() => setShowCreateAnnounce(false)} />
+                    <LoginDialog
+                        open={showLogin}
+                        onClose={() => setShowLogin(false)}
+                        onSwitchToRegister={() => {
+                            setShowLogin(false);
+                            setShowRegister(true);
+                        }}
+                    />
+                    <RegisterDialog
+                        open={showRegister}
+                        onClose={() => setShowRegister(false)}
+                        onSwitchToLogin={() => {
+                            setShowRegister(false);
+                            setShowLogin(true);
+                        }}
+                    />
                 </div>
 
                 {/* Mobile Navigation */}

@@ -5,6 +5,7 @@ import { getListingById, type Listing } from "../data/announces";
 import { Link, useParams } from "react-router";
 import { useMemo, useState } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
+import { ShareIcon } from "@heroicons/react/24/outline";
 
 function formatDate(dateString: string) {
     const date = new Date(dateString);
@@ -71,9 +72,6 @@ export default function AnnounceDetail() {
         <div className="min-h-screen bg-white dark:bg-gray-950">
             <Header />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="mb-6">
-                    <Link to="/annonces" className="text-indigo-600 hover:text-indigo-700 text-sm">← Retour aux annonces</Link>
-                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     {/* Left: media + traveller + route + description */}
@@ -81,7 +79,7 @@ export default function AnnounceDetail() {
                         {/* top right small action */}
                         <div className="flex items-center justify-end text-sm text-gray-500 mb-3 gap-3">
                             <button className="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-600" onClick={() => setShareOpen(true)}>
-                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7M16 6l-4-4m0 0L8 6m4-4v14" /></svg>
+                                <ShareIcon className="h-4 w-4" />
                                 Partager
                             </button>
                             <button className="inline-flex items-center gap-2 text-gray-500 hover:text-rose-600">
