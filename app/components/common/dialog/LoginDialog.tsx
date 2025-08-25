@@ -127,18 +127,7 @@ export default function LoginDialog({
 
                     {/* Côté droit - Image */}
                     <div className="w-1/2 bg-gradient-to-br from-blue-500 to-purple-600 relative">
-                        <div className="absolute inset-0 bg-black/20"></div>
-                        <div className="relative h-full flex items-center justify-center p-8">
-                            <div className="text-center text-white">
-                                <div className="mb-6">
-                                    <svg className="w-16 h-16 mx-auto mb-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
-                                </div>
-                                <h2 className="text-2xl font-bold mb-2">Bienvenue sur GoHappyGo</h2>
-                                <p className="text-blue-100 text-lg">Connectez-vous pour accéder à toutes nos fonctionnalités</p>
-                            </div>
-                        </div>
+                        <img src="/images/login.jpg" alt="Login" className="w-full h-full object-cover" />
                     </div>
                 </div>
             </div>

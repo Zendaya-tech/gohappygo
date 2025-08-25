@@ -7,15 +7,17 @@ export default function PopularPlaces() {
     ];
 
     return (
-        <section className="px-6 py-12 container mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Les routes les plus <span className="text-blue-600">populaires</span></h2>
+        <section className="py-12 px-4 mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Les routes les plus <span className="text-blue-600">populaires</span></h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {routes.map((route, index) => (
-                    <div key={index} className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
-                        <img src={route.image} alt={route.name} className="w-full h-48 object-cover" />
-                        <div className="p-4">
-                            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{route.name}</h3>
+                    <div key={index} className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden ">
+                        <div className="relative overflow-hidden rounded-2xl">
+                            <img src={route.image} alt={route.name} className="w-full h-48 object-cover" />
+                        </div>
+                        <div className="mt-2">
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-sm mb-2">{route.name}</h3>
                             <p className="text-blue-600 font-semibold text-xs">À partir de {route.price}</p>
                         </div>
                     </div>

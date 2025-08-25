@@ -11,11 +11,11 @@ interface PropertyCardProps {
 
 export default function PropertyCard({ title, location, price, rating, image, featured = false, weight, departure }: PropertyCardProps) {
     return (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
-            <div className="relative">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
+            <div className="relative overflow-hidden rounded-2xl">
                 <img src={image} alt={title} className="w-full h-48 object-cover" />
                 {featured && (
-                    <div className="absolute top-4 left-4 bg-blue-600/90 text-white px-2 py-1 rounded-full text-xs">
+                    <div className="absolute top-4 left-4 bg-emerald-950/80 text-white px-4 py-1 rounded-full text-xs">
                         Vérifié
                     </div>
                 )}

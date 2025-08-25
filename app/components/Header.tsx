@@ -6,10 +6,12 @@ import AvatarMenu from './common/popover/AvatarMenu';
 import SettingsDialog from './common/dialog/SettingsDialog';
 import CreatePackageDialog from './common/dialog/CreatePackageDialog';
 import CreateAnnounceDialog from './common/dialog/CreateAnnounceDialog';
+import AnnounceTypeDialog from './common/dialog/AnnounceTypeDialog';
 import LoginDialog from './common/dialog/LoginDialog';
 import RegisterDialog from './common/dialog/RegisterDialog';
 import { Link } from 'react-router';
 import { useAuthStore, type AuthState } from '../store/auth';
+import LanguageDropdown from './common/popover/LanguageDropdown';
 
 export default function Header() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,8 +24,18 @@ export default function Header() {
     const [pinnedDownload, setPinnedDownload] = useState(false);
     const downloadBtnRef = useRef<HTMLElement>({} as HTMLElement);
     const [showCreatePackage, setShowCreatePackage] = useState(false);
+    const [showAnnounceTypeDialog, setShowAnnounceTypeDialog] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
+    const [currentLanguage, setCurrentLanguage] = useState('fr');
+    const handleAnnounceTypeSelect = (type: 'travel' | 'package') => {
+        setShowAnnounceTypeDialog(false);
+        if (type === 'travel') {
+            setShowCreateAnnounce(true);
+        } else if (type === 'package') {
+            setShowCreatePackage(true);
+        }
+    };
 
     return (
         <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/80  border-b border-gray-200 dark:border-gray-800 ">
@@ -35,17 +47,16 @@ export default function Header() {
                             <img src="/logo.png" alt="Logo" className=" h-10 " />
                         </div>
                         <div className="flex flex-col">
-                            <a href="/" className="font-bold text-xl text-gray-900">Go Happy Go</a>
-                            <span className="text-xs text-gray-500 -mt-1">Voyagez ensemble, partagez l'espace</span>
+                            <a href="/" className="font-bold text-xl text-gray-900">GoHappyGo</a>
                         </div>
                     </div>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex items-center space-x-8">
-                        <Link to="/annonces" className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">
+                        {/* <Link to="/annonces" className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">
                             Voir les annonces
-                        </Link>
-                        <button onClick={() => setShowCreatePackage(true)} className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">Envoyer un colis</button>
+                        </Link> */}
+
                         <div className="relative">
                             <button
                                 onClick={() => setHoverDownload((v) => !v)}
@@ -56,8 +67,8 @@ export default function Header() {
                             </button>
                             <AppDownloadPopover open={hoverDownload} onClose={() => { setHoverDownload(false); setPinnedDownload(false); }} pinned={pinnedDownload} onTogglePin={() => setPinnedDownload((v) => !v)} triggerRef={downloadBtnRef} />
                         </div>
-                        <button onClick={() => setShowCreateAnnounce(true)} className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">
-                            Publier un annonces +
+                        <button onClick={() => setShowAnnounceTypeDialog(true)} className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">
+                            Publier une annonce +
                         </button>
 
                     </nav>
@@ -118,13 +129,15 @@ export default function Header() {
                                     onOpenLogin={() => setShowLogin(true)}
                                     onOpenRegister={() => setShowRegister(true)}
                                 />
+
                             </div>
                         </>
-                        <button className="text-gray-700 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </button>
+                        <LanguageDropdown
+                            currentLanguage={currentLanguage}
+                            onLanguageChange={(languageCode) => {
+                                setCurrentLanguage(languageCode);
+                            }}
+                        />
                     </div>
 
                     {/* Mobile menu button */}
@@ -154,6 +167,11 @@ export default function Header() {
                     <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
                     <CreatePackageDialog open={showCreatePackage} onClose={() => setShowCreatePackage(false)} />
                     <CreateAnnounceDialog open={showCreateAnnounce} onClose={() => setShowCreateAnnounce(false)} />
+                    <AnnounceTypeDialog
+                        open={showAnnounceTypeDialog}
+                        onClose={() => setShowAnnounceTypeDialog(false)}
+                        onSelectType={handleAnnounceTypeSelect}
+                    />
                     <LoginDialog
                         open={showLogin}
                         onClose={() => setShowLogin(false)}

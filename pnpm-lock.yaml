@@ -17,6 +17,9 @@ importers:
       '@react-router/serve':
         specifier: ^7.5.3
         version: 7.6.3(react-router@7.6.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(typescript@5.8.3)
+      country-flag-icons:
+        specifier: ^1.5.19
+        version: 1.5.19
       isbot:
         specifier: ^5.1.27
         version: 5.1.28
@@ -761,6 +764,9 @@ packages:
   cookie@1.0.2:
     resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
     engines: {node: '>=18'}
+
+  country-flag-icons@1.5.19:
+    resolution: {integrity: sha512-D/ZkRyj+ywJC6b2IrAN3/tpbReMUqmuRLlcKFoY/o0+EPQN9Ev/e8tV+D3+9scvu/tarxwLErNwS73C3yzxs/g==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -2265,6 +2271,8 @@ snapshots:
   cookie@0.7.1: {}
 
   cookie@1.0.2: {}
+
+  country-flag-icons@1.5.19: {}
 
   cross-spawn@7.0.6:
     dependencies:

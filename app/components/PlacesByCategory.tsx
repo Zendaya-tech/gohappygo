@@ -67,8 +67,8 @@ export default function PlacesByCategory() {
     ];
 
     return (
-        <section className="px-6 py-12 container mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Types de <span className="text-blue-600">colis</span></h2>
+        <section className=" py-12 container mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Types de <span className="text-blue-600">colis</span></h2>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
                 {categories.map((category) => (

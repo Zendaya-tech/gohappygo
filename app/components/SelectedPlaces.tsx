@@ -11,8 +11,8 @@ export default function SelectedPlaces() {
     ];
 
     return (
-        <section className="px-6 py-12 container mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Demandes d'envoi <span className="text-blue-600">récentes</span></h2>
+        <section className="py-12 bg-gray-100 dark:bg-gray-900  px-10 rounded-2xl  mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Demandes d'envoi <span className="text-blue-600">récentes</span></h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {requests.map((request, index) => (

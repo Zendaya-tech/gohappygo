@@ -21,19 +21,26 @@ export function meta({ }: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
+    <>
       <Header />
-      <HeroSection />
-      <FeaturesSection />
-      <PlacesByCategory />
-      <FeaturedProperties />
-      <Recommendations />
-      <PopularPlaces />
-      <HostSection />
-      <SelectedPlaces />
-      <Reviews />
-      <SupportSection />
+
+      <div className="min-h-screen max-w-7xl mx-auto bg-white dark:bg-gray-950">
+
+        <HeroSection />
+        {/* <FeaturesSection /> */}
+        {/* <PlacesByCategory /> */}
+        <FeaturedProperties />
+        <Recommendations />
+        <PopularPlaces />
+        <HostSection />
+        <SelectedPlaces />
+        <Reviews />
+        <SupportSection />
+
+      </div>
+
       <Footer />
-    </div>
+    </>
+
   );
 }
