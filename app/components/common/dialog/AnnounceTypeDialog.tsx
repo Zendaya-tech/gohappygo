@@ -48,18 +48,16 @@ export default function AnnounceTypeDialog({ open, onClose, onSelectType }: Anno
         {
             id: 'travel',
             title: 'Annonce de voyage',
-            description: 'Je voyage et j\'ai de l\'espace dans mes bagages',
+            description: 'Je voyage et j\'ai de l\'espace',
             icon: PaperAirplaneIcon,
-            gradient: 'from-blue-500 to-indigo-600',
-            bgGradient: 'from-blue-50 to-indigo-50'
+            color: 'text-blue-600'
         },
         {
             id: 'package',
             title: 'Annonce de colis',
-            description: 'J\'ai un colis à faire transporter',
+            description: 'J\'ai un colis à transporter',
             icon: TruckIcon,
-            gradient: 'from-green-500 to-emerald-600',
-            bgGradient: 'from-green-50 to-emerald-50'
+            color: 'text-green-600'
         }
     ];
 
@@ -67,39 +65,35 @@ export default function AnnounceTypeDialog({ open, onClose, onSelectType }: Anno
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div
                 ref={ref}
-                className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden"
+                className="relative w-full max-w-sm mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-lg"
             >
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
-                    <h2 className="text-xl font-bold text-white">Choisir le type d'annonce</h2>
-                    <p className="text-blue-100 text-sm mt-1">Que souhaitez-vous publier ?</p>
+                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Type d'annonce</h2>
                 </div>
 
                 {/* Content */}
-                <div className="p-6 space-y-4">
+                <div className="p-4 space-y-3">
                     {announceTypes.map((type) => {
                         const IconComponent = type.icon;
                         return (
                             <button
                                 key={type.id}
                                 onClick={() => onSelectType(type.id as 'travel' | 'package')}
-                                className={`w-full p-4 rounded-xl border-2 border-transparent hover:border-gray-200 transition-all duration-200 bg-gradient-to-r ${type.bgGradient} hover:shadow-lg group`}
+                                className="w-full p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 group"
                             >
-                                <div className="flex items-center space-x-4">
-                                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${type.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-200`}>
-                                        <IconComponent className="w-6 h-6 text-white" />
+                                <div className="flex items-center space-x-3">
+                                    <div className={`w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center group-hover:scale-105 transition-transform duration-200`}>
+                                        <IconComponent className={`w-5 h-5 ${type.color}`} />
                                     </div>
                                     <div className="flex-1 text-left">
-                                        <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
+                                        <h3 className="font-medium text-gray-900 dark:text-white">
                                             {type.title}
                                         </h3>
-                                        <p className="text-sm text-gray-600 mt-1">
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                                             {type.description}
                                         </p>
                                     </div>
-                                    <svg className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
                                 </div>
                             </button>
                         );
@@ -107,10 +101,10 @@ export default function AnnounceTypeDialog({ open, onClose, onSelectType }: Anno
                 </div>
 
                 {/* Footer */}
-                <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
                     <button
                         onClick={onClose}
-                        className="w-full px-4 py-2 text-gray-600 hover:text-gray-800 font-medium transition-colors"
+                        className="w-full px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 font-medium transition-colors"
                     >
                         Annuler
                     </button>

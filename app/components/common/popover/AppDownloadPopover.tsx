@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import QRCode from "qrcode";
 
 export default function AppDownloadPopover({ open, onClose, pinned, onTogglePin, triggerRef }: { open: boolean; onClose: () => void; pinned: boolean; onTogglePin: () => void; triggerRef?: React.RefObject<HTMLElement> }) {
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
 
     useEffect(() => {
         if (!open) return;
@@ -15,70 +17,71 @@ export default function AppDownloadPopover({ open, onClose, pinned, onTogglePin,
         document.addEventListener("mousedown", onDocClick);
         return () => document.removeEventListener("mousedown", onDocClick);
     }, [open, pinned, onClose, triggerRef]);
+
+    useEffect(() => {
+        if (open) {
+            // Générer le QR code pour la page de téléchargement
+            const downloadUrl = `${window.location.origin}/download-app`;
+            QRCode.toDataURL(downloadUrl, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }).then(url => {
+                setQrCodeUrl(url);
+            }).catch(err => {
+                console.error('Erreur lors de la génération du QR code:', err);
+            });
+        }
+    }, [open]);
     if (!open) return null;
 
     return (
         <div
             ref={containerRef}
-            className="absolute left-1/2 top-full z-50 mt-2 w-80 -translate-x-1/2 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 p-[1px] shadow-2xl ring-1 ring-black/5"
+            className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700"
             role="dialog"
             aria-label="Télécharger l'application"
         >
-            <div className="rounded-2xl bg-white dark:bg-gray-900">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800">
-                    <div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Téléchargez l’appli</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Choisissez votre plateforme</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                        <button
-                            onClick={onTogglePin}
-                            className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${pinned ? 'text-indigo-600 bg-indigo-50' : 'text-gray-500 hover:bg-gray-100'} `}
-                            aria-label="Épingler"
-                        >
-                            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M16 3l5 5-7 7-4 1 1-4 7-7zM2 22l6-6" /></svg>
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100"
-                            aria-label="Fermer"
-                        >
-                            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6" /></svg>
-                        </button>
-                    </div>
+            <div>
+                <div className="flex items-center justify-between px-4 py-3">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Téléchargez l'appli</p>
+                    <button
+                        onClick={onClose}
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                        aria-label="Fermer"
+                    >
+                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6" /></svg>
+                    </button>
                 </div>
 
-                <div className="p-4 space-y-3">
-                    <StoreButton icon="android" title="Android" subtitle="Disponible sur Google Play" />
-                    <StoreButton icon="apple" title="iOS" subtitle="Télécharger sur l’App Store" />
-                    <StoreButton icon="chrome" title="Extension Chrome" subtitle="Installer depuis le Web Store" />
+                <div className="p-4 text-center">
+                    {/* QR Code */}
+                    <div className="w-40 h-40 mx-auto bg-white rounded-lg flex items-center justify-center mb-3 p-2">
+                        {qrCodeUrl ? (
+                            <img
+                                src={qrCodeUrl}
+                                alt="QR Code pour télécharger l'application"
+                                className="w-full h-full object-contain"
+                            />
+                        ) : (
+                            <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <svg className="w-6 h-6 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </div>
+                        )}
+                    </div>
+
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                        Scannez pour télécharger
+                    </p>
                 </div>
             </div>
         </div>
-    );
-}
-
-function StoreButton({ icon, title, subtitle }: { icon: 'android' | 'apple' | 'chrome'; title: string; subtitle: string }) {
-    const Icon = () => {
-        if (icon === 'android') {
-            return <svg className="h-5 w-5 text-green-600" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20l8.5-8.5L3 3v17zm9.5-8.5L21 3H6.5l6 8.5zM6.5 21H21l-8.5-8.5L6.5 21zM21 21V3l-8.5 8.5L21 21z" /></svg>;
-        }
-        if (icon === 'apple') {
-            return <svg className="h-5 w-5 text-gray-900 dark:text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M16.365 1.43c.01 1.16-.43 2.27-1.2 3.09-.77.83-1.87 1.47-3.02 1.38-.13-1.13.46-2.32 1.22-3.09.83-.93 2.25-1.59 3-.38zM20.06 17.21c-.65 1.5-1.43 2.98-2.58 4.49-1 .01-1.74-.29-2.41-.6-.68-.31-1.3-.6-2.11-.6-.85 0-1.41.29-2.12.61-.66.31-1.37.64-2.42.62-1.09-1.52-1.92-3.12-2.54-4.79-1.07-2.82-1.19-5.11-.36-6.72.75-1.42 2.07-2.32 3.61-2.34.85-.02 1.64.31 2.33.62.58.26 1.12.5 1.7.5.53 0 1.04-.23 1.67-.52.75-.35 1.61-.75 2.77-.64 1.03.04 2.73.42 3.54 2.01-3.34 1.82-2.8 6.58-.08 7.96z" /></svg>;
-        }
-        return <svg className="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l4 4h4v4l-4 4 4 4v4h-4l-4-4-4 4H4v-4l4-4-4-4V6h4l4-4z" /></svg>;
-    };
-    return (
-        <a href="#" className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-3 hover:bg-gray-50 dark:border-gray-800">
-            <span className="inline-flex items-center gap-3">
-                <Icon />
-                <span>
-                    <span className="block text-sm font-semibold text-gray-900 dark:text-white">{title}</span>
-                    <span className="block text-xs text-gray-500 dark:text-gray-400">{subtitle}</span>
-                </span>
-            </span>
-            <span className="text-indigo-600 text-sm font-medium">Installer</span>
-        </a>
     );
 }
 
