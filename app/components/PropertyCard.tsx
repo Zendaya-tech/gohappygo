@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 interface PropertyCardProps {
     title: string;
     location: string;
@@ -7,11 +9,13 @@ interface PropertyCardProps {
     featured?: boolean;
     weight?: string;
     departure?: string;
+    airline?: string;
+    isRequest?: boolean;
 }
 
-export default function PropertyCard({ title, location, price, rating, image, featured = false, weight, departure }: PropertyCardProps) {
+export default function PropertyCard({ title, location, price, rating, image, featured = false, weight, departure, airline, isRequest = false }: PropertyCardProps) {
     return (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
+        <Link to={`/announces/${"9"}`} className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
             <div className="relative overflow-hidden rounded-2xl">
                 <img src={image} alt={title} className="w-full h-48 object-cover" />
                 {featured && (
@@ -24,12 +28,19 @@ export default function PropertyCard({ title, location, price, rating, image, fe
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                 </button>
+                {airline && (
+                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-medium text-gray-700">
+                        {airline}
+                    </div>
+                )}
             </div>
             <div className="p-6">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">{location}</p>
                 {weight && (
-                    <p className="text-blue-600 text-sm font-medium mb-2">Espace disponible: {weight}</p>
+                    <p className="text-blue-600 text-sm font-medium mb-2">
+                        {isRequest ? 'Espace demandé' : 'Espace disponible'}: {weight}
+                    </p>
                 )}
                 {departure && (
                     <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">Départ: {departure}</p>
@@ -44,6 +55,6 @@ export default function PropertyCard({ title, location, price, rating, image, fe
                     </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 } 

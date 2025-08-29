@@ -1,7 +1,7 @@
 export default function HostSection() {
     return (
         <section className="py-12 px-4 mx-auto">
-            <div className="bg-gradient-to-r from-blue-950 to-purple-950 rounded-3xl overflow-hidden">
+            <div className="bg-slate-950 rounded-3xl overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     <div className="p-12 text-white">
                         <h2 className="text-4xl font-bold mb-6">Devenez <span className="text-blue-600 uppercase ">transporteur</span> et gagnez de l'argent</h2>

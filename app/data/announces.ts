@@ -22,6 +22,8 @@ export interface Listing {
     availableWeight: number;
     maxWeight: number;
     description: string;
+    airline?: string; // Logo de la compagnie aérienne
+    isRequest?: boolean; // Si c'est une demande de transport
 }
 
 export const listings: Listing[] = [
@@ -48,7 +50,8 @@ export const listings: Listing[] = [
         price: 15,
         availableWeight: 8,
         maxWeight: 10,
-        description: "Voyage d'affaires, espace disponible dans ma valise pour vos colis"
+        description: "Voyage d'affaires, espace disponible dans ma valise pour vos colis",
+        airline: "Air France"
     },
     {
         id: "2",
@@ -73,7 +76,8 @@ export const listings: Listing[] = [
         price: 18,
         availableWeight: 5,
         maxWeight: 8,
-        description: "Vacances au Japon, je peux transporter vos colis avec plaisir"
+        description: "Vacances au Japon, je peux transporter vos colis avec plaisir",
+        airline: "United Airlines"
     },
     {
         id: "3",
@@ -98,7 +102,8 @@ export const listings: Listing[] = [
         price: 8,
         availableWeight: 12,
         maxWeight: 15,
-        description: "Étudiant en échange, beaucoup d'espace disponible"
+        description: "Étudiant en échange, beaucoup d'espace disponible",
+        airline: "Qatar Airways"
     },
     {
         id: "4",
@@ -174,6 +179,84 @@ export const listings: Listing[] = [
         availableWeight: 9,
         maxWeight: 12,
         description: "Voyage personnel, flexible sur les types de colis"
+    },
+    {
+        id: "7",
+        traveler: {
+            name: "Jack Black",
+            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+            rating: 4.8,
+            verified: true
+        },
+        departure: {
+            city: "Paris",
+            country: "France",
+            airport: "Paris CDG (CDG)",
+            date: "2024-03-15",
+            time: "10:30"
+        },
+        destination: {
+            city: "New York",
+            country: "États-Unis",
+            airport: "JFK New York (JFK)"
+        },
+        price: 15,
+        availableWeight: 8,
+        maxWeight: 10,
+        description: "Besoin de transporter un sac en cuir",
+        isRequest: true
+    },
+    {
+        id: "8",
+        traveler: {
+            name: "Bob Brown",
+            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+            rating: 4.9,
+            verified: true
+        },
+        departure: {
+            city: "Lyon",
+            country: "France",
+            airport: "Lyon–Saint-Exupéry (LYS)",
+            date: "2024-03-20",
+            time: "14:15"
+        },
+        destination: {
+            city: "Tokyo",
+            country: "Japon",
+            airport: "Tokyo Haneda (HND)"
+        },
+        price: 12,
+        availableWeight: 5,
+        maxWeight: 8,
+        description: "Recherche transport pour chaussures plates",
+        isRequest: true
+    },
+    {
+        id: "9",
+        traveler: {
+            name: "Patrick Olongo",
+            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            rating: 4.7,
+            verified: true
+        },
+        departure: {
+            city: "Marseille",
+            country: "France",
+            airport: "Marseille Provence (MRS)",
+            date: "2024-03-18",
+            time: "16:45"
+        },
+        destination: {
+            city: "Londres",
+            country: "Royaume-Uni",
+            airport: "London Heathrow (LHR)"
+        },
+        price: 8,
+        availableWeight: 12,
+        maxWeight: 15,
+        description: "Transport nécessaire pour sac de voyage",
+        isRequest: true
     }
 ];
 

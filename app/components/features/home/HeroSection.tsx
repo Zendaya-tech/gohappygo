@@ -1,10 +1,18 @@
+import { useNavigate } from 'react-router';
+
 export default function HeroSection() {
+    const navigate = useNavigate();
+
+    const handleSearch = () => {
+        navigate('/annonces');
+    };
+
     return (
         <section className="relative   py-16 px-4 mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
-                    <h1 className="text-5xl font-semibold text-gray-900 dark:text-white mb-6  ">
-                        Emportez autant de baggages que vous le voulez avec  <span className="text-blue-600  text-5xl font-black "> GoHappyGo </span>
+                    <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6 font-poppins">
+                        Emportez autant de bagages que vous le Desirez avec  <span className="text-blue-600 text-5xl font-black"> GoHappyGo </span>
                         lors de votre voyage
                     </h1>
                     <p className="text-gray-600 dark:text-gray-300 text-lg mb-8 line-clamp-2">
@@ -36,7 +44,7 @@ export default function HeroSection() {
             </div>
 
             {/* Search Form */}
-            <div className="bg-white max-w-4xl bottom-32 relative dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mt-4 shadow-lg">
+            <div className="bg-white max-w-7xl mx-auto  dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mt-7 shadow-lg">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                     <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">De</label>
@@ -75,7 +83,10 @@ export default function HeroSection() {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 truncate">Rechercher</label>
                             <span className="text-sm text-gray-600 dark:text-gray-300 truncate block">Trouver un voyageur</span>
                         </div>
-                        <button className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700">
+                        <button
+                            onClick={handleSearch}
+                            className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors duration-200"
+                        >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>

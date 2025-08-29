@@ -91,8 +91,8 @@ export default function AnnounceDetail() {
                         {/* Gallery */}
                         <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-900">
                             <div className="grid grid-cols-3 gap-0">
-                                <div className="col-span-2 p-3">
-                                    <div className="aspect-[3/1.2] w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+                                <div className="col-span-2 row-span-2 p-3">
+                                    <div className=" w-full h-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
                                         <img src={galleryImages[0]} alt="main" className="h-full w-full object-cover" />
                                     </div>
                                 </div>

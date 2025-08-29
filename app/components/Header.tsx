@@ -42,17 +42,14 @@ export default function Header() {
             <div className=" mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
-                    <div className="flex items-center space-x-3">
+                    <Link to={"/"} className="flex items-center space-x-3">
                         <div className=" h-10">
                             <img src="/logo.png" alt="Logo" className=" h-10 " />
                         </div>
-                        <div className="flex flex-col">
-                            <a href="/" className="font-bold text-xl text-gray-900">GoHappyGo</a>
-                        </div>
-                    </div>
+                    </Link>
 
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center space-x-8">
+                    <nav className="hidden md:flex items-center flex-1 justify-between px-6 space-x-8">
                         {/* <Link to="/annonces" className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">
                             Voir les annonces
                         </Link> */}
