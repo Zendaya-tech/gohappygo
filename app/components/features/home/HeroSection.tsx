@@ -25,10 +25,10 @@ export default function HeroSection() {
                 {/* Hero Images */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-4">
-                        <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-80 overflow-hidden">
+                        <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-48 overflow-hidden">
                             <img src="/images/history-converted.webp" alt="Avion en vol" className="w-full h-full object-cover" />
                         </div>
-                        <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-48 overflow-hidden">
+                        <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-42 overflow-hidden">
                             <img src="/images/rencontre2-converted.webp" alt="Valise" className="w-full h-full object-cover" />
                         </div>
                     </div>
@@ -36,7 +36,7 @@ export default function HeroSection() {
                         <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-32 overflow-hidden">
                             <img src="https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=400&h=200&fit=crop" alt="Colis" className="w-full h-full object-cover" />
                         </div>
-                        <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-72 overflow-hidden">
+                        <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-44 overflow-hidden">
                             <img src="/images/rencontre1-converted.webp" alt="Aéroport" className="w-full h-full object-cover" />
                         </div>
                     </div>
