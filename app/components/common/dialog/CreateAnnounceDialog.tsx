@@ -10,6 +10,7 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
     const [arrival, setArrival] = useState("");
     const [story, setStory] = useState("");
     const [files, setFiles] = useState<File[]>([]);
+    const [fileUrls, setFileUrls] = useState<string[]>([]);
     const [kilos, setKilos] = useState<number | "">("");
     const [pricePerKg, setPricePerKg] = useState<number | "">("");
     const [lateTax, setLateTax] = useState<number | "">(0);
@@ -45,7 +46,23 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
 
     const onFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
         const list = e.target.files ? Array.from(e.target.files) : [];
-        setFiles(list);
+        setFiles(prevFiles => [...prevFiles, ...list]);
+
+        // Create preview URLs for new images
+        const newUrls = list.map(file => URL.createObjectURL(file));
+        setFileUrls(prevUrls => [...prevUrls, ...newUrls]);
+
+        // Reset the input value to allow selecting the same file again
+        e.target.value = '';
+    };
+
+    const removeFile = (index: number) => {
+        setFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+        setFileUrls(prevUrls => {
+            // Revoke the URL to free memory
+            URL.revokeObjectURL(prevUrls[index]);
+            return prevUrls.filter((_, i) => i !== index);
+        });
     };
 
 
@@ -155,7 +172,23 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
                                 {files.length > 0 && (
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                         {files.map((f, idx) => (
-                                            <div key={idx} className="rounded-xl border border-gray-200 dark:border-gray-800 p-2 text-xs text-gray-600 dark:text-gray-300 truncate">{f.name}</div>
+                                            <div key={idx} className="relative rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                                                <button
+                                                    onClick={() => removeFile(idx)}
+                                                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg z-10"
+                                                    title="Remove image"
+                                                >
+                                                    −
+                                                </button>
+                                                <img
+                                                    src={fileUrls[idx]}
+                                                    alt={`Preview ${f.name}`}
+                                                    className="w-full h-32 object-cover"
+                                                />
+                                                <div className="p-2">
+                                                    <div className="text-xs text-gray-600 dark:text-gray-300 truncate">{f.name}</div>
+                                                </div>
+                                            </div>
                                         ))}
                                     </div>
                                 )}
