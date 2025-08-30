@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { countries } from 'country-flag-icons';
 
 interface Language {
@@ -26,17 +26,17 @@ export default function LanguageDropdown({ currentLanguage, onLanguageChange }: 
     const currentLang = languages.find(lang => lang.code === currentLanguage) || languages[0];
 
     // Close dropdown when clicking outside
-    // useEffect(() => {
-    //     const handleClickOutside = (event: MouseEvent) => {
-    //         const target = event.target as Element;
-    //         if (isOpen && !target.closest('.language-dropdown')) {
-    //             setIsOpen(false);
-    //         }
-    //     };
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Element;
+            if (isOpen && !target.closest('.language-dropdown')) {
+                setIsOpen(false);
+            }
+        };
 
-    //     document.addEventListener('mousedown', handleClickOutside);
-    //     return () => document.removeEventListener('mousedown', handleClickOutside);
-    // }, [isOpen]);
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isOpen]);
 
     const handleLanguageSelect = (languageCode: string) => {
         onLanguageChange(languageCode);
