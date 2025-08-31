@@ -1,61 +1,59 @@
 import { CurrencyDollarIcon, ShieldCheckIcon, DevicePhoneMobileIcon, HeartIcon, PlayIcon, MapPinIcon } from '@heroicons/react/24/outline';
-
-const features = [
-    {
-        id: 1,
-        title: "Rentabilisez vos voyages",
-        description: "Faites un voyage économe en gagnant de l'argent avec votre franchise de bagage non utilisée, tout en rencontrant de nouvelles personnes.",
-        icon: CurrencyDollarIcon,
-        gradientFrom: "from-yellow-400",
-        gradientTo: "to-orange-500",
-        overlayGradientFrom: "from-yellow-400/5",
-        overlayGradientTo: "to-orange-500/5",
-        indicatorGradientFrom: "from-yellow-400",
-        indicatorGradientTo: "to-orange-500",
-        floatingIcons: []
-    },
-    {
-        id: 2,
-        title: "Voyagez et échangez en toute confiance",
-        description: "Evoluez dans un cadre sécurisé et de confiance avec la vérification des identités, une messagerie interne, photos prises et stockées sur l'appli, traçabilité des transactions, assurance, évaluations.",
-        icon: ShieldCheckIcon,
-        gradientFrom: "from-green-400",
-        gradientTo: "to-blue-500",
-        overlayGradientFrom: "from-green-400/5",
-        overlayGradientTo: "to-blue-500/5",
-        indicatorGradientFrom: "from-green-400",
-        indicatorGradientTo: "to-blue-500",
-        floatingIcons: []
-    },
-    {
-        id: 3,
-        title: "Le Bonheur est simple",
-        description: "Installez l'appli GoHappyGo est une révolution. C'est simple et bénéfique pour tous les voyageurs. Rejoignez une communauté foisonnante pour une mobilité heureuse et écologique.",
-        icon: DevicePhoneMobileIcon,
-        gradientFrom: "from-purple-400",
-        gradientTo: "to-pink-500",
-        overlayGradientFrom: "from-purple-400/5",
-        overlayGradientTo: "to-pink-500/5",
-        indicatorGradientFrom: "from-purple-400",
-        indicatorGradientTo: "to-pink-500",
-        // floatingIcons: [
-        //     { icon: HeartIcon, position: "-top-2 -right-2", bgColor: "bg-red-500", delay: "0s" },
-        //     { icon: PlayIcon, position: "-bottom-2 -right-2", bgColor: "bg-blue-500", delay: "0.5s" },
-        //     { icon: MapPinIcon, position: "-top-2 -left-2", bgColor: "bg-green-500", delay: "1s" }
-        // ]
-        floatingIcons: []
-    }
-];
+import { useTranslation } from 'react-i18next';
 
 export default function FeaturesSection() {
+    const { t } = useTranslation();
+
+    const features = [
+        {
+            id: 1,
+            title: t('home.features.profitability.title'),
+            description: t('home.features.profitability.description'),
+            icon: CurrencyDollarIcon,
+            gradientFrom: "from-yellow-400",
+            gradientTo: "to-orange-500",
+            overlayGradientFrom: "from-yellow-400/5",
+            overlayGradientTo: "to-orange-500/5",
+            indicatorGradientFrom: "from-yellow-400",
+            indicatorGradientTo: "to-orange-500",
+            floatingIcons: []
+        },
+        {
+            id: 2,
+            title: t('home.features.security.title'),
+            description: t('home.features.security.description'),
+            icon: ShieldCheckIcon,
+            gradientFrom: "from-green-400",
+            gradientTo: "to-blue-500",
+            overlayGradientFrom: "from-green-400/5",
+            overlayGradientTo: "to-blue-500/5",
+            indicatorGradientFrom: "from-green-400",
+            indicatorGradientTo: "to-blue-500",
+            floatingIcons: []
+        },
+        {
+            id: 3,
+            title: t('home.features.simplicity.title'),
+            description: t('home.features.simplicity.description'),
+            icon: DevicePhoneMobileIcon,
+            gradientFrom: "from-purple-400",
+            gradientTo: "to-pink-500",
+            overlayGradientFrom: "from-purple-400/5",
+            overlayGradientTo: "to-pink-500/5",
+            indicatorGradientFrom: "from-purple-400",
+            indicatorGradientTo: "to-pink-500",
+            floatingIcons: []
+        }
+    ];
+
     return (
         <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Titre de section */}
                 <div className="text-center mb-16">
-                    <h2 className="text-4xl font-bold text-gray-900 mb-4">Pourquoi choisir GoHappyGo ?</h2>
+                    <h2 className="text-4xl font-bold text-gray-900 mb-4">{t('home.features.title')}</h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Découvrez les avantages qui font de GoHappyGo la solution idéale pour vos voyages
+                        {t('home.features.subtitle')}
                     </p>
                 </div>
 

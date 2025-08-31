@@ -6,7 +6,7 @@ type Faq = { q: string; a: string };
 
 const faqs: Faq[] = [
     {
-        q: "Comment fonctionne Go Happy Go ?",
+        q: "Comment fonctionne GoHappyGo ?",
         a: "Des voyageurs proposent l’espace disponible dans leurs bagages. Vous pouvez leur demander de transporter vos colis (au kilo).",
     },
     {

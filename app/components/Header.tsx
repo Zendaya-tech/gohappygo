@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import NotificationPopover from './common/popover/NotificationPopover';
 import AppDownloadPopover from './common/popover/AppDownloadPopover';
 import { useRef } from 'react';
@@ -6,7 +7,7 @@ import AvatarMenu from './common/popover/AvatarMenu';
 import SettingsDialog from './common/dialog/SettingsDialog';
 import CreatePackageDialog from './common/dialog/CreatePackageDialog';
 import CreateAnnounceDialog from './common/dialog/CreateAnnounceDialog';
-import AnnounceTypeDialog from './common/dialog/AnnounceTypeDialog';
+import AnnounceTypeDropdown from './common/popover/AnnounceTypeDropdown';
 import LoginDialog from './common/dialog/LoginDialog';
 import RegisterDialog from './common/dialog/RegisterDialog';
 import { Link } from 'react-router';
@@ -14,6 +15,7 @@ import { useAuthStore, type AuthState } from '../store/auth';
 import LanguageDropdown from './common/popover/LanguageDropdown';
 
 export default function Header() {
+    const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const isLoggedIn = useAuthStore((s: AuthState) => s.isLoggedIn);
     const [showNotif, setShowNotif] = useState(false);
@@ -24,12 +26,10 @@ export default function Header() {
     const [pinnedDownload, setPinnedDownload] = useState(false);
     const downloadBtnRef = useRef<HTMLElement>({} as HTMLElement);
     const [showCreatePackage, setShowCreatePackage] = useState(false);
-    const [showAnnounceTypeDialog, setShowAnnounceTypeDialog] = useState(false);
+    const [showAnnounceTypeDropdown, setShowAnnounceTypeDropdown] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
-    const [currentLanguage, setCurrentLanguage] = useState('fr');
     const handleAnnounceTypeSelect = (type: 'travel' | 'package') => {
-        setShowAnnounceTypeDialog(false);
         if (type === 'travel') {
             setShowCreateAnnounce(true);
         } else if (type === 'package') {
@@ -64,9 +64,19 @@ export default function Header() {
                             </button>
                             <AppDownloadPopover open={hoverDownload} onClose={() => { setHoverDownload(false); setPinnedDownload(false); }} pinned={pinnedDownload} onTogglePin={() => setPinnedDownload((v) => !v)} triggerRef={downloadBtnRef} />
                         </div>
-                        <button onClick={() => setShowAnnounceTypeDialog(true)} className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200">
-                            Publier une annonce +
-                        </button>
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowAnnounceTypeDropdown((v) => !v)}
+                                className="text-gray-700 hover:text-blue-600 font-medium text-sm transition-colors duration-200"
+                            >
+                                {t('header.publishAd')}
+                            </button>
+                            <AnnounceTypeDropdown
+                                open={showAnnounceTypeDropdown}
+                                onClose={() => setShowAnnounceTypeDropdown(false)}
+                                onSelectType={handleAnnounceTypeSelect}
+                            />
+                        </div>
 
                     </nav>
 
@@ -129,12 +139,7 @@ export default function Header() {
 
                             </div>
                         </>
-                        <LanguageDropdown
-                            currentLanguage={currentLanguage}
-                            onLanguageChange={(languageCode) => {
-                                setCurrentLanguage(languageCode);
-                            }}
-                        />
+                        <LanguageDropdown />
                     </div>
 
                     {/* Mobile menu button */}
@@ -164,11 +169,6 @@ export default function Header() {
                     <SettingsDialog open={showSettings} onClose={() => setShowSettings(false)} />
                     <CreatePackageDialog open={showCreatePackage} onClose={() => setShowCreatePackage(false)} />
                     <CreateAnnounceDialog open={showCreateAnnounce} onClose={() => setShowCreateAnnounce(false)} />
-                    <AnnounceTypeDialog
-                        open={showAnnounceTypeDialog}
-                        onClose={() => setShowAnnounceTypeDialog(false)}
-                        onSelectType={handleAnnounceTypeSelect}
-                    />
                     <LoginDialog
                         open={showLogin}
                         onClose={() => setShowLogin(false)}

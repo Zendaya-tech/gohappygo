@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 export default function Footer() {
+    const { t } = useTranslation();
     const year = new Date().getFullYear();
     return (
         <footer className="bg-gray-100 text-gray-900 px-6 py-12 dark:bg-gray-900 dark:text-gray-100">
@@ -7,12 +10,11 @@ export default function Footer() {
                     {/* Brand */}
                     <div className="col-span-2 sm:col-span-3 md:col-span-2">
                         <div className="flex items-center space-x-2 mb-4">
-                            <img src="/logo.png" alt="Go Happy Go logo" className="h-10" />
-                            <span className="font-bold text-lg">Go Happy Go</span>
+                            <img src="/logo.png" alt="GoHappyGo logo" className="h-10" />
+                            <span className="font-bold text-lg">GoHappyGo</span>
                         </div>
                         <p className="text-gray-900 dark:text-gray-100 text-sm">
-                            Plateforme qui connecte voyageurs et expéditeurs pour des envois économiques et
-                            écologiques.
+                            {t('footer.description')}
                         </p>
                         <div className="mt-4 flex items-center gap-3 text-gray-900 dark:text-gray-100">
                             <a href="#" aria-label="Twitter" className="hover:text-gray-900 dark:hover:text-gray-100">
@@ -35,12 +37,12 @@ export default function Footer() {
 
                     {/* Découvrir */}
                     <div>
-                        <h4 className="font-semibold mb-4">Découvrir</h4>
+                        <h4 className="font-semibold mb-4">{t('footer.discover.title')}</h4>
                         <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-                            <li><a href="/annonces" className="hover:text-gray-900 dark:hover:text-gray-100">Annonces</a></li>
-                            <li><a href="/transporters" className="hover:text-gray-900 dark:hover:text-gray-100">Transporteurs</a></li>
-                            <li><a href="/how-it-work" className="hover:text-gray-900 dark:hover:text-gray-100">Comment ça marche</a></li>
-                            <li><a href="/logos" className="hover:text-gray-900 dark:hover:text-gray-100">Logos</a></li>
+                            <li><a href="/annonces" className="hover:text-gray-900 dark:hover:text-gray-100">{t('footer.discover.announcements')}</a></li>
+                            <li><a href="/transporters" className="hover:text-gray-900 dark:hover:text-gray-100">{t('footer.discover.transporters')}</a></li>
+                            <li><a href="/how-it-work" className="hover:text-gray-900 dark:hover:text-gray-100">{t('footer.discover.howItWorks')}</a></li>
+                            <li><a href="/logos" className="hover:text-gray-900 dark:hover:text-gray-100">{t('footer.discover.logos')}</a></li>
                         </ul>
                     </div>
 
@@ -90,7 +92,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t dark:border-gray-700 border-gray-300 mt-10 pt-8 text-center text-sm text-gray-900 dark:text-gray-100">
-                    <p>&copy; {year} Go Happy Go. Tous droits réservés.</p>
+                    <p>&copy; {year} GoHappyGo. Tous droits réservés.</p>
                 </div>
             </div>
         </footer>

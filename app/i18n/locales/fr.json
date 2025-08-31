@@ -1,0 +1,239 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "clear": "Effacer",
+    "submit": "Soumettre",
+    "send": "Envoyer",
+    "download": "Télécharger",
+    "upload": "Téléverser",
+    "share": "Partager",
+    "copy": "Copier",
+    "view": "Voir",
+    "explore": "Explorer"
+  },
+  "header": {
+    "downloadApp": "Téléchargez l'appli +",
+    "publishAd": "Publier une annonce +",
+    "notifications": "Notifications",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "language": "Langue"
+  },
+  "home": {
+    "hero": {
+      "title": "Emportez autant de bagages que vous le désirez avec GoHappyGo lors de votre voyage",
+      "subtitle": "                        Faites enregistrer vos excédents de bagages par un autre voyageur du même vol , pour la même destination !",
+      "searchFrom": "De",
+      "searchTo": "Vers",
+      "searchDate": "Date",
+      "searchFlight": "Vol",
+      "searchButton": "Rechercher",
+      "fromPlaceholder": "Ville de départ",
+      "toPlaceholder": "Ville d'arrivée",
+      "datePlaceholder": "Quand ?",
+      "flightPlaceholder": "Numéro de vol"
+    },
+    "features": {
+      "title": "Pourquoi choisir GoHappyGo ?",
+      "subtitle": "Une solution simple et sécurisée pour vos envois",
+      "profitability": {
+        "title": "Rentabilisez vos voyages",
+        "description": "Faites un voyage économe en gagnant de l'argent avec votre franchise de bagage non utilisée, tout en rencontrant de nouvelles personnes."
+      },
+      "security": {
+        "title": "Voyagez et échangez en toute confiance",
+        "description": "Evoluez dans un cadre sécurisé et de confiance avec la vérification des identités, une messagerie interne, photos prises et stockées sur l'appli, traçabilité des transactions, assurance, évaluations."
+      },
+      "simplicity": {
+        "title": "Le Bonheur est simple",
+        "description": "Installez l'appli GoHappyGo est une révolution. C'est simple et bénéfique pour tous les voyageurs. Rejoignez une communauté foisonnante pour une mobilité heureuse et écologique."
+      }
+    },
+    "recommendations": {
+      "title": "Nos Recommandations",
+      "exploreDestinations": "Explorez de nouvelles destinations",
+      "popularRoutes": "Trajets populaires",
+      "secureTransport": "Transportez en toute sécurité",
+      "fragilePackages": "Colis fragiles",
+      "saveOnShipping": "Économisez sur vos envois",
+      "advantageousRates": "Tarifs avantageux",
+      "expressDelivery": "Livraison express",
+      "urgentPackages": "Colis urgents",
+      "watchVideo": "Voir la vidéo"
+    },
+    "reviews": {
+      "title": "Témoignages de nos utilisateurs",
+      "noReviews": "Vous n'avez pas encore d'avis",
+      "europe": {
+        "review": "J'ai envoyé un cadeau à ma famille à Londres. Le transporteur était très professionnel et le colis est arrivé en parfait état !",
+        "name": "Marie D."
+      },
+      "southAmerica": {
+        "review": "Excellent service ! J'ai pu rentabiliser mon voyage en transportant des colis. Interface simple et paiement rapide.",
+        "name": "Thomas L."
+      },
+      "northAmerica": {
+        "review": "Excellent service ! J'ai pu rentabiliser mon voyage en transportant des colis. Interface simple et paiement rapide.",
+        "name": "Thomas L."
+      },
+      "asia": {
+        "review": "Service très rapide et efficace. Je recommande vivement GoHappyGo !",
+        "name": "Thomas L."
+      },
+      "africa": {
+        "review": "J'ai transporté des colis en Afrique. Le service était très rapide et le prix était très abordable.",
+        "name": "Thierry M."
+      },
+      "oceania": {
+        "review": "Beaucoup moins cher que les services de livraison traditionnels. Je recommande vivement GoHappyGo !",
+        "name": "Sophie M."
+      }
+    },
+    "popularRoutes": {
+      "title": "Les trajets les plus populaires",
+      "startingFrom": "À partir de"
+    }
+  },
+  "announcements": {
+    "title": "Annonces",
+    "filters": {
+      "verifiedProfile": "Profil vérifié",
+      "lowestPrice": "Prix le plus bas",
+      "airline": "Compagnie aérienne",
+      "travelDate": "Date du voyage",
+      "travelAd": "Annonce de voyage",
+      "transportRequest": "Demande de Transport"
+    },
+    "card": {
+      "availableSpace": "Espace disponible",
+      "requestedSpace": "Espace demandé",
+      "departure": "Départ",
+      "perKilo": "/Kilo",
+      "addToFavorites": "Ajouter aux favoris",
+      "removeFromFavorites": "Retirer des favoris"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "editProfile": "Modifier le profil",
+    "addInfo": "Veuillez ajouter des informations sur vous dans les paramètres de votre profil.",
+    "sections": {
+      "reviews": "Mes Avis",
+      "travelRequests": "Mes Demandes de Voyages",
+      "travels": "Mes Voyages",
+      "favorites": "Mes Favoris",
+      "payments": "Paiements"
+    },
+    "stats": {
+      "rating": "Note",
+      "success": "Réussite",
+      "response": "Réponse",
+      "earnings": "Gains",
+      "packagesCarried": "Colis transportés",
+      "distance": "Distance",
+      "packagesSent": "Colis envoyés"
+    },
+    "dialog": {
+      "title": "Profil",
+      "uploadProfilePicture": "Téléverser une photo de profil",
+      "firstName": "Prénom",
+      "firstNameNote": "(Seul votre prénom apparaît sur la plateforme)",
+      "lastName": "Nom de famille",
+      "countryCode": "Indicatif du Pays",
+      "phoneNumber": "Numéro de téléphone",
+      "phoneNote": "(Nous vous enverrons un code pour confirmer votre numéro.)",
+      "aboutMe": "À propos de moi",
+      "saveChanges": "Sauvegarder les modifications"
+    }
+  },
+  "dialogs": {
+    "createAnnounce": {
+      "title": "Créer une annonce",
+      "step1": "Informations de base",
+      "step2": "Photos",
+      "step3": "Prix et conditions",
+      "departure": "Départ",
+      "arrival": "Arrivée",
+      "travelDate": "Date de votre Voyage",
+      "flightNumber": "Numéro de vol",
+      "reservationType": "Type de réservation",
+      "singlePerson": "Tous mes kilos pour une personne",
+      "sharedKilos": "Kilos partagés avec différents voyageurs",
+      "bookingType": "Type de réservation",
+      "instant": "Instantanée",
+      "nonInstant": "Non instantanée",
+      "story": "Votre histoire",
+      "photos": "Photos",
+      "weight": "Poids (kg)",
+      "pricePerKilo": "Prix par kilo",
+      "lateTax": "Taxe de retard",
+      "noSmileTax": "Taxe sans sourire",
+      "allowExtraGrams": "Autoriser les grammes en trop",
+      "create": "Créer"
+    },
+    "createPackage": {
+      "title": "Créer une demande de colis",
+      "title": "Titre du colis",
+      "description": "Description",
+      "weight": "Poids (kg)",
+      "maxDeliveryDate": "Date max de livraison",
+      "create": "Créer"
+    },
+    "login": {
+      "title": "Connexion",
+      "email": "Email",
+      "password": "Mot de passe",
+      "forgotPassword": "Mot de passe oublié ?",
+      "login": "Se connecter",
+      "noAccount": "Vous n'avez pas de compte ?",
+      "register": "S'inscrire"
+    },
+    "register": {
+      "title": "Inscription",
+      "firstName": "Prénom",
+      "lastName": "Nom de famille",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "register": "S'inscrire",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "login": "Se connecter"
+    }
+  },
+  "requests": {
+    "title": "Demandes d'envoi récentes",
+    "urgentDocuments": "Colis urgent - Documents",
+    "birthdayGift": "Cadeau d'anniversaire",
+    "medications": "Médicaments",
+    "clothing": "Vêtements",
+    "electronics": "Électronique",
+    "books": "Livres"
+  },
+  "footer": {
+    "about": "À propos",
+    "howItWorks": "Comment ça marche",
+    "help": "Aide",
+    "contact": "Contact",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "cookies": "Cookies"
+  },
+  "languages": {
+    "fr": "Français",
+    "en": "English"
+  }
+}

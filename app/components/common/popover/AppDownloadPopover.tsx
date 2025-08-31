@@ -45,41 +45,28 @@ export default function AppDownloadPopover({ open, onClose, pinned, onTogglePin,
             role="dialog"
             aria-label="Télécharger l'application"
         >
-            <div>
-                <div className="flex items-center justify-between px-4 py-3">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Téléchargez l'appli</p>
-                    <button
-                        onClick={onClose}
-                        className="inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                        aria-label="Fermer"
-                    >
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6" /></svg>
-                    </button>
+            <div className="p-4 text-center">
+                {/* QR Code */}
+                <div className="w-40 h-40 mx-auto bg-white rounded-lg flex items-center justify-center mb-3 p-2">
+                    {qrCodeUrl ? (
+                        <img
+                            src={qrCodeUrl}
+                            alt="QR Code pour télécharger l'application"
+                            className="w-full h-full object-contain"
+                        />
+                    ) : (
+                        <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <svg className="w-6 h-6 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                    )}
                 </div>
 
-                <div className="p-4 text-center">
-                    {/* QR Code */}
-                    <div className="w-40 h-40 mx-auto bg-white rounded-lg flex items-center justify-center mb-3 p-2">
-                        {qrCodeUrl ? (
-                            <img
-                                src={qrCodeUrl}
-                                alt="QR Code pour télécharger l'application"
-                                className="w-full h-full object-contain"
-                            />
-                        ) : (
-                            <div className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center">
-                                <svg className="w-6 h-6 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </div>
-                        )}
-                    </div>
-
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                        Scannez pour télécharger
-                    </p>
-                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    Scannez pour télécharger
+                </p>
             </div>
         </div>
     );

@@ -14,6 +14,7 @@ import { useAuthStore, type AuthState } from "./store/auth";
 import { useThemeStore, type Theme } from "./store/theme";
 import ChatWidget from "./components/ChatWidget";
 import CookieConsent from "./components/common/dialog/CookieConsent";
+import "./i18n";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

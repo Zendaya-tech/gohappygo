@@ -7,7 +7,7 @@ import FooterMinimal from '~/components/FooterMinimal';
 import PropertyCard from '~/components/PropertyCard';
 
 export default function Annonces() {
-    const [selectedFilter, setSelectedFilter] = useState('verified');
+    const [selectedFilters, setSelectedFilters] = useState<string[]>(['verified']);
     const [searchParams, setSearchParams] = useState({
         from: 'Paris',
         to: 'New-York',
@@ -24,13 +24,25 @@ export default function Annonces() {
     };
 
     const filters = [
-        { id: 'verified', label: 'Profil vérifié', selected: selectedFilter === 'verified' },
-        { id: 'lowest-price', label: 'Prix le plus bas', selected: selectedFilter === 'lowest-price' },
-        { id: 'airline', label: 'Compagnie aérienne', selected: selectedFilter === 'airline' },
-        { id: 'travel-date', label: 'Date du voyage', selected: selectedFilter === 'travel-date' },
-        { id: 'travel-ad', label: 'Annonce de voyage', selected: selectedFilter === 'travel-ad' },
-        { id: 'transport-request', label: 'Demande de Transport', selected: selectedFilter === 'transport-request' }
+        { id: 'verified', label: 'Profil vérifié' },
+        { id: 'lowest-price', label: 'Prix le plus bas' },
+        { id: 'airline', label: 'Compagnie aérienne' },
+        { id: 'travel-date', label: 'Date du voyage' },
+        { id: 'travel-ad', label: 'Annonce de voyage' },
+        { id: 'transport-request', label: 'Demande de Transport' }
     ];
+
+    const handleFilterChange = (filterId: string) => {
+        setSelectedFilters(prev =>
+            prev.includes(filterId)
+                ? prev.filter(id => id !== filterId)
+                : [...prev, filterId]
+        );
+    };
+
+    const clearAllFilters = () => {
+        setSelectedFilters([]);
+    };
 
     return (
         <div className="min-h-screen dark:bg-gray-950 relative">
@@ -103,7 +115,10 @@ export default function Annonces() {
                                 <button className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg text-sm font-medium">
                                     Filtrer par
                                 </button>
-                                <button className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                                <button
+                                    onClick={clearAllFilters}
+                                    className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                >
                                     tout effacer
                                 </button>
                             </div>
@@ -112,12 +127,10 @@ export default function Annonces() {
                                 {filters.map((filter) => (
                                     <label key={filter.id} className="flex items-center space-x-3 cursor-pointer">
                                         <input
-                                            type="radio"
-                                            name="filter"
-                                            value={filter.id}
-                                            checked={filter.selected}
-                                            onChange={() => setSelectedFilter(filter.id)}
-                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                                            type="checkbox"
+                                            checked={selectedFilters.includes(filter.id)}
+                                            onChange={() => handleFilterChange(filter.id)}
+                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 rounded"
                                         />
                                         <span className="text-sm text-gray-700 dark:text-gray-300">{filter.label}</span>
                                     </label>

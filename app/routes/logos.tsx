@@ -6,7 +6,7 @@ export default function Logos() {
         <div className="min-h-screen bg-white">
             <Header />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                <h1 className="text-3xl font-bold text-gray-900 mb-6">Logos Go Happy Go</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-6">Logos GoHappyGo</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div className="rounded-2xl border border-gray-200 p-6">
                         <div className="flex items-center gap-3">
@@ -16,7 +16,7 @@ export default function Logos() {
                                 </svg>
                             </div>
                             <div>
-                                <div className="text-xl font-bold">Go Happy Go</div>
+                                <div className="text-xl font-bold">GoHappyGo</div>
                                 <div className="text-sm text-gray-500">Logo principal</div>
                             </div>
                         </div>
@@ -31,7 +31,7 @@ export default function Logos() {
                                 </svg>
                             </div>
                             <div>
-                                <div className="text-xl font-bold">Go Happy Go</div>
+                                <div className="text-xl font-bold">GoHappyGo</div>
                                 <div className="text-sm text-gray-500">Monochrome</div>
                             </div>
                         </div>
@@ -46,7 +46,7 @@ export default function Logos() {
                                 </svg>
                             </div>
                             <div>
-                                <div className="text-xl font-bold">Go Happy Go</div>
+                                <div className="text-xl font-bold">GoHappyGo</div>
                                 <div className="text-sm text-gray-500">Contour</div>
                             </div>
                         </div>

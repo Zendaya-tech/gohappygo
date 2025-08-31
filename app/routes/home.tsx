@@ -14,7 +14,7 @@ import Footer from "../components/Footer";
 
 export function meta({ }: Route.MetaArgs) {
   return [
-    { title: "Go Happy Go - Expédiez vos colis avec des voyageurs" },
+    { title: "GoHappyGo - Expédiez vos colis avec des voyageurs" },
     { name: "description", content: "Connectez-vous avec des voyageurs qui ont de l'espace dans leurs bagages. Expédiez vos colis de manière économique et écologique." },
   ];
 }
@@ -27,7 +27,7 @@ export default function Home() {
       <div className="min-h-screen max-w-7xl mx-auto bg-white dark:bg-gray-950">
 
         <HeroSection />
-        {/* <FeaturesSection /> */}
+        <FeaturesSection />
         {/* <PlacesByCategory /> */}
         <FeaturedProperties />
         <Recommendations />

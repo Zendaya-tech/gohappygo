@@ -1,45 +1,49 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ReviewCard from './ReviewCard';
 
 export default function Reviews() {
+    const { t } = useTranslation();
+    const [selectedReview, setSelectedReview] = useState<number>(0);
     const reviews = [
         {
-            review: "J'ai envoyé un cadeau à ma famille à Londres. Le transporteur était très professionnel et le colis est arrivé en parfait état !",
-            name: "Marie D.",
+            review: t('home.reviews.europe.review'),
+            name: t('home.reviews.europe.name'),
             avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=100&h=100&fit=crop&crop=face",
             rating: 5,
             location: "europe"
         },
         {
-            review: "Excellent service ! J'ai pu rentabiliser mon voyage en transportant des colis. Interface simple et paiement rapide.",
-            name: "Thomas L.",
+            review: t('home.reviews.southAmerica.review'),
+            name: t('home.reviews.southAmerica.name'),
             avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
             rating: 5,
             location: "south america"
         },
         {
-            review: "Excellent service ! J'ai pu rentabiliser mon voyage en transportant des colis. Interface simple et paiement rapide.",
-            name: "Thomas L.",
+            review: t('home.reviews.northAmerica.review'),
+            name: t('home.reviews.northAmerica.name'),
             avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
             rating: 5,
             location: "north america"
         },
         {
-            review: "service très rapide et efficace. Je recommande vivement Go Happy Go !",
-            name: "Thomas L.",
+            review: t('home.reviews.asia.review'),
+            name: t('home.reviews.asia.name'),
             avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
             rating: 5,
             location: "asia"
         },
         {
-            review: "J'ai transporté des colis en Afrique. Le service était très rapide et le prix était très abordable.",
-            name: "Thierry M.",
+            review: t('home.reviews.africa.review'),
+            name: t('home.reviews.africa.name'),
             avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
             rating: 5,
             location: "africa"
         },
         {
-            review: "Beaucoup moins cher que les services de livraison traditionnels. Je recommande vivement Go Happy Go !",
-            name: "Sophie M.",
+            review: t('home.reviews.oceania.review'),
+            name: t('home.reviews.oceania.name'),
             avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
             rating: 5,
             location: "oceania"
@@ -48,8 +52,6 @@ export default function Reviews() {
 
     return (
         <section className="px-4 py-12 mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Témoignages de nos utilisateurs</h2>
-
             <div className='flex gap-4'>
 
 
@@ -105,27 +107,29 @@ export default function Reviews() {
                                 }
                             }()
                             return (
-                                <div className="size-10 object-cover overflow-hidden  border-2 border-blue-700 rounded-full absolute"
+                                <div
+                                    key={index}
+                                    className={`size-10 object-cover overflow-hidden border-2 rounded-full absolute cursor-pointer transition-all duration-200 hover:scale-110 ${selectedReview === index ? 'border-blue-500 shadow-lg' : 'border-transparent'
+                                        }`}
                                     style={{
                                         top: position.lat,
                                         left: position.lng
-                                    }}>
-                                    <img src={review.avatar} className="size-full object-cover" alt={review.name}
-                                    />
+                                    }}
+                                    onClick={() => setSelectedReview(index)}
+                                >
+                                    <img src={review.avatar} className="size-full object-cover" alt={review.name} />
                                 </div>
                             )
 
                         })
                     }
                 </div>
-                {/* review one by one with fade in and fade out animation */}
-                {/* <div className='w-96'>
-                    {reviews.map((review, index) => (
-                        <div key={index} className="top-0 left-0  bg-white ">
-                            <ReviewCard {...review} />
-                        </div>
-                    ))}
-                </div> */}
+                {/* Review display area */}
+                <div className='w-96 flex items-center'>
+                    <div className="bg-white rounded-lg shadow-lg p-6 animate-fade-in">
+                        <ReviewCard {...reviews[selectedReview]} />
+                    </div>
+                </div>
 
             </div>
             {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">

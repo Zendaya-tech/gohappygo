@@ -91,7 +91,7 @@ export default function Transporters() {
                             </div>
 
                             <div className="mb-4">
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Itinéraires</p>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Trajets</p>
                                 <div className="mt-1 flex flex-wrap gap-2">
                                     {t.routes.map((r) => (
                                         <span key={r} className="rounded-full bg-gray-100 dark:bg-gray-800 px-2.5 py-1 text-xs text-gray-700 dark:text-gray-300">

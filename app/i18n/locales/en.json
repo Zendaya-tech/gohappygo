@@ -1,0 +1,289 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "submit": "Submit",
+    "send": "Send",
+    "download": "Download",
+    "upload": "Upload",
+    "share": "Share",
+    "copy": "Copy",
+    "view": "View",
+    "explore": "Explore"
+  },
+  "header": {
+    "downloadApp": "Download app +",
+    "publishAd": "Publish ad +",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "language": "Language"
+  },
+  "home": {
+    "hero": {
+      "title": "Ship your packages safely",
+      "subtitle": "Connect with trusted travelers to send your packages worldwide",
+      "searchFrom": "From",
+      "searchTo": "To",
+      "searchDate": "Date",
+      "searchFlight": "Flight",
+      "searchButton": "Search",
+      "fromPlaceholder": "Departure city",
+      "toPlaceholder": "Arrival city",
+      "datePlaceholder": "When?",
+      "flightPlaceholder": "Flight number"
+    },
+    "features": {
+      "title": "Why choose GoHappyGo?",
+      "subtitle": "A simple and secure solution for your shipments",
+      "profitability": {
+        "title": "Profit from your travels",
+        "description": "Make an economical trip by earning money with your unused baggage allowance while meeting new people."
+      },
+      "security": {
+        "title": "Travel and exchange with confidence",
+        "description": "Evolve in a secure and trusted environment with identity verification, internal messaging, photos taken and stored on the app, transaction traceability, insurance, ratings."
+      },
+      "simplicity": {
+        "title": "Happiness is simple",
+        "description": "Installing the GoHappyGo app is a revolution. It's simple and beneficial for all travelers. Join a thriving community for happy and ecological mobility."
+      }
+    },
+    "recommendations": {
+      "title": "Our Recommendations",
+      "exploreDestinations": "Explore new destinations",
+      "popularRoutes": "Popular routes",
+      "secureTransport": "Ship securely",
+      "fragilePackages": "Fragile packages",
+      "saveOnShipping": "Save on shipping",
+      "advantageousRates": "Advantageous rates",
+      "expressDelivery": "Express delivery",
+      "urgentPackages": "Urgent packages",
+      "watchVideo": "Watch video"
+    },
+    "reviews": {
+      "title": "User testimonials",
+      "noReviews": "You don't have any reviews yet",
+      "europe": {
+        "review": "I sent a gift to my family in London. The transporter was very professional and the package arrived in perfect condition!",
+        "name": "Marie D."
+      },
+      "southAmerica": {
+        "review": "Excellent service! I was able to profit from my trip by transporting packages. Simple interface and fast payment.",
+        "name": "Thomas L."
+      },
+      "northAmerica": {
+        "review": "Excellent service! I was able to profit from my trip by transporting packages. Simple interface and fast payment.",
+        "name": "Thomas L."
+      },
+      "asia": {
+        "review": "Very fast and efficient service. I highly recommend GoHappyGo!",
+        "name": "Thomas L."
+      },
+      "africa": {
+        "review": "I transported packages to Africa. The service was very fast and the price was very affordable.",
+        "name": "Thierry M."
+      },
+      "oceania": {
+        "review": "Much cheaper than traditional delivery services. I highly recommend GoHappyGo!",
+        "name": "Sophie M."
+      }
+    },
+    "popularRoutes": {
+      "title": "Most popular routes",
+      "startingFrom": "Starting from"
+    },
+    "hostSection": {
+      "title": "Become a transporter and earn money",
+      "description": "Profit from your travels by transporting packages for other people. Simple, secure and profitable.",
+      "cta": "Start now"
+    },
+    "supportSection": {
+      "support247": {
+        "title": "24/7 Support",
+        "description": "Understand the essentials before starting!",
+        "cta": "Learn more"
+      },
+      "insurance": {
+        "title": "Insurance and security",
+        "description": "Insured and tracked. Travel with peace of mind!"
+      },
+      "online": {
+        "title": "Online",
+        "description": "Ask any question to our support",
+        "placeholder": "Your question",
+        "send": "Send"
+      }
+    }
+  },
+  "announcements": {
+    "title": "Announcements",
+    "filters": {
+      "verifiedProfile": "Verified profile",
+      "lowestPrice": "Lowest price",
+      "airline": "Airline",
+      "travelDate": "Travel date",
+      "travelAd": "Travel ad",
+      "transportRequest": "Transport request"
+    },
+    "card": {
+      "availableSpace": "Available space",
+      "requestedSpace": "Requested space",
+      "departure": "Departure",
+      "perKilo": "/Kilo",
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit profile",
+    "addInfo": "Please add information about yourself in your profile settings.",
+    "sections": {
+      "reviews": "My Reviews",
+      "travelRequests": "My Travel Requests",
+      "travels": "My Travels",
+      "favorites": "My Favorites",
+      "payments": "Payments"
+    },
+    "stats": {
+      "rating": "Rating",
+      "success": "Success",
+      "response": "Response",
+      "earnings": "Earnings",
+      "packagesCarried": "Packages carried",
+      "distance": "Distance",
+      "packagesSent": "Packages sent"
+    },
+    "dialog": {
+      "title": "Profile",
+      "uploadProfilePicture": "Upload profile picture",
+      "firstName": "First name",
+      "firstNameNote": "(Only your first name appears on the platform)",
+      "lastName": "Last name",
+      "countryCode": "Country code",
+      "phoneNumber": "Phone number",
+      "phoneNote": "(We will send you a code to confirm your number.)",
+      "aboutMe": "About me",
+      "saveChanges": "Save changes"
+    }
+  },
+  "dialogs": {
+    "createAnnounce": {
+      "title": "Create announcement",
+      "step1": "Basic information",
+      "step2": "Photos",
+      "step3": "Price and conditions",
+      "departure": "Departure",
+      "arrival": "Arrival",
+      "travelDate": "Your travel date",
+      "flightNumber": "Flight number",
+      "reservationType": "Reservation type",
+      "singlePerson": "All my kilos for one person",
+      "sharedKilos": "Shared kilos with different travelers",
+      "bookingType": "Booking type",
+      "instant": "Instant",
+      "nonInstant": "Non-instant",
+      "story": "Your story",
+      "photos": "Photos",
+      "weight": "Weight (kg)",
+      "pricePerKilo": "Price per kilo",
+      "lateTax": "Late tax",
+      "noSmileTax": "No smile tax",
+      "allowExtraGrams": "Allow extra grams",
+      "create": "Create"
+    },
+    "createPackage": {
+      "title": "Create package request",
+      "title": "Package title",
+      "description": "Description",
+      "weight": "Weight (kg)",
+      "maxDeliveryDate": "Max delivery date",
+      "create": "Create"
+    },
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "login": "Login",
+      "noAccount": "Don't have an account?",
+      "register": "Register"
+    },
+    "register": {
+      "title": "Register",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "register": "Register",
+      "hasAccount": "Already have an account?",
+      "login": "Login"
+    }
+  },
+  "requests": {
+    "title": "Recent shipping requests",
+    "urgentDocuments": "Urgent package - Documents",
+    "birthdayGift": "Birthday gift",
+    "medications": "Medications",
+    "clothing": "Clothing",
+    "electronics": "Electronics",
+    "books": "Books"
+  },
+  "footer": {
+    "description": "Platform that connects travelers and shippers for economical and ecological shipments.",
+    "discover": {
+      "title": "Discover",
+      "announcements": "Announcements",
+      "transporters": "Transporters",
+      "howItWorks": "How it works",
+      "logos": "Logos"
+    },
+    "ship": {
+      "title": "Ship",
+      "postRequest": "Post a request",
+      "pricing": "Pricing",
+      "packageInsurance": "Package insurance"
+    },
+    "transport": {
+      "title": "Transport",
+      "becomeTransporter": "Become a transporter",
+      "securityRules": "Security rules",
+      "identityVerification": "Identity verification"
+    },
+    "support": {
+      "title": "Support",
+      "helpCenter": "Help center",
+      "forgotPassword": "Forgot password",
+      "contact": "Contact"
+    },
+    "account": {
+      "title": "Account",
+      "login": "Login",
+      "register": "Register"
+    },
+    "legal": {
+      "title": "Legal",
+      "termsPrivacy": "Terms & Privacy"
+    }
+  },
+  "languages": {
+    "fr": "Français",
+    "en": "English"
+  }
+}

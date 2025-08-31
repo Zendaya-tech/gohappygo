@@ -33,7 +33,7 @@ export default function RegisterDialog({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div
                 ref={ref}
-                className="relative w-full max-w-4xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden"
+                className="relative w-full max-w-4xl max-h-[90vh] mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden"
             >
                 <div className="flex">
                     {/* Côté gauche - Formulaire */}

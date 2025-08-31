@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 
 export default function HeroSection() {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const handleSearch = () => {
         navigate('/annonces');
@@ -16,7 +18,7 @@ export default function HeroSection() {
                         lors de votre voyage
                     </h1>
                     <p className="text-gray-600 dark:text-gray-300 text-lg mb-8 line-clamp-2">
-                        Faites enregistrer vos excédents de bagages par un autre voyageur du même vol , pour la même destination!
+                        {t('home.hero.subtitle')}
                     </p>
 
 
@@ -47,40 +49,40 @@ export default function HeroSection() {
             <div className="bg-white max-w-7xl mx-auto  dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mt-7 shadow-lg">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                     <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">De</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('home.hero.searchFrom')}</label>
                         <input
                             type="text"
-                            placeholder="Ville de départ"
+                            placeholder={t('home.hero.fromPlaceholder')}
                             className="w-full text-sm text-gray-600 dark:text-gray-300 bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 truncate"
                         />
                     </div>
                     <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vers</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('home.hero.searchTo')}</label>
                         <input
                             type="text"
-                            placeholder="Ville d'arrivée"
+                            placeholder={t('home.hero.toPlaceholder')}
                             className="w-full text-sm text-gray-600 dark:text-gray-300 bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 truncate"
                         />
                     </div>
                     <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('home.hero.searchDate')}</label>
                         <input
                             type="text"
-                            placeholder="Quand ?"
+                            placeholder={t('home.hero.datePlaceholder')}
                             className="w-full text-sm text-gray-600 dark:text-gray-300 bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 truncate"
                         />
                     </div>
                     <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vol</label>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('home.hero.searchFlight')}</label>
                         <input
                             type="text"
-                            placeholder="Numéro de vol"
+                            placeholder={t('home.hero.flightPlaceholder')}
                             className="w-full text-sm text-gray-600 dark:text-gray-300 bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 truncate"
                         />
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="min-w-0">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 truncate">Rechercher</label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 truncate">{t('home.hero.searchButton')}</label>
                             <span className="text-sm text-gray-600 dark:text-gray-300 truncate block">Trouver un voyageur</span>
                         </div>
                         <button

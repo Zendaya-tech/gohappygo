@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { countries } from 'country-flag-icons';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../../hooks/useLanguage';
 
 interface Language {
     code: string;
@@ -7,20 +8,14 @@ interface Language {
     countryCode: string;
 }
 
-interface LanguageDropdownProps {
-    currentLanguage: string;
-    onLanguageChange: (languageCode: string) => void;
-}
-
-export default function LanguageDropdown({ currentLanguage, onLanguageChange }: LanguageDropdownProps) {
+export default function LanguageDropdown() {
     const [isOpen, setIsOpen] = useState(false);
+    const { t } = useTranslation();
+    const { currentLanguage, changeLanguage } = useLanguage();
 
     const languages: Language[] = [
-        { code: 'fr', name: 'Français', countryCode: 'FR' },
-        { code: 'en', name: 'English', countryCode: 'US' },
-        { code: 'es', name: 'Español', countryCode: 'ES' },
-        { code: 'de', name: 'Deutsch', countryCode: 'DE' },
-        { code: 'it', name: 'Italiano', countryCode: 'IT' }
+        { code: 'fr', name: t('languages.fr'), countryCode: 'FR' },
+        { code: 'en', name: t('languages.en'), countryCode: 'GB' }
     ];
 
     const currentLang = languages.find(lang => lang.code === currentLanguage) || languages[0];
@@ -39,7 +34,7 @@ export default function LanguageDropdown({ currentLanguage, onLanguageChange }: 
     }, [isOpen]);
 
     const handleLanguageSelect = (languageCode: string) => {
-        onLanguageChange(languageCode);
+        changeLanguage(languageCode);
         setIsOpen(false);
     };
 
@@ -50,7 +45,6 @@ export default function LanguageDropdown({ currentLanguage, onLanguageChange }: 
                 className="text-gray-700 hover:text-blue-600 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors duration-200 flex items-center gap-2 font-medium text-sm"
             >
                 <img src={`https://purecatamphetamine.github.io/country-flag-icons/3x2/${currentLang.countryCode}.svg`} alt={currentLang.name} className="w-5 h-4 object-cover rounded-sm" />
-
 
                 <span>{currentLang.name}</span>
                 <svg

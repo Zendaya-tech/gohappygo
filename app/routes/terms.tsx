@@ -9,12 +9,12 @@ export default function TermsPrivacy() {
                 <section className="max-w-3xl mx-auto">
                     <h1 className="text-3xl font-bold text-gray-900">Conditions d’utilisation</h1>
                     <p className="mt-3 text-gray-600">
-                        En utilisant Go Happy Go, vous acceptez nos conditions générales. Merci de lire attentivement ces
+                        En utilisant GoHappyGo, vous acceptez nos conditions générales. Merci de lire attentivement ces
                         informations pour comprendre vos droits et responsabilités.
                     </p>
                     <div className="mt-6 space-y-4 text-gray-700">
                         <p>
-                            1. Go Happy Go met en relation des personnes disposant d’espace disponible dans leurs bagages et des
+                            1. GoHappyGo met en relation des personnes disposant d’espace disponible dans leurs bagages et des
                             personnes souhaitant expédier des objets. Les utilisateurs sont responsables du contenu transporté.
                         </p>
                         <p>
