@@ -106,6 +106,28 @@
     "popularRoutes": {
       "title": "Les trajets les plus populaires",
       "startingFrom": "À partir de"
+    },
+    "hostSection": {
+      "title": "Devenez transporteur et gagnez de l'argent",
+      "description": "Rentabilisez vos voyages en transportant des colis pour d'autres personnes. Simple, sécurisé et rémunérateur.",
+      "cta": "Commencer maintenant"
+    },
+    "supportSection": {
+      "support247": {
+        "title": "Support 24/7",
+        "description": "Comprenez l'essentiel avant de commencer!",
+        "cta": "En savoir plus"
+      },
+      "insurance": {
+        "title": "Assurance et sécurité",
+        "description": "Assurés et trackés. Voyagez l'esprit tranquille!"
+      },
+      "online": {
+        "title": "En ligne",
+        "description": "Posez n'importe quelle question à notre support",
+        "placeholder": "Votre question",
+        "send": "Envoyer"
+      }
     }
   },
   "announcements": {
@@ -224,13 +246,41 @@
     "books": "Livres"
   },
   "footer": {
-    "about": "À propos",
-    "howItWorks": "Comment ça marche",
-    "help": "Aide",
-    "contact": "Contact",
-    "terms": "Conditions d'utilisation",
-    "privacy": "Politique de confidentialité",
-    "cookies": "Cookies"
+    "description": "Plateforme qui connecte voyageurs et expéditeurs pour des envois économiques et écologiques.",
+    "discover": {
+      "title": "Découvrir",
+      "announcements": "Annonces",
+      "transporters": "Transporteurs",
+      "howItWorks": "Comment ça marche",
+      "logos": "Logos"
+    },
+    "ship": {
+      "title": "Expédier",
+      "postRequest": "Poster une demande",
+      "pricing": "Tarifs",
+      "packageInsurance": "Assurance colis"
+    },
+    "transport": {
+      "title": "Transporter",
+      "becomeTransporter": "Devenir transporteur",
+      "securityRules": "Règles de sécurité",
+      "identityVerification": "Vérification d'identité"
+    },
+    "support": {
+      "title": "Support",
+      "helpCenter": "Centre d'aide",
+      "forgotPassword": "Mot de passe oublié",
+      "contact": "Contact"
+    },
+    "account": {
+      "title": "Compte",
+      "login": "Se connecter",
+      "register": "S'inscrire"
+    },
+    "legal": {
+      "title": "Légal",
+      "termsPrivacy": "Conditions & Confidentialité"
+    }
   },
   "languages": {
     "fr": "Français",
