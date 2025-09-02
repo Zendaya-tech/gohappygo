@@ -52,7 +52,7 @@ export default function AnnounceDetail() {
     // Simple gallery to mirror the design
     const galleryImages = useMemo(
         () => [
-            "/images/history-converted.webp",
+            "https://images.planefinder.net/api/logo-square/BYD/w/396",
             "/images/rencontre1-converted.webp",
             "/images/rencontre2-converted.webp",
             "/images/rencontre3-converted.webp",
@@ -105,8 +105,8 @@ export default function AnnounceDetail() {
 
                     {/* Gallery with hover effects */}
                     <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-gray-900">
-                        <div className="grid grid-cols-3 gap-0">
-                            <div className="col-span-2 row-span-2 p-3">
+                        <div className="flex h-[400px] gap-0">
+                            <div className="flex-1 p-3">
                                 <div
                                     className="relative w-full h-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
                                     onClick={() => {
@@ -122,7 +122,7 @@ export default function AnnounceDetail() {
                                     <div className="absolute inset-0  bg-black  opacity-0  group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
                                 </div>
                             </div>
-                            <div className="col-span-1 p-3 flex flex-col gap-3">
+                            <div className="w-80 p-3 flex flex-col gap-3">
                                 <div
                                     className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
                                     onClick={() => {

@@ -10,7 +10,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section className="relative   py-16 px-4 mx-auto">
+        <section className="   py-16 px-4 mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                     <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6 font-poppins">
@@ -46,7 +46,7 @@ export default function HeroSection() {
             </div>
 
             {/* Search Form */}
-            <div className="bg-white max-w-7xl mx-auto  dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mt-7 shadow-lg">
+            <div className="bg-white max-w-7xl mx-auto sticky top-52 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mt-7 shadow-lg">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                     <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('home.hero.searchFrom')}</label>

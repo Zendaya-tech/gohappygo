@@ -31,7 +31,7 @@ export const listings: Listing[] = [
         id: "1",
         traveler: {
             name: "Marie Dubois",
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=100&h=100&fit=crop&crop=face",
+            avatar: "https://images.planefinder.net/api/logo-square/CFE/w/396",
             rating: 4.8,
             verified: true
         },
@@ -57,7 +57,7 @@ export const listings: Listing[] = [
         id: "2",
         traveler: {
             name: "Thomas Martin",
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+            avatar: "https://images.planefinder.net/api/logo-square/EFW/w/396",
             rating: 4.9,
             verified: true
         },
@@ -83,7 +83,7 @@ export const listings: Listing[] = [
         id: "3",
         traveler: {
             name: "Sophie Laurent",
-            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+            avatar: "https://images.planefinder.net/api/logo-square/BDR/w/396",
             rating: 4.7,
             verified: true
         },
@@ -109,7 +109,7 @@ export const listings: Listing[] = [
         id: "4",
         traveler: {
             name: "Pierre Moreau",
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+            avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
             rating: 4.6,
             verified: false
         },
@@ -134,7 +134,7 @@ export const listings: Listing[] = [
         id: "5",
         traveler: {
             name: "Emma Bernard",
-            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
+            avatar: "https://images.planefinder.net/api/logo-square/BDR/w/396",
             rating: 4.9,
             verified: true
         },
@@ -184,7 +184,7 @@ export const listings: Listing[] = [
         id: "7",
         traveler: {
             name: "Jack Black",
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+            avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
             rating: 4.8,
             verified: true
         },
@@ -210,7 +210,7 @@ export const listings: Listing[] = [
         id: "8",
         traveler: {
             name: "Bob Brown",
-            avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+            avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
             rating: 4.9,
             verified: true
         },

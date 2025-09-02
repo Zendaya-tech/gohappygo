@@ -48,7 +48,7 @@ export default function Annonces() {
         <div className="min-h-screen dark:bg-gray-950 relative">
             <Header />
 
-            <main className="container mx-auto py-8 px-4">
+            <main className="max-w-7xl mx-auto py-8 px-4">
                 {/* Search Bar - Hero Section Style */}
                 <div className="bg-white z-50  w-full mx-auto dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mb-8">
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-2">

@@ -7,7 +7,7 @@ export default function FeaturedProperties() {
             location: "Paris → New York",
             price: "15€/kg",
             rating: "4.8",
-            image: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=400&h=300&fit=crop&crop=face",
+            image: "https://images.planefinder.net/api/logo-square/BYD/w/396",
             weight: "8kg",
             departure: "15 Mars 2024"
         },
@@ -16,7 +16,7 @@ export default function FeaturedProperties() {
             location: "Lyon → Tokyo",
             price: "12€/kg",
             rating: "4.9",
-            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face",
+            image: "https://images.planefinder.net/api/logo-square/NTB/w/396",
             weight: "5kg",
             departure: "20 Mars 2024"
         },
@@ -25,7 +25,7 @@ export default function FeaturedProperties() {
             location: "Marseille → Londres",
             price: "8€/kg",
             rating: "4.7",
-            image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop&crop=face",
+            image: "https://images.planefinder.net/api/logo-square/AFB/w/396",
             weight: "12kg",
             departure: "18 Mars 2024"
         }
