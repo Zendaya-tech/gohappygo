@@ -1,23 +1,34 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 
-export default function CreatePackageDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function BookingDialog({
+    open,
+    onClose,
+    pricePerKilo,
+    onConfirm
+}: {
+    open: boolean;
+    onClose: () => void;
+    pricePerKilo: number;
+    onConfirm: (packageData: {
+        description: string;
+        weight: number;
+        deadline?: string;
+    }) => void;
+}) {
     const { t } = useTranslation();
     const [currentStep, setCurrentStep] = useState(1);
 
-    // Step 1: General
-    const [departureAirport, setDepartureAirport] = useState("");
-    const [arrivalAirport, setArrivalAirport] = useState("");
-    const [baggageDescription, setBaggageDescription] = useState("");
+    // Step 1: Package Details
+    const [packageDescription, setPackageDescription] = useState("");
+    const [weight, setWeight] = useState("");
+    const [deadline, setDeadline] = useState("");
 
     // Step 2: Photos
     const [photos, setPhotos] = useState<File[]>([]);
 
-    // Step 3: Price & Booking
-    const [weight, setWeight] = useState("");
-    const [pricePerKilo, setPricePerKilo] = useState("");
-    const [flightNumber, setFlightNumber] = useState("");
-    const [travelDate, setTravelDate] = useState("");
+    // Step 3: Review & Confirm
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
 
     useEffect(() => {
         if (!open) return;
@@ -31,14 +42,11 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
     useEffect(() => {
         if (open) {
             setCurrentStep(1);
-            setDepartureAirport("");
-            setArrivalAirport("");
-            setBaggageDescription("");
-            setPhotos([]);
+            setPackageDescription("");
             setWeight("");
-            setPricePerKilo("");
-            setFlightNumber("");
-            setTravelDate("");
+            setDeadline("");
+            setPhotos([]);
+            setAcceptedTerms(false);
         }
     }, [open]);
 
@@ -68,30 +76,32 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
     const canProceedToNext = () => {
         switch (currentStep) {
             case 1:
-                return departureAirport && arrivalAirport && baggageDescription;
+                return packageDescription && weight;
             case 2:
-                return photos.length >= 2;
+                return photos.length >= 1; // At least one photo required
             case 3:
-                return weight && pricePerKilo && flightNumber && travelDate;
+                return acceptedTerms;
             default:
                 return false;
         }
     };
 
     const handleSubmit = () => {
-        // Handle form submission
-        console.log("Form submitted:", {
-            departureAirport,
-            arrivalAirport,
-            baggageDescription,
-            photos,
-            weight,
-            pricePerKilo,
-            flightNumber,
-            travelDate
-        });
+        const packageData = {
+            description: packageDescription,
+            weight: parseFloat(weight),
+            deadline: deadline || undefined
+        };
+        onConfirm(packageData);
         onClose();
     };
+
+    // Calculate pricing
+    const subtotal = parseFloat(weight || "0") * pricePerKilo;
+    const vatRate = 0.24;
+    const vat = subtotal * vatRate;
+    const platformTax = 10;
+    const total = Math.max(0, subtotal + vat + platformTax);
 
     if (!open) return null;
 
@@ -101,7 +111,8 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
             <div className="relative z-10 w-full max-w-4xl overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10 dark:ring-white/10">
                 <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 py-4">
                     <div>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('dialogs.createPackage.title')}</h2>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Réserver un transport</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Prix: ${pricePerKilo}/kg</p>
                     </div>
                     <button onClick={onClose} className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Fermer">
                         <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6" /></svg>
@@ -112,10 +123,9 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                     {/* Left Sidebar - Progress Indicator */}
                     <div className="w-64 border-r border-gray-200 dark:border-gray-800 p-6">
                         <div className="space-y-6">
-                            {/* Step 1: General */}
+                            {/* Step 1: Package Details */}
                             <div className="flex items-start space-x-3">
-                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
-                                    }`}>
+                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
                                     {currentStep > 1 ? (
                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -126,10 +136,10 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                 </div>
                                 <div className="flex-1">
                                     <h3 className={`font-medium ${currentStep >= 1 ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
-                                        {t('dialogs.createAnnounce.step1')}
+                                        Détails du colis
                                     </h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t('dialogs.createAnnounce.step1')}
+                                        Description et poids
                                     </p>
                                 </div>
                                 {currentStep === 1 && (
@@ -137,10 +147,9 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                 )}
                             </div>
 
-                            {/* Step 2: Pictures */}
+                            {/* Step 2: Photos */}
                             <div className="flex items-start space-x-3">
-                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
-                                    }`}>
+                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
                                     {currentStep > 2 ? (
                                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -151,10 +160,10 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                 </div>
                                 <div className="flex-1">
                                     <h3 className={`font-medium ${currentStep >= 2 ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
-                                        {t('dialogs.createAnnounce.step2')}
+                                        Photos du colis
                                     </h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t('dialogs.createAnnounce.photos')}
+                                        Au moins une photo
                                     </p>
                                 </div>
                                 {currentStep === 2 && (
@@ -162,18 +171,17 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                 )}
                             </div>
 
-                            {/* Step 3: Price & Booking */}
+                            {/* Step 3: Review & Confirm */}
                             <div className="flex items-start space-x-3">
-                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
-                                    }`}>
+                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
                                     <span className="text-xs font-medium">3</span>
                                 </div>
                                 <div className="flex-1">
                                     <h3 className={`font-medium ${currentStep >= 3 ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
-                                        {t('dialogs.createAnnounce.step3')}
+                                        Confirmation
                                     </h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t('dialogs.createAnnounce.step3')}
+                                        Vérification finale
                                     </p>
                                 </div>
                             </div>
@@ -184,51 +192,78 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                     <div className="flex-1 p-6">
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {t('common.step')} {currentStep} {t('common.of')} 3
+                                Étape {currentStep} sur 3
                             </h3>
                         </div>
 
-                        {/* Step 1: General */}
+                        {/* Step 1: Package Details */}
                         {currentStep === 1 && (
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.departure')}
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={departureAirport}
-                                        onChange={(e) => setDepartureAirport(e.target.value)}
-                                        placeholder={t('dialogs.createAnnounce.departure')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.arrival')}
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={arrivalAirport}
-                                        onChange={(e) => setArrivalAirport(e.target.value)}
-                                        placeholder={t('dialogs.createAnnounce.arrival')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.story')}
+                                        Description du colis
                                     </label>
                                     <textarea
-                                        value={baggageDescription}
-                                        onChange={(e) => setBaggageDescription(e.target.value)}
+                                        value={packageDescription}
+                                        onChange={(e) => setPackageDescription(e.target.value)}
                                         rows={4}
-                                        placeholder={t('dialogs.createAnnounce.story')}
+                                        placeholder="Décrivez brièvement le contenu, l'emballage, etc."
                                         className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                     />
                                 </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Poids (kg)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            step="0.1"
+                                            value={weight}
+                                            onChange={(e) => setWeight(e.target.value)}
+                                            placeholder="0.0"
+                                            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            Date limite (optionnel)
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={deadline}
+                                            onChange={(e) => setDeadline(e.target.value)}
+                                            className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Price preview */}
+                                {weight && (
+                                    <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-4 bg-gray-50 dark:bg-gray-800">
+                                        <h4 className="font-medium text-gray-900 dark:text-white mb-3">Aperçu du prix</h4>
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex items-center justify-between text-gray-600 dark:text-gray-400">
+                                                <span>Sous-total ({weight}kg × ${pricePerKilo})</span>
+                                                <span>${subtotal.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between text-gray-600 dark:text-gray-400">
+                                                <span>TVA 24%</span>
+                                                <span>${vat.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex items-center justify-between text-gray-600 dark:text-gray-400">
+                                                <span>Frais plateforme</span>
+                                                <span>${platformTax.toFixed(2)}</span>
+                                            </div>
+                                            <div className="border-t border-gray-200 dark:border-gray-800 pt-2 flex items-center justify-between text-gray-800 dark:text-gray-200 font-semibold">
+                                                <span>Total</span>
+                                                <span>${total.toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
@@ -237,7 +272,7 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                             <div className="space-y-6">
                                 <div>
                                     <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                                        {t('dialogs.createAnnounce.photos')}
+                                        Photos du colis (au moins 1 photo requise)
                                     </p>
 
                                     <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
@@ -254,7 +289,8 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                                 <svg className="mx-auto h-12 w-12 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                                 </svg>
-                                                <p className="text-lg font-medium">{t('common.upload')}</p>
+                                                <p className="text-lg font-medium">Ajouter des photos</p>
+                                                <p className="text-sm">Glissez-déposez ou cliquez pour sélectionner</p>
                                             </div>
                                         </label>
                                     </div>
@@ -282,64 +318,53 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                             </div>
                         )}
 
-                        {/* Step 3: Price & Booking */}
+                        {/* Step 3: Review & Confirm */}
                         {currentStep === 3 && (
                             <div className="space-y-6">
-                    <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.weight')}
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.1"
-                                        value={weight}
-                                        onChange={(e) => setWeight(e.target.value)}
-                                        placeholder={t('dialogs.createAnnounce.weight')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                    </div>
+                                <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-6 bg-gray-50 dark:bg-gray-800">
+                                    <h4 className="font-medium text-gray-900 dark:text-white mb-4">Récapitulatif de la réservation</h4>
 
-                    <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.pricePerKilo')}
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={pricePerKilo}
-                                        onChange={(e) => setPricePerKilo(e.target.value)}
-                                        placeholder={t('dialogs.createAnnounce.pricePerKilo')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                    </div>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-600 dark:text-gray-400">Description:</span>
+                                            <span className="text-gray-900 dark:text-white font-medium">{packageDescription}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-600 dark:text-gray-400">Poids:</span>
+                                            <span className="text-gray-900 dark:text-white font-medium">{weight} kg</span>
+                                        </div>
+                                        {deadline && (
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-gray-600 dark:text-gray-400">Date limite:</span>
+                                                <span className="text-gray-900 dark:text-white font-medium">{deadline}</span>
+                                            </div>
+                                        )}
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-gray-600 dark:text-gray-400">Photos:</span>
+                                            <span className="text-gray-900 dark:text-white font-medium">{photos.length} photo(s)</span>
+                                        </div>
+                                        <div className="border-t border-gray-200 dark:border-gray-800 pt-3">
+                                            <div className="flex items-center justify-between text-lg font-semibold text-gray-900 dark:text-white">
+                                                <span>Total à payer:</span>
+                                                <span>${total.toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                        <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.flightNumber')}
-                                    </label>
+                                <div className="flex items-start space-x-3">
                                     <input
-                                        type="text"
-                                        value={flightNumber}
-                                        onChange={(e) => setFlightNumber(e.target.value)}
-                                        placeholder={t('dialogs.createAnnounce.flightNumber')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        type="checkbox"
+                                        id="terms"
+                                        checked={acceptedTerms}
+                                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                        className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                     />
-                        </div>
-
-                        <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.travelDate')}
+                                    <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
+                                        J'accepte les <a href="#" className="text-blue-600 hover:text-blue-700 underline">conditions générales</a> et la <a href="#" className="text-blue-600 hover:text-blue-700 underline">politique de confidentialité</a>
                                     </label>
-                                    <input
-                                        type="date"
-                                        value={travelDate}
-                                        onChange={(e) => setTravelDate(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                        </div>
-                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {/* Navigation Buttons */}
@@ -349,18 +374,11 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                 onClick={prevStep}
                                 disabled={currentStep === 1}
                                 className={`px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium transition-colors ${currentStep === 1
-                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                                     }`}
                             >
-                                ← {t('common.back')}
-                            </button>
-
-                            <button
-                                type="button"
-                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                            >
-                                {t('common.save')} {t('common.as')} {t('common.unfinished')}
+                                ← Retour
                             </button>
 
                             {currentStep < 3 ? (
@@ -369,11 +387,11 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                     onClick={nextStep}
                                     disabled={!canProceedToNext()}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${canProceedToNext()
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                         }`}
                                 >
-                                    {t('common.next')} →
+                                    Suivant →
                                 </button>
                             ) : (
                                 <button
@@ -381,19 +399,17 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                     onClick={handleSubmit}
                                     disabled={!canProceedToNext()}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${canProceedToNext()
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        ? 'bg-green-600 text-white hover:bg-green-700'
+                                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                         }`}
                                 >
-                                    {t('dialogs.createAnnounce.create')}
+                                    Confirmer la réservation
                                 </button>
                             )}
                         </div>
                     </div>
-                    </div>
+                </div>
             </div>
         </div>
     );
 }
-
-

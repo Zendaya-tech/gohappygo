@@ -20,7 +20,11 @@
     "share": "Partager",
     "copy": "Copier",
     "view": "Voir",
-    "explore": "Explorer"
+    "explore": "Explorer",
+    "step": "Étape",
+    "of": "sur",
+    "as": "comme",
+    "unfinished": "inachevé"
   },
   "header": {
     "downloadApp": "Téléchargez l'appli +",

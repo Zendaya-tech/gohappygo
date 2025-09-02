@@ -164,7 +164,7 @@ export default function Profile() {
                                         <div className="flex items-center gap-3">
                                             {section.icon}
                                             <span className="text-sm font-medium">{section.label}</span>
-                                        </div>
+                            </div>
                                         <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
                                             {section.count}
                                         </span>

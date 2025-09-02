@@ -20,7 +20,11 @@
     "share": "Share",
     "copy": "Copy",
     "view": "View",
-    "explore": "Explore"
+    "explore": "Explore",
+    "step": "Step",
+    "of": "of",
+    "as": "as",
+    "unfinished": "unfinished"
   },
   "header": {
     "downloadApp": "Download app +",
