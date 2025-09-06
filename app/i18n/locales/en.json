@@ -70,7 +70,7 @@
     "recommendations": {
       "title": "Our Recommendations",
       "exploreDestinations": "Explore new destinations",
-      "popularRoutes": "Popular routes",
+      "popularRoutes": "Popular journeys",
       "secureTransport": "Ship securely",
       "fragilePackages": "Fragile packages",
       "saveOnShipping": "Save on shipping",
@@ -108,7 +108,7 @@
       }
     },
     "popularRoutes": {
-      "title": "Most popular routes",
+      "title": "Most popular journeys",
       "startingFrom": "Starting from"
     },
     "hostSection": {
