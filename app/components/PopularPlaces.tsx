@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 export default function PopularPlaces() {
     const { t } = useTranslation();
     const routes = [
-        { name: "PARIS → NEW YORK", price: "15€/kg", image: "https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=300&fit=crop" },
-        { name: "LYON → TOKYO", price: "18€/kg", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=300&fit=crop" },
-        { name: "MARSEILLE → LONDRES", price: "8€/kg", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop" },
-        { name: "NICE → BARCELONE", price: "6€/kg", image: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=400&h=300&fit=crop" }
+        { name: "PARIS → NEW YORK", price: "15€/kg", image: "./images/paris.jpg" },
+        { name: "LYON → PEKIN", price: "18€/kg", image: "./images/pekin.jpg" },
+        { name: "MARSEILLE → LONDRES", price: "8€/kg", image: "./images/londre.jpg" },
+        { name: "NICE → BARCELONE", price: "6€/kg", image: "./images/barcelone.jpg" }
     ];
 
     return (
