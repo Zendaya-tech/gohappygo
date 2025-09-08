@@ -14,7 +14,7 @@ export default function HeroSection() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <div>
                     <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6 font-poppins">
-                        Emportez autant de bagages que vous le Desirez avec  <span className="text-blue-600 text-5xl font-black"> GoHappyGo </span>
+                        Emportez autant de bagages que vous le desirez avec  <span className="text-blue-600 text-5xl font-black"> GoHappyGo </span>
                         lors de votre voyage
                     </h1>
                     <p className="text-gray-600 dark:text-gray-300 text-lg mb-8 line-clamp-2">

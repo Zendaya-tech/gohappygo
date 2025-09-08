@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 interface AnnounceType {
     id: string;
@@ -19,7 +20,7 @@ export default function AnnounceTypeDropdown({
     onSelectType,
 }: AnnounceTypeDropdownProps) {
     const ref = useRef<HTMLDivElement | null>(null);
-
+    const { t } = useTranslation()
     useEffect(() => {
         if (!open) return;
         const onKey = (e: KeyboardEvent) => {
@@ -79,7 +80,9 @@ export default function AnnounceTypeDropdown({
                         }}
                         className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-200 text-sm font-medium text-gray-700 hover:text-blue-600"
                     >
-                        {type.title}
+
+                        {t("demande." + type.title)}
+
                     </button>
                 ))}
             </div>

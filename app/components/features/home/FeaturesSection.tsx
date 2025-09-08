@@ -37,23 +37,23 @@ export default function FeaturesSection() {
                         const IconComponent = feature.image;
                         return (
                             <div key={feature.id} className="group relative h-full">
-                                <div className=" rounded-2xl p-8  transition-all duration-300 transform hover:-translate-y-2 border border-gray-200 h-full flex flex-col">
+                                <div className=" rounded-2xl p-8  transition-all duration-300 transform hover:-translate-y-2  h-full flex flex-col">
 
                                     <div className="relative">
                                         <div className="mb-8">
-                                            <div className={` h-56  relative`}>
-                                                <img src={feature.image} alt={feature.title} className=" text-white h-full w-full object-cover" />
+                                            <div className={` relative text-center`}>
+                                                <img src={feature.image} alt={feature.title} className=" text-white h-36 m-auto  object-cover" />
 
                                                 {/* Petites icônes flottantes */}
 
                                             </div>
                                         </div>
 
-                                        <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors duration-300">
                                             {feature.title}
                                         </h3>
 
-                                        <p className="text-gray-600  text-justify leading-relaxed text-base">
+                                        <p className="text-gray-600  text-justify leading-relaxed text-sm">
                                             {feature.description}
                                         </p>
 

@@ -52,7 +52,7 @@ export default function Reviews() {
 
     return (
         <section className="px-4 py-12 mx-auto">
-            <div className='flex gap-4'>
+            <div className='flex gap-4 flex-col lg:flex-row justify-center lg:justify-start items-center '>
 
 
                 {/*worl map reviews*/}
@@ -126,9 +126,9 @@ export default function Reviews() {
                 </div>
                 {/* Review display area */}
                 <div className='w-96 flex items-center'>
-                    <div className="bg-white rounded-lg shadow-lg p-6 animate-fade-in">
-                        <ReviewCard {...reviews[selectedReview]} />
-                    </div>
+
+                    <ReviewCard {...reviews[selectedReview]} />
+
                 </div>
 
             </div>

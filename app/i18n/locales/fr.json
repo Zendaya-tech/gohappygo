@@ -1,4 +1,8 @@
 {
+  "demande":{
+    "Colis":"Demandez un transport",
+    "Voyage":"Annonce de voyage"
+  },
   "common": {
     "loading": "Chargement...",
     "save": "Sauvegarder",
@@ -46,8 +50,8 @@
       "searchDate": "Date",
       "searchFlight": "Vol",
       "searchButton": "Rechercher",
-      "fromPlaceholder": "Ville de départ",
-      "toPlaceholder": "Ville d'arrivée",
+      "fromPlaceholder": "Aéroport de départ",
+      "toPlaceholder": "Aéroport d'arrivée",
       "datePlaceholder": "Quand ?",
       "flightPlaceholder": "Numéro de vol"
     },
@@ -241,7 +245,7 @@
     }
   },
   "requests": {
-    "title": "Demandes d'envoi récentes",
+    "title": "Demandes de transport",
     "urgentDocuments": "Colis urgent - Documents",
     "birthdayGift": "Cadeau d'anniversaire",
     "medications": "Médicaments",

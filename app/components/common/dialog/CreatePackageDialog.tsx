@@ -29,24 +29,23 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
     }, [open, onClose]);
 
     useEffect(() => {
-        if (open) {
-            setCurrentStep(1);
-            setDepartureAirport("");
-            setArrivalAirport("");
-            setBaggageDescription("");
-            setPhotos([]);
-            setWeight("");
-            setPricePerKilo("");
-            setFlightNumber("");
-            setTravelDate("");
-        }
+        if (!open) return;
+        setCurrentStep(1);
+        setDepartureAirport("");
+        setArrivalAirport("");
+        setBaggageDescription("");
+        setPhotos([]);
+        setWeight("");
+        setPricePerKilo("");
+        setFlightNumber("");
+        setTravelDate("");
     }, [open]);
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const newPhotos = Array.from(e.target.files);
-            setPhotos(prev => [...prev, ...newPhotos]);
-        }
+        if (!e.target.files) return;
+        const list = Array.from(e.target.files);
+        setPhotos(prev => [...prev, ...list]);
+        e.target.value = '';
     };
 
     const removePhoto = (index: number) => {
@@ -54,32 +53,27 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
     };
 
     const nextStep = () => {
-        if (currentStep < 3) {
-            setCurrentStep(currentStep + 1);
-        }
+        if (currentStep < 3) setCurrentStep(currentStep + 1);
     };
 
     const prevStep = () => {
-        if (currentStep > 1) {
-            setCurrentStep(currentStep - 1);
-        }
+        if (currentStep > 1) setCurrentStep(currentStep - 1);
     };
 
     const canProceedToNext = () => {
         switch (currentStep) {
             case 1:
-                return departureAirport && arrivalAirport && baggageDescription;
+                return Boolean(departureAirport) && Boolean(arrivalAirport) && Boolean(baggageDescription);
             case 2:
                 return photos.length >= 2;
             case 3:
-                return weight && pricePerKilo && flightNumber && travelDate;
+                return Boolean(weight) && Boolean(pricePerKilo) && Boolean(flightNumber) && Boolean(travelDate);
             default:
                 return false;
         }
     };
 
     const handleSubmit = () => {
-        // Handle form submission
         console.log("Form submitted:", {
             departureAirport,
             arrivalAirport,
@@ -96,304 +90,199 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black/40 backdrop-blur-[1px]" onClick={onClose} />
-            <div className="relative z-10 w-full max-w-4xl overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10 dark:ring-white/10">
-                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 py-4">
-                    <div>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t('dialogs.createPackage.title')}</h2>
-                    </div>
-                    <button onClick={onClose} className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800" aria-label="Fermer">
-                        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6" /></svg>
-                    </button>
-                </div>
+        <div className="fixed inset-0 z-50 flex items-start justify-center p-4">
+            {/* Overlay */}
+            <div className="fixed inset-0 bg-black/35" onClick={onClose} />
 
-                <div className="flex">
-                    {/* Left Sidebar - Progress Indicator */}
-                    <div className="w-64 border-r border-gray-200 dark:border-gray-800 p-6">
-                        <div className="space-y-6">
-                            {/* Step 1: General */}
-                            <div className="flex items-start space-x-3">
-                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
-                                    }`}>
-                                    {currentStep > 1 ? (
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                        </svg>
-                                    ) : (
-                                        <span className="text-xs font-medium">1</span>
-                                    )}
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className={`font-medium ${currentStep >= 1 ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
-                                        {t('dialogs.createAnnounce.step1')}
-                                    </h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t('dialogs.createAnnounce.step1')}
-                                    </p>
-                                </div>
-                                {currentStep === 1 && (
-                                    <div className="w-px h-8 bg-green-500 ml-3"></div>
-                                )}
-                            </div>
+            {/* Dialog container */}
+            <div className="relative z-10 mt-10 w-full max-w-6xl overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10 dark:ring-white/10 max-h-[85vh] flex flex-col">
+                <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-0 flex-1">
+                    {/* Sidebar steps */}
+                    <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800 p-6 overflow-y-auto">
+                        <StepsNavPackage step={currentStep as 1 | 2 | 3} />
+                    </aside>
 
-                            {/* Step 2: Pictures */}
-                            <div className="flex items-start space-x-3">
-                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
-                                    }`}>
-                                    {currentStep > 2 ? (
-                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                        </svg>
-                                    ) : (
-                                        <span className="text-xs font-medium">2</span>
-                                    )}
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className={`font-medium ${currentStep >= 2 ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
-                                        {t('dialogs.createAnnounce.step2')}
-                                    </h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t('dialogs.createAnnounce.photos')}
-                                    </p>
-                                </div>
-                                {currentStep === 2 && (
-                                    <div className="w-px h-8 bg-green-500 ml-3"></div>
-                                )}
-                            </div>
+                    {/* Content */}
+                    <section className="p-6 overflow-y-auto min-h-0">
+                        <header className="mb-6">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dialogs.createPackage.title')} — {t('common.step')} {currentStep} {t('common.of')} 3</h2>
+                        </header>
 
-                            {/* Step 3: Price & Booking */}
-                            <div className="flex items-start space-x-3">
-                                <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'
-                                    }`}>
-                                    <span className="text-xs font-medium">3</span>
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className={`font-medium ${currentStep >= 3 ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
-                                        {t('dialogs.createAnnounce.step3')}
-                                    </h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        {t('dialogs.createAnnounce.step3')}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right Content Area */}
-                    <div className="flex-1 p-6">
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                {t('common.step')} {currentStep} {t('common.of')} 3
-                            </h3>
-                        </div>
-
-                        {/* Step 1: General */}
                         {currentStep === 1 && (
                             <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.departure')}
-                                    </label>
+                                <Field label={t('dialogs.createAnnounce.departure')}>
                                     <input
-                                        type="text"
                                         value={departureAirport}
                                         onChange={(e) => setDepartureAirport(e.target.value)}
                                         placeholder={t('dialogs.createAnnounce.departure')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.arrival')}
-                                    </label>
+                                </Field>
+                                <Field label={t('dialogs.createAnnounce.arrival')}>
                                     <input
-                                        type="text"
                                         value={arrivalAirport}
                                         onChange={(e) => setArrivalAirport(e.target.value)}
                                         placeholder={t('dialogs.createAnnounce.arrival')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.story')}
-                                    </label>
+                                </Field>
+                                <Field label={t('dialogs.createAnnounce.story')}>
                                     <textarea
                                         value={baggageDescription}
                                         onChange={(e) => setBaggageDescription(e.target.value)}
-                                        rows={4}
+                                        rows={5}
                                         placeholder={t('dialogs.createAnnounce.story')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                        className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Step 2: Photos */}
-                        {currentStep === 2 && (
-                            <div className="space-y-6">
-                                <div>
-                                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
-                                        {t('dialogs.createAnnounce.photos')}
-                                    </p>
-
-                                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center">
-                                        <input
-                                            type="file"
-                                            multiple
-                                            accept="image/*"
-                                            onChange={handleFileUpload}
-                                            className="hidden"
-                                            id="photo-upload"
-                                        />
-                                        <label htmlFor="photo-upload" className="cursor-pointer">
-                                            <div className="text-gray-500 dark:text-gray-400">
-                                                <svg className="mx-auto h-12 w-12 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                </svg>
-                                                <p className="text-lg font-medium">{t('common.upload')}</p>
-                                            </div>
-                                        </label>
-                                    </div>
-
-                                    {photos.length > 0 && (
-                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-                                            {photos.map((photo, index) => (
-                                                <div key={index} className="relative">
-                                                    <img
-                                                        src={URL.createObjectURL(photo)}
-                                                        alt={`Photo ${index + 1}`}
-                                                        className="w-full h-32 object-cover rounded-lg"
-                                                    />
-                                                    <button
-                                                        onClick={() => removePhoto(index)}
-                                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                                                    >
-                                                        ×
-                                                    </button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Step 3: Price & Booking */}
-                        {currentStep === 3 && (
-                            <div className="space-y-6">
-                    <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.weight')}
-                                    </label>
+                                </Field>
+                                <Field label={t('dialogs.createAnnounce.flightNumber')}>
                                     <input
-                                        type="number"
-                                        min="0"
-                                        step="0.1"
-                                        value={weight}
-                                        onChange={(e) => setWeight(e.target.value)}
-                                        placeholder={t('dialogs.createAnnounce.weight')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                    </div>
-
-                    <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.pricePerKilo')}
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        value={pricePerKilo}
-                                        onChange={(e) => setPricePerKilo(e.target.value)}
-                                        placeholder={t('dialogs.createAnnounce.pricePerKilo')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    />
-                    </div>
-
-                        <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.flightNumber')}
-                                    </label>
-                                    <input
-                                        type="text"
                                         value={flightNumber}
                                         onChange={(e) => setFlightNumber(e.target.value)}
                                         placeholder={t('dialogs.createAnnounce.flightNumber')}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
-                        </div>
-
-                        <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        {t('dialogs.createAnnounce.travelDate')}
-                                    </label>
+                                </Field>
+                                <Field label={t('dialogs.createAnnounce.travelDate')}>
                                     <input
                                         type="date"
                                         value={travelDate}
                                         onChange={(e) => setTravelDate(e.target.value)}
-                                        className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
-                        </div>
-                    </div>
+                                </Field>
+                            </div>
                         )}
 
-                        {/* Navigation Buttons */}
-                        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-800">
-                            <button
-                                type="button"
-                                onClick={prevStep}
-                                disabled={currentStep === 1}
-                                className={`px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-sm font-medium transition-colors ${currentStep === 1
-                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                    }`}
-                            >
-                                ← {t('common.back')}
-                            </button>
+                        {currentStep === 2 && (
+                            <div className="space-y-6">
+                                <p className="text-gray-700 dark:text-gray-300 font-medium">{t('dialogs.createAnnounce.photos')}</p>
+                                <label className="block cursor-pointer rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-10 text-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileUpload} />
+                                    {t('common.upload')}
+                                </label>
+                                {photos.length > 0 && (
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        {photos.map((photo, idx) => (
+                                            <div key={idx} className="relative rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                                                <button
+                                                    onClick={() => removePhoto(idx)}
+                                                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg z-10"
+                                                    title="Remove image"
+                                                >
+                                                    −
+                                                </button>
+                                                <img
+                                                    src={URL.createObjectURL(photo)}
+                                                    alt={`Preview ${idx + 1}`}
+                                                    className="w-full h-32 object-cover"
+                                                />
+                                                <div className="p-2">
+                                                    <div className="text-xs text-gray-600 dark:text-gray-300 truncate">{photo.name}</div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
-                            <button
-                                type="button"
-                                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                            >
-                                {t('common.save')} {t('common.as')} {t('common.unfinished')}
-                            </button>
+                        {currentStep === 3 && (
+                            <div className="space-y-6">
+                                <Field label={t('dialogs.createAnnounce.weight')}>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        step={0.1}
+                                        value={weight}
+                                        onChange={(e) => setWeight(e.target.value)}
+                                        placeholder={t('dialogs.createAnnounce.weight')}
+                                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                </Field>
+                                <Field label={t('dialogs.createAnnounce.pricePerKilo')}>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        step={0.01}
+                                        value={pricePerKilo}
+                                        onChange={(e) => setPricePerKilo(e.target.value)}
+                                        placeholder={t('dialogs.createAnnounce.pricePerKilo')}
+                                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                </Field>
+                            </div>
+                        )}
 
+                        {/* Footer actions */}
+                        <div className="mt-10 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <button
+                                    className="rounded-xl bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+                                    onClick={() => (currentStep > 1 ? prevStep() : onClose())}
+                                >
+                                    ‹ {t('common.back')}
+                                </button>
+                                <button className="text-sm text-gray-500">{t('common.save')} {t('common.as')} {t('common.unfinished')}</button>
+                            </div>
                             {currentStep < 3 ? (
                                 <button
-                                    type="button"
-                                    onClick={nextStep}
                                     disabled={!canProceedToNext()}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${canProceedToNext()
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                        }`}
+                                    onClick={nextStep}
+                                    className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white ${canProceedToNext() ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed"}`}
                                 >
-                                    {t('common.next')} →
+                                    {t('common.next')} ›
                                 </button>
                             ) : (
                                 <button
-                                    type="button"
                                     onClick={handleSubmit}
                                     disabled={!canProceedToNext()}
-                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${canProceedToNext()
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                        }`}
+                                    className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white ${canProceedToNext() ? "bg-indigo-600 hover:bg-indigo-700" : "bg-gray-300 cursor-not-allowed"}`}
                                 >
                                     {t('dialogs.createAnnounce.create')}
                                 </button>
                             )}
                         </div>
-                    </div>
-                    </div>
+                    </section>
+                </div>
             </div>
         </div>
     );
 }
 
+function StepsNavPackage({ step }: { step: 1 | 2 | 3 }) {
+    const Item = ({ index, title, subtitle }: { index: 1 | 2 | 3; title: string; subtitle: string }) => (
+        <div className="flex items-start gap-3 py-4">
+            <div className={`mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full border ${index <= step ? "border-green-500 text-green-600" : "border-gray-300 text-gray-400"}`}>
+                {index <= step ? (
+                    <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                ) : (
+                    <span className="h-2 w-2 rounded-full bg-gray-300"></span>
+                )}
+            </div>
+            <div>
+                <div className={`text-base font-semibold ${index <= step ? "text-gray-900 dark:text-white" : "text-gray-400"}`}>{title}</div>
+                <div className="text-sm text-gray-400">{subtitle}</div>
+            </div>
+        </div>
+    );
 
+    return (
+        <div>
+            <Item index={1} title="General" subtitle="Select basic settings" />
+            <div className="ml-2 h-6 w-px bg-gray-200 dark:bg-gray-800" />
+            <Item index={2} title="Pictures" subtitle="Add 2 photos" />
+            <div className="ml-2 h-6 w-px bg-gray-200 dark:bg-gray-800" />
+            <Item index={3} title="Price & Booking" subtitle="Specify your preferences" />
+        </div>
+    );
+}
+
+function Field({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
+    return (
+        <div>
+            <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-white">{label}</label>
+            {children}
+        </div>
+    );
+}

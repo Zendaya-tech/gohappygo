@@ -29,6 +29,7 @@ export default function Header() {
     const [showAnnounceTypeDropdown, setShowAnnounceTypeDropdown] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
     const [showRegister, setShowRegister] = useState(false);
+    const [showMobilePublishOptions, setShowMobilePublishOptions] = useState(false);
     const handleAnnounceTypeSelect = (type: 'travel' | 'package') => {
         if (type === 'travel') {
             setShowCreateAnnounce(true);
@@ -194,6 +195,38 @@ export default function Header() {
                             <a href="/annonces" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200">
                                 Voir les annonces
                             </a>
+                            <button
+                                onClick={() => setShowMobilePublishOptions((v) => !v)}
+                                className="w-full flex items-center justify-between px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200"
+                            >
+                                {t('header.publishAd')}
+                                <svg className="h-4 w-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+                                </svg>
+                            </button>
+                            {showMobilePublishOptions && (
+                                <div className="pl-3 space-y-1">
+                                    <button
+                                        onClick={() => { setShowCreateAnnounce(true); setIsMenuOpen(false); }}
+                                        className="block w-full text-left px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                                    >
+                                        Publier un trajet
+                                    </button>
+                                    <button
+                                        onClick={() => { setShowCreatePackage(true); setIsMenuOpen(false); }}
+                                        className="block w-full text-left px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                                    >
+                                        Publier un colis
+                                    </button>
+                                </div>
+                            )}
+                            <button
+                                onClick={() => { setPinnedDownload(true); setHoverDownload((v) => !v); }}
+                                className="block w-full px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200"
+                                ref={(el) => { (downloadBtnRef as any).current = el; }}
+                            >
+                                Téléchargez l’appli
+                            </button>
                             {/* <a href="#" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200">
                                 Envoyer un colis
                             </a>
@@ -203,6 +236,14 @@ export default function Header() {
                             <a href="#" className="block px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200">
                                 Comment ça marche
                             </a>
+                            {!isLoggedIn && (
+                                <button
+                                    onClick={() => { setShowLogin(true); setIsMenuOpen(false); }}
+                                    className="block w-full px-3 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-lg font-medium transition-colors duration-200"
+                                >
+                                    Se connecter
+                                </button>
+                            )}
 
                         </div>
                     </div>

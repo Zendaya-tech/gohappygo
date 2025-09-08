@@ -41,7 +41,7 @@ export default function AppDownloadPopover({ open, onClose, pinned, onTogglePin,
     return (
         <div
             ref={containerRef}
-            className="absolute left-1/2 top-full z-50 mt-2 w-64 -translate-x-1/2 overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700"
+            className="absolute  top-full z-50 mt-2 w-64 overflow-hidden rounded-xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700"
             role="dialog"
             aria-label="Télécharger l'application"
         >
