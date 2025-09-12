@@ -5,6 +5,7 @@ import { listings } from '../data/announces';
 import { useState } from 'react';
 import FooterMinimal from '~/components/FooterMinimal';
 import PropertyCard from '~/components/PropertyCard';
+import SearchFiltersBar from '~/components/SearchFiltersBar';
 
 export default function Annonces() {
     const [selectedFilters, setSelectedFilters] = useState<string[]>(['verified']);
@@ -49,62 +50,15 @@ export default function Annonces() {
             <Header />
 
             <main className="max-w-7xl mx-auto py-8 px-4">
-                {/* Search Bar - Hero Section Style */}
-                <div className="bg-white z-50  w-full mx-auto dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
-                        <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">De</label>
-                            <input
-                                type="text"
-                                value={searchParams.from}
-                                onChange={(e) => setSearchParams({ ...searchParams, from: e.target.value })}
-                                placeholder="Ville de départ"
-                                className="w-full text-sm text-gray-600 dark:text-gray-300 bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 truncate"
-                            />
-                        </div>
-                        <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vers</label>
-                            <input
-                                type="text"
-                                value={searchParams.to}
-                                onChange={(e) => setSearchParams({ ...searchParams, to: e.target.value })}
-                                placeholder="Ville d'arrivée"
-                                className="w-full text-sm text-gray-600 dark:text-gray-300 bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 truncate"
-                            />
-                        </div>
-                        <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
-                            <input
-                                type="text"
-                                value={searchParams.date}
-                                onChange={(e) => setSearchParams({ ...searchParams, date: e.target.value })}
-                                placeholder="Quand ?"
-                                className="w-full text-sm text-gray-600 dark:text-gray-300 bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 truncate"
-                            />
-                        </div>
-                        <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vol</label>
-                            <input
-                                type="text"
-                                value={searchParams.flight}
-                                onChange={(e) => setSearchParams({ ...searchParams, flight: e.target.value })}
-                                placeholder="Numéro de vol"
-                                className="w-full text-sm text-gray-600 dark:text-gray-300 bg-transparent border-none outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 truncate"
-                            />
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="min-w-0">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 truncate">Rechercher</label>
-                                <span className="text-sm text-gray-600 dark:text-gray-300 truncate block">Trouver un voyageur</span>
-                            </div>
-                            <button className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                {/* Search Bar */}
+                <SearchFiltersBar
+                    initialFrom={searchParams.from}
+                    initialTo={searchParams.to}
+                    initialDate={new Date().toISOString().slice(0, 10)}
+                    initialFlight={searchParams.flight}
+                    initialWeight={0}
+                    onChange={(f) => setSearchParams({ from: f.from, to: f.to, date: f.date, flight: f.flight })}
+                />
 
                 {/* Main Content with Filters and Results */}
                 <div className="flex gap-8  ">

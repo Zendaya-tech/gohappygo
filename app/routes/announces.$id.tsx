@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
 import { ShareIcon } from "@heroicons/react/24/outline";
 import BookingDialog from "~/components/common/dialog/BookingDialog";
+import MessageDialog from "~/components/common/dialog/MessageDialog";
 import ShareDialog from "~/components/common/dialog/ShareDialog";
 
 function formatDate(dateString: string) {
@@ -27,8 +28,12 @@ export default function AnnounceDetail() {
     const [shareOpen, setShareOpen] = useState<boolean>(false);
     const [bookOpen, setBookOpen] = useState<boolean>(false);
     const [sliderOpen, setSliderOpen] = useState<boolean>(false);
+    const [messageOpen, setMessageOpen] = useState<boolean>(false);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
+    const [newRating, setNewRating] = useState<number>(0);
+    const averageRating = 4.0;
+    const totalReviews = 1;
 
     if (!listing) {
         return (
@@ -170,11 +175,11 @@ export default function AnnounceDetail() {
                                 <div className="flex items-center gap-3">
                                     <button
                                         onClick={() => navigate('/profile')}
-                                        className="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 transition-colors duration-200"
+                                        className="rounded-lg bg-blue-600 px-5 py-2  font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors duration-200"
                                     >
                                         Profile
                                     </button>
-                                    <button className="rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">Message</button>
+                                    <button onClick={() => setMessageOpen(true)} className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2  font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">Message</button>
                                 </div>
                             </div>
 
@@ -185,7 +190,7 @@ export default function AnnounceDetail() {
                                         <span className="font-medium">{listing.departure.city} → {listing.destination.city}</span>
                                         <span>Départ: {formatDate(listing.departure.date)}</span>
                                         <span className="font-medium">Vol N° FRH{String(listing.id).padStart(3, "0")}</span>
-                                        <span className="text-indigo-600">Espace disponible: {listing.availableWeight}kg</span>
+                                        <span className="text-blue-600">Espace disponible: {listing.availableWeight}kg</span>
                                     </div>
                                 </div>
                                 <div className="md:col-span-3 text-left md:text-right">
@@ -205,26 +210,77 @@ export default function AnnounceDetail() {
 
                             {/* Badges */}
                             <div className="mt-6 flex flex-wrap items-center gap-6 text-sm">
-                                <div className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                {/* <div className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">✓</span>
                                     accepte qu'une personne pour tous les kilos
                                 </div>
                                 <div className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">⏱️</span>
                                     accepte la ponctualité
-                                </div>
-                                <div className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                                </div> */}
+                                {/* <div className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300">
                                     <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">⚖️</span>
                                     n'accepte pas de grammes en trop
-                                </div>
+                                </div> */}
                             </div>
 
                             {/* Capacity bar */}
-                            <div className="mt-6 space-y-2">
+                            {/* <div className="mt-6 space-y-2">
                                 <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                                     <div className={`h-full rounded-full ${availableRatio > 0.5 ? "bg-green-500" : availableRatio > 0.2 ? "bg-yellow-500" : "bg-red-500"}`} style={{ width: `${availablePercent}%` }} />
                                 </div>
                                 <div className="text-xs text-gray-500 dark:text-gray-400">Capacité restante: {listing.availableWeight}kg / {listing.maxWeight}kg ({availablePercent}%)</div>
+                            </div> */}
+
+
+                            {/* Bottom reviews-like section */}
+                            <div className="mt-14   mb-14">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">Add a review</h3>
+                                    {/* Interactive stars */}
+                                    <div className="flex items-center">
+                                        {[1, 2, 3, 4, 5].map((i) => (
+                                            <button
+                                                key={i}
+                                                onClick={() => setNewRating(i)}
+                                                className="p-0.5"
+                                                aria-label={`Rate ${i} star${i > 1 ? 's' : ''}`}
+                                            >
+                                                <svg className={`h-5 w-5 ${i <= newRating ? 'text-yellow-400' : 'text-gray-300'}`} viewBox="0 0 20 20" fill="currentColor">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.176 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81H7.03a1 1 0 00.95-.69l1.07-3.293z" />
+                                                </svg>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">You will not be able to edit your review</p>
+                                <div className="rounded-2xl   flex items-center justify-between gap-3">
+                                    <input placeholder="Write your review..." className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                                    <button className="rounded-lg bg-blue-600 text-white px-5 py-3 font-semibold hover:bg-blue-700">Post a review</button>
+                                </div>
+                                <div className="mt-8">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className="text-xl font-semibold text-gray-900 dark:text-white">1 Comments</h4>
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <div className="flex items-center">
+                                                {[1, 2, 3, 4, 5].map(i => (
+                                                    <svg key={i} className={`h-4 w-4 ${i <= Math.round(averageRating) ? 'text-yellow-400' : 'text-gray-300'}`} viewBox="0 0 20 20" fill="currentColor">
+                                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.176 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81H7.03a1 1 0 00.95-.69l1.07-3.293z" />
+                                                    </svg>
+                                                ))}
+                                            </div>
+                                            <span className="text-gray-700 dark:text-gray-300 font-medium">{averageRating.toFixed(1)}</span>
+                                            <span className="text-gray-500">({totalReviews} reviews)</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start gap-3">
+                                        <img src={listing.traveler.avatar} alt="avatar" className="h-10 w-10 rounded-full" />
+                                        <div>
+                                            <div className="text-sm text-gray-600 dark:text-gray-400">Jack Black • {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}</div>
+                                            <p className="mt-1 text-gray-800 dark:text-gray-200">g</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -258,10 +314,12 @@ export default function AnnounceDetail() {
                                     </div>
                                 </div>
 
-                                <button onClick={() => setBookOpen(true)} className="mt-6 w-full rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700">Book now</button>
+                                <button onClick={() => setBookOpen(true)} className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700">Book now</button>
                             </div>
                         </aside>
                     </div>
+
+
 
                 </div>
 
@@ -286,9 +344,22 @@ export default function AnnounceDetail() {
             <BookingDialog
                 open={bookOpen}
                 onClose={() => setBookOpen(false)}
-                pricePerKilo={listing.price}
-                onConfirm={(packageData) => {
-                    setKilos(packageData.weight);
+                amount={total}
+                email={"test1@demo.com"}
+                onConfirm={() => {
+                    // Keep existing behavior: confirm sets kilos implicitly by existing input
+                }}
+            />
+
+            {/* Message Dialog */}
+            <MessageDialog
+                open={messageOpen}
+                onClose={() => setMessageOpen(false)}
+                title={`${listing.departure.city} → ${listing.destination.city}`}
+                hostName={listing.traveler.name}
+                hostAvatar={listing.traveler.avatar}
+                onSend={(msg) => {
+                    console.log('Message sent:', msg);
                 }}
             />
 

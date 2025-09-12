@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
+import SearchFiltersBar from '~/components/SearchFiltersBar';
 
 export default function HeroSection() {
     const navigate = useNavigate();
@@ -46,7 +47,7 @@ export default function HeroSection() {
             </div>
 
             {/* Search Form */}
-            <div className="bg-white max-w-7xl mx-auto sticky top-52 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mt-7 shadow-lg">
+            {/* <div className="bg-white max-w-7xl mx-auto sticky top-52 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mt-7 shadow-lg">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                     <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('home.hero.searchFrom')}</label>
@@ -87,7 +88,7 @@ export default function HeroSection() {
                         </div>
                         <button
                             onClick={handleSearch}
-                            className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition-colors duration-200"
+                            className="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700 transition-colors duration-200"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -95,6 +96,9 @@ export default function HeroSection() {
                         </button>
                     </div>
                 </div>
+            </div> */}
+            <div className="mt-12">
+                <SearchFiltersBar />
             </div>
         </section>
     );

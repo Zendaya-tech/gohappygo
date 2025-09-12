@@ -78,12 +78,6 @@ export default function Footer() {
 
                     {/* Compte & Légal */}
                     <div>
-                        <h4 className="font-semibold mb-4">Compte</h4>
-                        <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-                            <li><a href="/login" className="hover:text-gray-900 dark:hover:text-gray-100">Se connecter</a></li>
-                            <li><a href="/register" className="hover:text-gray-900 dark:hover:text-gray-100">S’inscrire</a></li>
-
-                        </ul>
                         <h4 className="font-semibold mt-6 mb-4">Légal</h4>
                         <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
                             <li><a href="/terms-privacy" className="hover:text-gray-900 dark:hover:text-gray-100">Conditions & Confidentialité</a></li>

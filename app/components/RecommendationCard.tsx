@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { PlayCircleIcon } from '@heroicons/react/24/outline';
 
 interface RecommendationCardProps {
     title: string;
@@ -35,14 +36,14 @@ export default function RecommendationCard({ title, subtitle, image, videoUrl }:
                     </div>
 
                     <div className="flex gap-2">
-                        <button className="bg-blue-600 hover:bg-blue-700  text-white px-4 py-2 rounded-lg">
+                        <button className="bg-blue-600 hover:bg-blue-700 text-sm  text-white px-4 py-2 rounded-lg">
                             Explorer
                         </button>
                         <button
                             onClick={openVideoModal}
-                            className="bg-white/40 backdrop-blur-2xl w-32 text-white px-4 py-2 rounded-lg hover:bg-white/50 transition-colors"
+                            className="bg-white/40 backdrop-blur-2xl text-sm w-32 relative text-white px-4 py-2 rounded-lg hover:bg-white/50 transition-colors"
                         >
-                            {t('home.recommendations.watchVideo')}
+                            <PlayCircleIcon className="size-4 absolute left-1 top-1/2 -translate-y-1/2 " />  {t('home.recommendations.watchVideo')}
                         </button>
                     </div>
                 </div>

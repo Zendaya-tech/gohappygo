@@ -68,7 +68,7 @@ export default function App() {
   return (
     <>
       <Outlet />
-      <ChatWidget />
+      {/* <ChatWidget /> */}
       <CookieConsent />
     </>
   );
