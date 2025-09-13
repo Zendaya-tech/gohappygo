@@ -61,7 +61,7 @@ export default function Annonces() {
                 />
 
                 {/* Main Content with Filters and Results */}
-                <div className="flex gap-8  ">
+                <div className="flex gap-8 mt-10 ">
                     {/* Left Sidebar - Filters */}
                     <div className="w-64 flex-shrink-0 sticky top-52">
                         <div className="bg-gray-100 dark:bg-gray-900 rounded-2xl p-6  border border-gray-200 dark:border-gray-800">
@@ -103,7 +103,8 @@ export default function Annonces() {
                                 return (
                                     <PropertyCard
                                         key={listing.id}
-                                        title={listing.traveler.name}
+                                        name={listing.traveler.name}
+                                        avatar={listing.traveler.avatar}
                                         location={route}
                                         price={`${listing.price}€/kg`}
                                         rating={listing.traveler.rating.toString()}
@@ -112,7 +113,8 @@ export default function Annonces() {
                                         weight={`${listing.availableWeight}kg`}
                                         departure={tripDate}
                                         airline={listing.airline}
-                                        isRequest={listing.isRequest}
+                                        // isRequest={listing.isRequest}
+                                        type="transporter"
                                     />
                                 );
                             })}

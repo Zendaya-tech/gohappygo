@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 type Props = {
     initialFrom?: string;
@@ -29,6 +30,7 @@ export default function SearchFiltersBar({
     const [date, setDate] = useState(initialDate);
     const [flight, setFlight] = useState(initialFlight);
     const [weight, setWeight] = useState<number>(initialWeight);
+    const navigate = useNavigate();
 
     const emit = (next?: Partial<{ from: string; to: string; date: string; flight: string; weight: number }>) => {
         if (!onChange) return;
@@ -36,8 +38,12 @@ export default function SearchFiltersBar({
         onChange(payload);
     };
 
+    const handleSearch = () => {
+        navigate('/annonces');
+    };
+
     return (
-        <div className="bg-white max-w-7xl mx-auto sticky top-52 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6 mt-7 shadow-lg">
+        <div className="bg-white max-w-7xl mx-auto  dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6  shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-6 gap-2">
                 {/* From */}
                 <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
@@ -109,7 +115,9 @@ export default function SearchFiltersBar({
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 truncate">Rechercher</label>
                         <span className="text-sm text-gray-600 dark:text-gray-300 truncate block">Trouver un voyageur</span>
                     </div>
-                    <button className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
+                    <button
+                        onClick={handleSearch}
+                        className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>

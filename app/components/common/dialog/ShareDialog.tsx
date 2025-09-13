@@ -117,7 +117,7 @@ export default function ShareDialog({ open, onClose, listing }: ShareDialogProps
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="fixed inset-0 bg-black/40 backdrop-blur-[1px]" onClick={onClose} />
-            <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl">
+            <div className="relative z-10 w-full max-w-xl bg-white rounded-2xl shadow-2xl">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200">
                     <h2 className="text-xl font-semibold text-gray-900">Partager cette annonce</h2>
@@ -142,7 +142,8 @@ export default function ShareDialog({ open, onClose, listing }: ShareDialogProps
                         <div className="flex-1">
                             <h3 className="font-medium text-gray-900">{listing.title}</h3>
                             <p className="text-sm text-gray-600">
-                                {listing.location} • ★{listing.rating} • {listing.bedrooms} chambre{listing.bedrooms > 1 ? 's' : ''} • {listing.beds} lit{listing.beds > 1 ? 's' : ''} • {listing.bathrooms} salle{listing.bathrooms > 1 ? 's' : ''} de bain
+                                {listing.location} • ★{listing.rating} • {listing.availableWeight}kg
+
                             </p>
                         </div>
                     </div>
@@ -155,12 +156,12 @@ export default function ShareDialog({ open, onClose, listing }: ShareDialogProps
                             <button
                                 key={index}
                                 onClick={option.action}
-                                className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-200 ${option.primary
-                                        ? 'border-blue-500 bg-blue-50 hover:bg-blue-100'
-                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                className={`flex  items-center justify-center p-2 rounded-xl border transition-all duration-200 ${option.primary
+                                    ? 'border-blue-500 bg-blue-50 hover:bg-blue-100'
+                                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                                     }`}
                             >
-                                <div className={`w-8 h-8 flex items-center justify-center mb-2 ${option.primary ? 'text-blue-600' : 'text-gray-600'
+                                <div className={`w-8 h-8 flex items-center justify-center  ${option.primary ? 'text-blue-600' : 'text-gray-600'
                                     }`}>
                                     {option.icon}
                                 </div>

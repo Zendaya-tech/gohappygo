@@ -1,5 +1,6 @@
 export interface Listing {
     id: string;
+    type: "traveler" | "transporter";
     traveler: {
         name: string;
         avatar: string;
@@ -29,6 +30,7 @@ export interface Listing {
 export const listings: Listing[] = [
     {
         id: "1",
+        type: "traveler",
         traveler: {
             name: "Marie Dubois",
             avatar: "https://images.planefinder.net/api/logo-square/CFE/w/396",
@@ -55,6 +57,7 @@ export const listings: Listing[] = [
     },
     {
         id: "2",
+        type: "traveler",
         traveler: {
             name: "Thomas Martin",
             avatar: "https://images.planefinder.net/api/logo-square/EFW/w/396",
@@ -81,6 +84,7 @@ export const listings: Listing[] = [
     },
     {
         id: "3",
+        type: "traveler",
         traveler: {
             name: "Sophie Laurent",
             avatar: "https://images.planefinder.net/api/logo-square/BDR/w/396",
@@ -107,6 +111,7 @@ export const listings: Listing[] = [
     },
     {
         id: "4",
+        type: "traveler",
         traveler: {
             name: "Pierre Moreau",
             avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
@@ -132,6 +137,7 @@ export const listings: Listing[] = [
     },
     {
         id: "5",
+        type: "traveler",
         traveler: {
             name: "Emma Bernard",
             avatar: "https://images.planefinder.net/api/logo-square/BDR/w/396",
@@ -157,6 +163,7 @@ export const listings: Listing[] = [
     },
     {
         id: "6",
+        type: "traveler",
         traveler: {
             name: "Lucas Petit",
             avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
@@ -182,6 +189,7 @@ export const listings: Listing[] = [
     },
     {
         id: "7",
+        type: "traveler",
         traveler: {
             name: "Jack Black",
             avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
@@ -208,6 +216,7 @@ export const listings: Listing[] = [
     },
     {
         id: "8",
+        type: "traveler",
         traveler: {
             name: "Bob Brown",
             avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
@@ -234,6 +243,7 @@ export const listings: Listing[] = [
     },
     {
         id: "9",
+        type: "traveler",
         traveler: {
             name: "Patrick Olongo",
             avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
