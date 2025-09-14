@@ -142,7 +142,7 @@ export default function ShareDialog({ open, onClose, listing }: ShareDialogProps
                         <div className="flex-1">
                             <h3 className="font-medium text-gray-900">{listing.title}</h3>
                             <p className="text-sm text-gray-600">
-                                {listing.location} • ★{listing.rating} • {listing.availableWeight}kg
+                                {listing.location} • ★{listing.rating}
 
                             </p>
                         </div>

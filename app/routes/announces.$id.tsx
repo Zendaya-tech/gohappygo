@@ -60,7 +60,6 @@ export default function AnnounceDetail() {
             "https://images.planefinder.net/api/logo-square/BYD/w/396",
             "/images/rencontre1-converted.webp",
             "/images/rencontre2-converted.webp",
-            "/images/rencontre3-converted.webp",
         ],
         []
     );
@@ -235,10 +234,10 @@ export default function AnnounceDetail() {
 
                             {/* Bottom reviews-like section */}
                             <div className="mt-14   mb-14">
-                                <div className="flex items-center justify-between mb-2">
-                                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">Add a review</h3>
-                                    {/* Interactive stars */}
-                                    <div className="flex items-center">
+                                {/* <div className="flex items-center justify-between mb-2"> */}
+                                {/* <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">Add a review</h3> */}
+                                {/* Interactive stars */}
+                                {/* <div className="flex items-center">
                                         {[1, 2, 3, 4, 5].map((i) => (
                                             <button
                                                 key={i}
@@ -252,12 +251,12 @@ export default function AnnounceDetail() {
                                             </button>
                                         ))}
                                     </div>
-                                </div>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">You will not be able to edit your review</p>
-                                <div className="rounded-2xl   flex items-center justify-between gap-3">
+                                </div> */}
+                                {/* <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">You will not be able to edit your review</p> */}
+                                {/* <div className="rounded-2xl   flex items-center justify-between gap-3">
                                     <input placeholder="Write your review..." className="flex-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                                     <button className="rounded-lg bg-blue-600 text-white px-5 py-3 font-semibold hover:bg-blue-700">Post a review</button>
-                                </div>
+                                </div> */}
                                 <div className="mt-8">
                                     <div className="flex items-center justify-between mb-4">
                                         <h4 className="text-xl font-semibold text-gray-900 dark:text-white">1 Comments</h4>
@@ -402,7 +401,7 @@ export default function AnnounceDetail() {
                             <img
                                 src={galleryImages[currentImageIndex]}
                                 alt={`Image ${currentImageIndex + 1}`}
-                                className="max-w-full max-h-full object-contain rounded-lg"
+                                className="max-w-full max-h-full  object-contain  rounded-lg"
                             />
                         </div>
 

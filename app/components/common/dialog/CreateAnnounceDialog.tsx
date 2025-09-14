@@ -106,16 +106,7 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
                                         className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </Field>
-                                <Field label="Tell a bit more  about your travel">
-                                    <textarea
-                                        value={story}
-                                        onChange={(e) => setStory(e.target.value)}
-                                        rows={5}
-                                        placeholder="Type here..."
-                                        className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                    <div className="mt-1 text-xs text-gray-400">Max 500 characters</div>
-                                </Field>
+
                                 <Field label="Numéro de Vol">
                                     <input
                                         value={flightNumber}
@@ -132,6 +123,17 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
                                         placeholder="Choisir une date"
                                         className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
+                                </Field>
+
+                                <Field label="Tell a bit more  about your travel">
+                                    <textarea
+                                        value={story}
+                                        onChange={(e) => setStory(e.target.value)}
+                                        rows={5}
+                                        placeholder="Type here..."
+                                        className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                    <div className="mt-1 text-xs text-gray-400">Max 500 characters</div>
                                 </Field>
                                 <div>
                                     <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">What kind of reservation do you prefer?</div>

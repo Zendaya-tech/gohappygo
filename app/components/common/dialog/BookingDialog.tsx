@@ -41,19 +41,19 @@ export default function BookingDialog({
             <div className="relative z-10 w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
                 {/* Logo badge */}
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-                    <div className="h-16 w-16 rounded-full border-4 border-white shadow-md overflow-hidden bg-gradient-to-br from-indigo-400 to-yellow-400 flex items-center justify-center">
-                        <svg className="h-8 w-8 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l7 6v12h-5v-7H10v7H5V9l7-6z" /></svg>
+                    <div className=" rounded-full border-4 border-white shadow-md  bg-white flex items-center justify-center">
+                        <img src="/logo.png" alt="GoHappyGo" className="h-16" />
                     </div>
                 </div>
 
                 {/* Header */}
-                <div className="pt-10 text-center px-6">
-                    <h3 className="text-xl font-bold text-gray-900">HomeBnB Template</h3>
-                    <p className="mt-1 text-sm text-gray-500">Booking a stay at Perfectly located C…</p>
+                <div className="pt-20 text-center px-6">
+                    <h3 className="text-xl font-bold text-gray-900">GoHappyGo</h3>
+                    <p className="mt-1 text-sm text-gray-500">Réserver vos kilos pour votre prochain voyage</p>
                 </div>
 
                 {/* Email row */}
-                <div className="mt-4 border-y bg-gray-50 text-center text-gray-700 text-sm font-medium py-3">{email || "test1@demo.com"}</div>
+                {/* <div className="mt-4 border-y bg-gray-50 text-center text-gray-700 text-sm font-medium py-3">{email || "test1@demo.com"}</div> */}
 
                 {/* Card form */}
                 <div className="px-6 py-5">

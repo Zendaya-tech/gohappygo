@@ -105,7 +105,7 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                     {/* Content */}
                     <section className="p-6 overflow-y-auto min-h-0">
                         <header className="mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t('dialogs.createPackage.title')} — {t('common.step')} {currentStep} {t('common.of')} 3</h2>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{/*t('dialogs.createPackage.title')*/}  {t('common.step')} {currentStep} {t('common.of')} 3</h2>
                         </header>
 
                         {currentStep === 1 && (
@@ -126,15 +126,7 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                         className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </Field>
-                                <Field label={t('dialogs.createAnnounce.story')}>
-                                    <textarea
-                                        value={baggageDescription}
-                                        onChange={(e) => setBaggageDescription(e.target.value)}
-                                        rows={5}
-                                        placeholder={t('dialogs.createAnnounce.story')}
-                                        className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </Field>
+
                                 <Field label={t('dialogs.createAnnounce.flightNumber')}>
                                     <input
                                         value={flightNumber}
@@ -149,6 +141,16 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                         value={travelDate}
                                         onChange={(e) => setTravelDate(e.target.value)}
                                         className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                </Field>
+
+                                <Field label={t('dialogs.createAnnounce.story')}>
+                                    <textarea
+                                        value={baggageDescription}
+                                        onChange={(e) => setBaggageDescription(e.target.value)}
+                                        rows={5}
+                                        placeholder={t('dialogs.createAnnounce.story')}
+                                        className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </Field>
                             </div>

@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAuthStore, type AuthState } from "../../../store/auth";
 
 export default function LoginDialog({
     open,
@@ -27,6 +28,40 @@ export default function LoginDialog({
         };
     }, [open, onClose]);
 
+
+
+    const login = useAuthStore((s: AuthState) => s.login);
+    const [formData, setFormData] = useState({
+        email: '',
+        password: '',
+        rememberMe: false
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Simulated auth: set cookie via store and optional localStorage for other UI bits
+        const demoToken = 'demo-auth-token';
+        const demoUser = {
+            id: 'u_demo',
+            name: formData.email.split('@')[0] || 'Utilisateur',
+            avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=64&h=64&fit=crop&crop=face'
+        };
+        try {
+            // keep ChatWidget compatibility (uses localStorage currently)
+            window.localStorage.setItem('auth_token', demoToken);
+        } catch { }
+        login(demoToken, demoUser);
+        onClose();
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
     if (!open) return null;
 
     return (
@@ -42,7 +77,7 @@ export default function LoginDialog({
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">Connexion</h1>
                             <p className="text-gray-600">et profitez de toutes les possibilités</p>
                         </div>
-                        <form className="space-y-6">
+                        <form className="space-y-6" onSubmit={handleSubmit}>
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                                     Email
@@ -50,9 +85,12 @@ export default function LoginDialog({
                                 <input
                                     type="email"
                                     id="email"
+                                    name="email"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                     placeholder="Votre email"
                                     required
+                                    value={formData.email}
+                                    onChange={handleChange}
                                 />
                             </div>
 
@@ -63,15 +101,18 @@ export default function LoginDialog({
                                 <input
                                     type="password"
                                     id="password"
+                                    name="password"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                     placeholder="Votre mot de passe"
                                     required
+                                    value={formData.password}
+                                    onChange={handleChange}
                                 />
                             </div>
 
                             <div className="flex items-center justify-between">
                                 <label className="flex items-center">
-                                    <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                                    <input type="checkbox" className="rounded border-gray-300 text-blue-600 focus:ring-blue-500" name="rememberMe" checked={formData.rememberMe} onChange={handleChange} />
                                     <span className="ml-2 text-sm text-gray-600">Se souvenir de moi</span>
                                 </label>
                                 <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">

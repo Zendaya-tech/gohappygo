@@ -292,6 +292,26 @@
   },
   "languages": {
     "fr": "Français",
-    "en": "English"
+    "en": "English",
+    "de": "Allemand",
+    "es": "Espagnol",
+    "it": "Italien",
+    "pt": "Portugais",
+    "ru": "Russe",
+    "tr": "Turque",
+    "zh": "Chinois",
+    "ar": "Arabe",
+    "hi": "Hindi",
+    "bn": "Bengali",
+    "pa": "Punjabi",
+    "te": "Télougou",
+    "ta": "Tamoul",
+    "th": "Thaï",
+    "vi": "Vietnamien",
+    "id": "Indonésien",
+    "ms": "Malaisien",
+    "fil": "Filipino",
+    "ja": "Japonais",
+    "ko": "Coréen"
   }
 }

@@ -7,7 +7,7 @@ interface ReviewCardProps {
 
 export default function ReviewCard({ review, name, avatar, rating }: ReviewCardProps) {
     return (
-        <div className="bg-gray-100 rounded-lg  p-6 animate-fade-in">
+        <div className="bg-gray-50 rounded-lg  p-6 animate-fade-in">
             <img src="/images/quote.svg" alt="quote" className="w-10 h-10 mb-4" />
             <p className="text-gray-600 mb-4 h-24">"{review}"</p>
 

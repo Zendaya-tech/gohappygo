@@ -27,7 +27,7 @@ export default function PropertyCard({ name, location, price, type, rating, imag
     return (
         <Link to={`/announces/${"9"}`} className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
             <div className="relative overflow-hidden rounded-2xl">
-                <img src={image} alt={name} className="w-full h-48 object-cover" />
+                <img src={image} alt={name} className={`${type === 'transporter' && 'max-h-full max-w-full'} w-full object-cover `} />
                 {featured && (
                     <div className="absolute top-4 left-4 bg-emerald-950/80 text-white px-4 py-1 rounded-full text-xs">
                         Vérifié
@@ -69,11 +69,11 @@ export default function PropertyCard({ name, location, price, type, rating, imag
                         {type === 'transporter' ? 'Espace disponible' : 'Espace demandé'}: {weight}
                     </p>
                 )}
-                {departure && type === 'transporter' && (
+                {departure && (
                     <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">Départ: {departure}</p>
                 )}
 
-                {departure && type === 'transporter' && (
+                {departure && (
 
                     <div className="flex items-center justify-between">
                         <span className="font-semibold text-gray-900 dark:text-white">{price}</span>

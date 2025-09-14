@@ -39,7 +39,6 @@ export default function Footer() {
                     <div>
                         <h4 className="font-semibold mb-4">{t('footer.discover.title')}</h4>
                         <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-                            <li><a href="/annonces" className="hover:text-gray-900 dark:hover:text-gray-100">{t('footer.discover.announcements')}</a></li>
                             <li><a href="/transporters" className="hover:text-gray-900 dark:hover:text-gray-100">{t('footer.discover.transporters')}</a></li>
                             <li><a href="/how-it-work" className="hover:text-gray-900 dark:hover:text-gray-100">{t('footer.discover.howItWorks')}</a></li>
                             <li><a href="/logos" className="hover:text-gray-900 dark:hover:text-gray-100">{t('footer.discover.logos')}</a></li>
@@ -71,18 +70,12 @@ export default function Footer() {
                         <h4 className="font-semibold mb-4">Support</h4>
                         <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
                             <li><a href="/help-center" className="hover:text-gray-900 dark:hover:text-gray-100">Centre d'aide</a></li>
-                            <li><a href="/forgot-password" className="hover:text-gray-900 dark:hover:text-gray-100">Mot de passe oublié</a></li>
                             <li><a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Contact</a></li>
+                            <li><a href="/terms-privacy" className="hover:text-gray-900 dark:hover:text-gray-100">Conditions & Confidentialité</a></li>
+
                         </ul>
                     </div>
 
-                    {/* Compte & Légal */}
-                    <div>
-                        <h4 className="font-semibold mt-6 mb-4">Légal</h4>
-                        <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-                            <li><a href="/terms-privacy" className="hover:text-gray-900 dark:hover:text-gray-100">Conditions & Confidentialité</a></li>
-                        </ul>
-                    </div>
                 </div>
 
                 <div className="border-t dark:border-gray-700 border-gray-300 mt-10 pt-8 text-center text-sm text-gray-900 dark:text-gray-100">
