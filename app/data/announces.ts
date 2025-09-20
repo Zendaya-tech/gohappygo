@@ -7,23 +7,26 @@ export interface Listing {
         rating: number;
         verified: boolean;
     };
+    //departure airport
     departure: {
+        name: string; // e.g. "Paris CDG (CDG)"
         city: string;
         country: string;
-        airport: string; // e.g. "Paris CDG (CDG)"
         date: string;
         time: string;
+        airline: string; // Logo de la compagnie aérienne
     };
+    //departure  airport
     destination: {
         city: string;
         country: string;
-        airport: string; // e.g. "JFK New York (JFK)"
+        name: string; // e.g. "JFK New York (JFK)"
+        airline: string; // Logo de la compagnie aérienne
     };
     price: number;
     availableWeight: number;
     maxWeight: number;
     description: string;
-    airline?: string; // Logo de la compagnie aérienne
     isRequest?: boolean; // Si c'est une demande de transport
 }
 
@@ -40,20 +43,21 @@ export const listings: Listing[] = [
         departure: {
             city: "Paris",
             country: "France",
-            airport: "Paris CDG (CDG)",
+            name: "Paris CDG (CDG)",
             date: "2024-03-20",
-            time: "14:30"
+            time: "14:30",
+            airline: "Air France"
         },
         destination: {
             city: "New York",
             country: "États-Unis",
-            airport: "JFK New York (JFK)"
+            name: "JFK New York (JFK)",
+            airline: "United Airlines"
         },
         price: 15,
         availableWeight: 8,
         maxWeight: 10,
         description: "Voyage d'affaires, espace disponible dans ma valise pour vos colis",
-        airline: "Air France"
     },
     {
         id: "2",
@@ -67,20 +71,21 @@ export const listings: Listing[] = [
         departure: {
             city: "Lyon",
             country: "France",
-            airport: "Lyon–Saint-Exupéry (LYS)",
+            name: "Lyon–Saint-Exupéry (LYS)",
             date: "2024-03-22",
-            time: "09:15"
+            time: "09:15",
+            airline: "United Airlines"
         },
         destination: {
             city: "Tokyo",
             country: "Japon",
-            airport: "Tokyo Haneda (HND)"
+            name: "Tokyo Haneda (HND)",
+            airline: "United Airlines"
         },
         price: 18,
         availableWeight: 5,
         maxWeight: 8,
         description: "Vacances au Japon, je peux transporter vos colis avec plaisir",
-        airline: "United Airlines"
     },
     {
         id: "3",
@@ -94,20 +99,21 @@ export const listings: Listing[] = [
         departure: {
             city: "Marseille",
             country: "France",
-            airport: "Marseille Provence (MRS)",
+            name: "Marseille Provence (MRS)",
             date: "2024-03-18",
-            time: "16:45"
+            time: "16:45",
+            airline: "Qatar Airways"
         },
         destination: {
             city: "Londres",
             country: "Royaume-Uni",
-            airport: "London Heathrow (LHR)"
+            name: "London Heathrow (LHR)",
+            airline: "Qatar Airways"
         },
         price: 8,
         availableWeight: 12,
         maxWeight: 15,
         description: "Étudiant en échange, beaucoup d'espace disponible",
-        airline: "Qatar Airways"
     },
     {
         id: "4",
@@ -119,21 +125,24 @@ export const listings: Listing[] = [
             verified: false
         },
         departure: {
+            airline: "Air France",
             city: "Nice",
             country: "France",
-            airport: "Nice Côte d'Azur (NCE)",
+            name: "Nice Côte d'Azur (NCE)",
             date: "2024-03-25",
             time: "11:20"
         },
         destination: {
+            airline: "Air France",
             city: "Barcelone",
             country: "Espagne",
-            airport: "Barcelona El Prat (BCN)"
+            name: "Barcelona El Prat (BCN)"
         },
         price: 6,
         availableWeight: 7,
         maxWeight: 10,
-        description: "Week-end à Barcelone, espace libre dans mes bagages"
+        description: "Week-end à Barcelone, espace libre dans mes bagages",
+        airline: "Air France"
     },
     {
         id: "5",
@@ -145,21 +154,23 @@ export const listings: Listing[] = [
             verified: true
         },
         departure: {
+            airline: "Air France",
             city: "Toulouse",
             country: "France",
-            airport: "Toulouse-Blagnac (TLS)",
+            name: "Toulouse-Blagnac (TLS)",
             date: "2024-03-28",
             time: "07:50"
         },
         destination: {
+            airline: "Air France",
             city: "Berlin",
             country: "Allemagne",
-            airport: "Berlin Brandenburg (BER)"
+            name: "Berlin Brandenburg (BER)",
         },
         price: 12,
         availableWeight: 6,
         maxWeight: 8,
-        description: "Conférence professionnelle, transport sécurisé garanti"
+        description: "Conférence professionnelle, transport sécurisé garanti",
     },
     {
         id: "6",
@@ -173,19 +184,21 @@ export const listings: Listing[] = [
         departure: {
             city: "Bordeaux",
             country: "France",
-            airport: "Bordeaux–Mérignac (BOD)",
+            name: "Bordeaux–Mérignac (BOD)",
             date: "2024-03-30",
-            time: "13:10"
+            time: "13:10",
+            airline: "Air France"
         },
         destination: {
             city: "Amsterdam",
             country: "Pays-Bas",
-            airport: "Amsterdam Schiphol (AMS)"
+            name: "Amsterdam Schiphol (AMS)",
+            airline: "Air France"
         },
         price: 10,
         availableWeight: 9,
         maxWeight: 12,
-        description: "Voyage personnel, flexible sur les types de colis"
+        description: "Voyage personnel, flexible sur les types de colis",
     },
     {
         id: "7",
@@ -199,20 +212,22 @@ export const listings: Listing[] = [
         departure: {
             city: "Paris",
             country: "France",
-            airport: "Paris CDG (CDG)",
+            name: "Paris CDG (CDG)",
             date: "2024-03-15",
-            time: "10:30"
+            time: "10:30",
+            airline: "Air France"
         },
         destination: {
             city: "New York",
             country: "États-Unis",
-            airport: "JFK New York (JFK)"
+            name: "JFK New York (JFK)",
+            airline: "Air France"
         },
         price: 15,
         availableWeight: 8,
         maxWeight: 10,
         description: "Besoin de transporter un sac en cuir",
-        isRequest: true
+        isRequest: true,
     },
     {
         id: "8",
@@ -226,14 +241,16 @@ export const listings: Listing[] = [
         departure: {
             city: "Lyon",
             country: "France",
-            airport: "Lyon–Saint-Exupéry (LYS)",
+            name: "Lyon–Saint-Exupéry (LYS)",
             date: "2024-03-20",
-            time: "14:15"
+            time: "14:15",
+            airline: "Air France"
         },
         destination: {
             city: "Tokyo",
             country: "Japon",
-            airport: "Tokyo Haneda (HND)"
+            name: "Tokyo Haneda (HND)",
+            airline: "Air France"
         },
         price: 12,
         availableWeight: 5,
@@ -253,14 +270,16 @@ export const listings: Listing[] = [
         departure: {
             city: "Marseille",
             country: "France",
-            airport: "Marseille Provence (MRS)",
+            name: "Marseille Provence (MRS)",
             date: "2024-03-18",
-            time: "16:45"
+            time: "16:45",
+            airline: "Air France"
         },
         destination: {
             city: "Londres",
             country: "Royaume-Uni",
-            airport: "London Heathrow (LHR)"
+            name: "London Heathrow (LHR)",
+            airline: "Air France"
         },
         price: 8,
         availableWeight: 12,

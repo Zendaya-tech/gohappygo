@@ -1,14 +1,34 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { Route } from "../+types/root";
-import { getListingById, type Listing } from "../data/announces";
+import { type Listing } from "../data/announces";
 import { Link, useParams, useNavigate } from "react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
 import { ShareIcon } from "@heroicons/react/24/outline";
 import BookingDialog from "~/components/common/dialog/BookingDialog";
 import MessageDialog from "~/components/common/dialog/MessageDialog";
 import ShareDialog from "~/components/common/dialog/ShareDialog";
+import { getAnnounce } from "~/services/announceService";
+
+
+const mockReviews = [
+    {
+        id: 1,
+        rating: 5,
+        name: "Jack Black",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+        comment: "Super annonce !",
+    },
+    {
+        id: 2,
+        rating: 4,
+        name: "John Doe",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+        comment: "le voyage c'est déroulé sans problème, la livraison a été rapide et le colis a été bien reçu.",
+    },
+
+];
 
 function formatDate(dateString: string) {
     const date = new Date(dateString);
@@ -23,7 +43,8 @@ export default function AnnounceDetail() {
     const params = useParams<"id">();
     const navigate = useNavigate();
     const id = params.id ?? "";
-    const listing: Listing | undefined = getListingById(id);
+
+    const [listing, setListing] = useState<Listing | undefined>(undefined);
     const [kilos, setKilos] = useState<number>(0);
     const [shareOpen, setShareOpen] = useState<boolean>(false);
     const [bookOpen, setBookOpen] = useState<boolean>(false);
@@ -34,6 +55,14 @@ export default function AnnounceDetail() {
     const [newRating, setNewRating] = useState<number>(0);
     const averageRating = 4.0;
     const totalReviews = 1;
+
+    useEffect(() => {
+        const fetchAnnounce = async () => {
+            const announce = await getAnnounce(id);
+            setListing(announce);
+        };
+        fetchAnnounce();
+    }, [id]);
 
     if (!listing) {
         return (
@@ -51,8 +80,6 @@ export default function AnnounceDetail() {
         );
     }
 
-    const availableRatio = listing.maxWeight > 0 ? listing.availableWeight / listing.maxWeight : 0;
-    const availablePercent = Math.round(availableRatio * 100);
 
     // Simple gallery to mirror the design
     const galleryImages = useMemo(
@@ -272,13 +299,25 @@ export default function AnnounceDetail() {
                                             <span className="text-gray-500">({totalReviews} reviews)</span>
                                         </div>
                                     </div>
-                                    <div className="flex items-start gap-3">
-                                        <img src={listing.traveler.avatar} alt="avatar" className="h-10 w-10 rounded-full" />
-                                        <div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">Jack Black • {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}</div>
-                                            <p className="mt-1 text-gray-800 dark:text-gray-200">g</p>
-                                        </div>
+                                    <div className="flex flex-col mt-10  gap-5">
+                                        {mockReviews.map((review) => (
+                                            <div key={review.id} className="flex items-start gap-3">
+                                                <img src={review.avatar} alt="avatar" className="h-10 w-10 rounded-full" />
+                                                <div className="flex-1">
+                                                    <div className="text-sm text-gray-600 dark:text-gray-400">{review.name} • {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase()}</div>
+                                                    <p className="mt-1 text-gray-800 dark:text-gray-200">{review.comment}</p>
+                                                </div>
+                                                <div className="flex items-center">
+                                                    {[1, 2, 3, 4, 5].map(i => (
+                                                        <svg key={i} className={`h-4 w-4 ${i <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`} viewBox="0 0 20 20" fill="currentColor">
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.176 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81H7.03a1 1 0 00.95-.69l1.07-3.293z" />
+                                                        </svg>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
+
                                 </div>
                             </div>
                         </div>
