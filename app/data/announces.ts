@@ -1,6 +1,7 @@
 export interface Listing {
     id: string;
     type: "traveler" | "transporter";
+    images: string[];
     traveler: {
         name: string;
         avatar: string;
@@ -142,7 +143,6 @@ export const listings: Listing[] = [
         availableWeight: 7,
         maxWeight: 10,
         description: "Week-end à Barcelone, espace libre dans mes bagages",
-        airline: "Air France"
     },
     {
         id: "5",
@@ -267,6 +267,73 @@ export const listings: Listing[] = [
             rating: 4.7,
             verified: true
         },
+        departure: {
+            city: "Marseille",
+            country: "France",
+            name: "Marseille Provence (MRS)",
+            date: "2024-03-18",
+            time: "16:45",
+            airline: "Air France"
+        },
+        destination: {
+            city: "Londres",
+            country: "Royaume-Uni",
+            name: "London Heathrow (LHR)",
+            airline: "Air France"
+        },
+        price: 8,
+        availableWeight: 12,
+        maxWeight: 15,
+        description: "Transport nécessaire pour sac de voyage",
+        isRequest: true
+    },
+    {
+        id: "10",
+        type: "transporter",
+        traveler: {
+            name: "John Doe",
+            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            rating: 4.7,
+            verified: true
+        },
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
+        departure: {
+            city: "Marseille",
+            country: "France",
+            name: "Marseille Provence (MRS)",
+            date: "2024-03-18",
+            time: "16:45",
+            airline: "Air France"
+        },
+        destination: {
+            city: "Londres",
+            country: "Royaume-Uni",
+            name: "London Heathrow (LHR)",
+            airline: "Air France"
+        },
+        price: 8,
+        availableWeight: 12,
+        maxWeight: 15,
+        description: "Transport nécessaire pour sac de voyage",
+        isRequest: true
+    },
+
+    {
+        id: "11",
+        type: "transporter",
+        traveler: {
+            name: "Patrick Olongo",
+            avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            rating: 4.7,
+            verified: true
+        },
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         departure: {
             city: "Marseille",
             country: "France",

@@ -1,15 +1,14 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { Route } from "../+types/root";
-import { type Listing } from "../data/announces";
+import { getListingById, type Listing } from "../data/announces";
 import { Link, useParams, useNavigate } from "react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
 import { ShareIcon } from "@heroicons/react/24/outline";
 import BookingDialog from "~/components/common/dialog/BookingDialog";
 import MessageDialog from "~/components/common/dialog/MessageDialog";
 import ShareDialog from "~/components/common/dialog/ShareDialog";
-import { getAnnounce } from "~/services/announceService";
 
 
 const mockReviews = [
@@ -43,8 +42,7 @@ export default function AnnounceDetail() {
     const params = useParams<"id">();
     const navigate = useNavigate();
     const id = params.id ?? "";
-
-    const [listing, setListing] = useState<Listing | undefined>(undefined);
+    const listing: Listing | undefined = getListingById(id);
     const [kilos, setKilos] = useState<number>(0);
     const [shareOpen, setShareOpen] = useState<boolean>(false);
     const [bookOpen, setBookOpen] = useState<boolean>(false);
@@ -56,13 +54,9 @@ export default function AnnounceDetail() {
     const averageRating = 4.0;
     const totalReviews = 1;
 
-    useEffect(() => {
-        const fetchAnnounce = async () => {
-            const announce = await getAnnounce(id);
-            setListing(announce);
-        };
-        fetchAnnounce();
-    }, [id]);
+    // useEffect(() => {
+    //     getAnnounce(id);
+    // }, [id]);
 
     if (!listing) {
         return (
@@ -80,6 +74,8 @@ export default function AnnounceDetail() {
         );
     }
 
+    const availableRatio = listing.maxWeight > 0 ? listing.availableWeight / listing.maxWeight : 0;
+    const availablePercent = Math.round(availableRatio * 100);
 
     // Simple gallery to mirror the design
     const galleryImages = useMemo(
