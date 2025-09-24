@@ -1,11 +1,12 @@
 import api from "./Api";
 import { listings } from "~/data/announces";
 
+
 export const getAnnounce = async (id: string) => {
     try {
-        if(process.env.NODE_ENV === "development") {
+        // if(process.env.NODE_ENV === "development") {
             return listings.find((l) => l.id === id);
-        }
+        // }
         const response = await api.get(`/announces/${id}`);
         return response.data;
     } catch (error) {
