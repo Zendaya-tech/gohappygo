@@ -34,7 +34,11 @@ export interface Listing {
 export const listings: Listing[] = [
     {
         id: "1",
-        type: "traveler",
+        type: "transporter",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Marie Dubois",
             avatar: "https://images.planefinder.net/api/logo-square/CFE/w/396",
@@ -47,13 +51,13 @@ export const listings: Listing[] = [
             name: "Paris CDG (CDG)",
             date: "2024-03-20",
             time: "14:30",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "New York",
             country: "États-Unis",
             name: "JFK New York (JFK)",
-            airline: "United Airlines"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 15,
         availableWeight: 8,
@@ -62,7 +66,11 @@ export const listings: Listing[] = [
     },
     {
         id: "2",
-        type: "traveler",
+        type: "transporter",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Thomas Martin",
             avatar: "https://images.planefinder.net/api/logo-square/EFW/w/396",
@@ -75,13 +83,13 @@ export const listings: Listing[] = [
             name: "Lyon–Saint-Exupéry (LYS)",
             date: "2024-03-22",
             time: "09:15",
-            airline: "United Airlines"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "Tokyo",
             country: "Japon",
             name: "Tokyo Haneda (HND)",
-            airline: "United Airlines"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 18,
         availableWeight: 5,
@@ -90,7 +98,11 @@ export const listings: Listing[] = [
     },
     {
         id: "3",
-        type: "traveler",
+        type: "transporter",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Sophie Laurent",
             avatar: "https://images.planefinder.net/api/logo-square/BDR/w/396",
@@ -103,13 +115,13 @@ export const listings: Listing[] = [
             name: "Marseille Provence (MRS)",
             date: "2024-03-18",
             time: "16:45",
-            airline: "Qatar Airways"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "Londres",
             country: "Royaume-Uni",
             name: "London Heathrow (LHR)",
-            airline: "Qatar Airways"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 8,
         availableWeight: 12,
@@ -118,7 +130,11 @@ export const listings: Listing[] = [
     },
     {
         id: "4",
-        type: "traveler",
+        type: "transporter",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Pierre Moreau",
             avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
@@ -126,7 +142,7 @@ export const listings: Listing[] = [
             verified: false
         },
         departure: {
-            airline: "Air France",
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396",
             city: "Nice",
             country: "France",
             name: "Nice Côte d'Azur (NCE)",
@@ -134,7 +150,7 @@ export const listings: Listing[] = [
             time: "11:20"
         },
         destination: {
-            airline: "Air France",
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396",
             city: "Barcelone",
             country: "Espagne",
             name: "Barcelona El Prat (BCN)"
@@ -146,7 +162,11 @@ export const listings: Listing[] = [
     },
     {
         id: "5",
-        type: "traveler",
+        type: "transporter",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Emma Bernard",
             avatar: "https://images.planefinder.net/api/logo-square/BDR/w/396",
@@ -154,7 +174,7 @@ export const listings: Listing[] = [
             verified: true
         },
         departure: {
-            airline: "Air France",
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396",
             city: "Toulouse",
             country: "France",
             name: "Toulouse-Blagnac (TLS)",
@@ -162,7 +182,7 @@ export const listings: Listing[] = [
             time: "07:50"
         },
         destination: {
-            airline: "Air France",
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396",
             city: "Berlin",
             country: "Allemagne",
             name: "Berlin Brandenburg (BER)",
@@ -174,7 +194,11 @@ export const listings: Listing[] = [
     },
     {
         id: "6",
-        type: "traveler",
+        type: "transporter",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Lucas Petit",
             avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
@@ -187,13 +211,13 @@ export const listings: Listing[] = [
             name: "Bordeaux–Mérignac (BOD)",
             date: "2024-03-30",
             time: "13:10",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "Amsterdam",
             country: "Pays-Bas",
             name: "Amsterdam Schiphol (AMS)",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 10,
         availableWeight: 9,
@@ -202,7 +226,11 @@ export const listings: Listing[] = [
     },
     {
         id: "7",
-        type: "traveler",
+        type: "transporter",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Jack Black",
             avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
@@ -215,13 +243,13 @@ export const listings: Listing[] = [
             name: "Paris CDG (CDG)",
             date: "2024-03-15",
             time: "10:30",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "New York",
             country: "États-Unis",
             name: "JFK New York (JFK)",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 15,
         availableWeight: 8,
@@ -232,6 +260,10 @@ export const listings: Listing[] = [
     {
         id: "8",
         type: "traveler",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Bob Brown",
             avatar: "https://images.planefinder.net/api/logo-square/BRU/w/396",
@@ -244,13 +276,13 @@ export const listings: Listing[] = [
             name: "Lyon–Saint-Exupéry (LYS)",
             date: "2024-03-20",
             time: "14:15",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "Tokyo",
             country: "Japon",
             name: "Tokyo Haneda (HND)",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 12,
         availableWeight: 5,
@@ -261,6 +293,10 @@ export const listings: Listing[] = [
     {
         id: "9",
         type: "traveler",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Patrick Olongo",
             avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
@@ -273,13 +309,13 @@ export const listings: Listing[] = [
             name: "Marseille Provence (MRS)",
             date: "2024-03-18",
             time: "16:45",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "Londres",
             country: "Royaume-Uni",
             name: "London Heathrow (LHR)",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 8,
         availableWeight: 12,
@@ -290,29 +326,29 @@ export const listings: Listing[] = [
     {
         id: "10",
         type: "transporter",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "John Doe",
             avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
             rating: 4.7,
             verified: true
         },
-        images: [
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-        ],
         departure: {
             city: "Marseille",
             country: "France",
             name: "Marseille Provence (MRS)",
             date: "2024-03-18",
             time: "16:45",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "Londres",
             country: "Royaume-Uni",
             name: "London Heathrow (LHR)",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 8,
         availableWeight: 12,
@@ -323,30 +359,31 @@ export const listings: Listing[] = [
 
     {
         id: "11",
-        type: "transporter",
+        type: "traveler",
+        images: [
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        ],
         traveler: {
             name: "Patrick Olongo",
             avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
             rating: 4.7,
             verified: true
         },
-        images: [
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-        ],
+
         departure: {
             city: "Marseille",
             country: "France",
             name: "Marseille Provence (MRS)",
             date: "2024-03-18",
             time: "16:45",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         destination: {
             city: "Londres",
             country: "Royaume-Uni",
             name: "London Heathrow (LHR)",
-            airline: "Air France"
+            airline: "https://images.planefinder.net/api/logo-square/BYD/w/396"
         },
         price: 8,
         availableWeight: 12,

@@ -63,7 +63,7 @@
         "description": "Faites un voyage économe en gagnant de l'argent avec votre franchise de bagage non utilisée, tout en rencontrant de nouvelles personnes."
       },
       "security": {
-        "title": "Voyagez et échangez en toute confiance",
+        "title": "Voyagez en toute confiance",
         "description": "Evoluez dans un cadre sécurisé et de confiance avec la vérification des identités, une messagerie interne, photos prises et stockées sur l'appli, traçabilité des transactions, assurance, évaluations."
       },
       "simplicity": {
@@ -192,7 +192,7 @@
   },
   "dialogs": {
     "createAnnounce": {
-      "title": "Créer une annonce",
+      "title": "Annonce de voyage",
       "step1": "Informations de base",
       "step2": "Photos",
       "step3": "Prix et conditions",
@@ -216,8 +216,7 @@
       "create": "Créer"
     },
     "createPackage": {
-      "title": "Créer une demande de colis",
-      "title": "Titre du colis",
+      "title": "Demande de transport ",
       "description": "Description",
       "weight": "Poids (kg)",
       "maxDeliveryDate": "Date max de livraison",

@@ -43,8 +43,13 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files) return;
-        const list = Array.from(e.target.files);
-        setPhotos(prev => [...prev, ...list]);
+        const selectedFiles = Array.from(e.target.files);
+        setPhotos(prev => {
+            const remainingSlots = Math.max(0, 2 - prev.length);
+            const filesToAdd = selectedFiles.slice(0, remainingSlots);
+            return [...prev, ...filesToAdd];
+        });
+        // Reset input so same file can be chosen again after removing
         e.target.value = '';
     };
 
@@ -105,7 +110,8 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                     {/* Content */}
                     <section className="p-6 overflow-y-auto min-h-0">
                         <header className="mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{/*t('dialogs.createPackage.title')*/}  {t('common.step')} {currentStep} {t('common.of')} 3</h2>
+                            {t('dialogs.createPackage.title')}
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">   {t('common.step')} {currentStep} {t('common.of')} 3</h2>
                         </header>
 
                         {currentStep === 1 && (
@@ -160,8 +166,8 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                             <div className="space-y-6">
                                 <p className="text-gray-700 dark:text-gray-300 font-medium">{t('dialogs.createAnnounce.photos')}</p>
                                 <label className="block cursor-pointer rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-10 text-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileUpload} />
-                                    {t('common.upload')}
+                                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileUpload} disabled={photos.length >= 2} />
+                                    {t('common.upload')} ({photos.length}/2)
                                 </label>
                                 {photos.length > 0 && (
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

@@ -49,7 +49,7 @@ export default function Annonces() {
         <div className="min-h-screen dark:bg-gray-950 relative">
             <Header />
 
-            <main className="max-w-7xl mx-auto py-8 px-4">
+            <main className=" mx-auto max-w-7xl py-8 px-4">
                 {/* Search Bar */}
                 <SearchFiltersBar
                     initialFrom={searchParams.from}
@@ -103,10 +103,11 @@ export default function Annonces() {
                                 return (
                                     <PropertyCard
                                         key={listing.id}
+                                        id={listing.id}
                                         name={listing.traveler.name}
                                         avatar={listing.traveler.avatar}
                                         location={route}
-                                        price={`${listing.price}€/kg`}
+                                        price={`${listing.price}`}
                                         rating={listing.traveler.rating.toString()}
                                         image={listing.traveler.avatar}
                                         featured={listing.traveler.verified}

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type StepKey = 1 | 2 | 3 | 4;
 
 export default function CreateAnnounceDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
     const [step, setStep] = useState<StepKey>(1);
-
+    const { t } = useTranslation();
     // Form state
     const [departure, setDeparture] = useState("");
     const [arrival, setArrival] = useState("");
@@ -45,12 +46,19 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
     }, [step, departure, arrival, files.length, kilos, pricePerKg]);
 
     const onFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const list = e.target.files ? Array.from(e.target.files) : [];
-        setFiles(prevFiles => [...prevFiles, ...list]);
+        const selected = e.target.files ? Array.from(e.target.files) : [];
+        setFiles(prevFiles => {
+            const remainingSlots = Math.max(0, 2 - prevFiles.length);
+            const filesToAdd = selected.slice(0, remainingSlots);
+            return [...prevFiles, ...filesToAdd];
+        });
 
-        // Create preview URLs for new images
-        const newUrls = list.map(file => URL.createObjectURL(file));
-        setFileUrls(prevUrls => [...prevUrls, ...newUrls]);
+        // Create preview URLs for new images up to the cap
+        setFileUrls(prevUrls => {
+            const remainingSlots = Math.max(0, 2 - prevUrls.length);
+            const urlsToAdd = selected.slice(0, remainingSlots).map(file => URL.createObjectURL(file));
+            return [...prevUrls, ...urlsToAdd];
+        });
 
         // Reset the input value to allow selecting the same file again
         e.target.value = '';
@@ -85,7 +93,7 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
                     {/* Content */}
                     <section className="p-6 overflow-y-auto min-h-0">
                         <header className="mb-6">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Step {step} of 4</h2>
+                            {t('dialogs.createAnnounce.title')}   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Step {step} of 4</h2>
                         </header>
 
                         {step === 1 && (
@@ -168,8 +176,8 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
                             <div className="space-y-6">
                                 <p className="text-gray-700 dark:text-gray-300 font-medium">Upload at least 2 pictures about your travel</p>
                                 <label className="block cursor-pointer rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-10 text-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                                    <input type="file" accept="image/*" multiple className="hidden" onChange={onFilesSelected} />
-                                    Click to upload a files
+                                    <input type="file" accept="image/*" multiple className="hidden" onChange={onFilesSelected} disabled={files.length >= 2} />
+                                    Click to upload files ({files.length}/2)
                                 </label>
                                 {files.length > 0 && (
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

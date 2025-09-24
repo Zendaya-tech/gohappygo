@@ -43,7 +43,7 @@ export default function SearchFiltersBar({
     };
 
     return (
-        <div className="bg-white max-w-7xl mx-auto  dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl px-4 py-6  shadow-lg">
+        <div className="bg-white max-w-7xl mx-auto  dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl rounded-r-full px-4 py-4  shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                 {/* From */}
                 <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
@@ -99,8 +99,8 @@ export default function SearchFiltersBar({
 
 
                 {/* Search Button */}
-                <div className="flex items-center justify-between">
-                    <div className="min-w-0">
+                <div className="flex items-center justify-center  bg-[url('/images/gribouille.jpg')] rounded-r-full overflow-hidden   bg-no-repeat  bg-cover bg-center " >
+                    {/* <div className="min-w-0">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 truncate">Go</label>
                         <span className="text-sm text-gray-600 dark:text-gray-300 truncate block">Trouver un voyageur</span>
                     </div>
@@ -110,6 +110,14 @@ export default function SearchFiltersBar({
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
+                    </button> */}
+
+
+
+                    <button
+                        onClick={handleSearch}
+                        className="bg-blue-600 border-8 border-white text-white p-3 rounded-full hover:bg-blue-700">
+                        <span className="text-2xl font-bold">GO</span>
                     </button>
                 </div>
             </div>

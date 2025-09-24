@@ -1,14 +1,15 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { Route } from "../+types/root";
-import { getListingById, type Listing } from "../data/announces";
+import { type Listing } from "../data/announces";
 import { Link, useParams, useNavigate } from "react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
 import { ShareIcon } from "@heroicons/react/24/outline";
 import BookingDialog from "~/components/common/dialog/BookingDialog";
 import MessageDialog from "~/components/common/dialog/MessageDialog";
 import ShareDialog from "~/components/common/dialog/ShareDialog";
+import { getAnnounce } from "~/services/announceService";
 
 
 const mockReviews = [
@@ -29,6 +30,39 @@ const mockReviews = [
 
 ];
 
+const quotes = [
+    {
+        id: 1,
+        quote: "le bohneur est la seule chose qui se double quand on le partage",
+        author: "Albert Einstein",
+        align: "right",
+    },
+    {
+        id: 2,
+        quote: "le bohneur n'est pas une destination , mais une facon de voyager",
+        author: "Margaret lee runbeck",
+        align: "left",
+    },
+    {
+        id: 3,
+        quote: "souris a la vie et la vie te sourira",
+        author: "Virginie Bertrand",
+        align: "right",
+    },
+    {
+        id: 4,
+        quote: "un voyage se mesure mieux en amis qu'en miles",
+        author: "Henry David Thoreau",
+        align: "center",
+    },
+    {
+        id: 5,
+        quote: "ou que vous alliez allez y avec tout votre coeur",
+        author: "confucius",
+        align: "left",
+    },
+];
+
 function formatDate(dateString: string) {
     const date = new Date(dateString);
     return date.toLocaleDateString("fr-FR", {
@@ -42,7 +76,8 @@ export default function AnnounceDetail() {
     const params = useParams<"id">();
     const navigate = useNavigate();
     const id = params.id ?? "";
-    const listing: Listing | undefined = getListingById(id);
+
+    const [listing, setListing] = useState<Listing | undefined>(undefined);
     const [kilos, setKilos] = useState<number>(0);
     const [shareOpen, setShareOpen] = useState<boolean>(false);
     const [bookOpen, setBookOpen] = useState<boolean>(false);
@@ -54,9 +89,24 @@ export default function AnnounceDetail() {
     const averageRating = 4.0;
     const totalReviews = 1;
 
-    // useEffect(() => {
-    //     getAnnounce(id);
-    // }, [id]);
+    useEffect(() => {
+        const fetchAnnounce = async () => {
+            const announce = await getAnnounce(id);
+            setListing(announce);
+        };
+        fetchAnnounce();
+    }, [id]);
+
+    // Simple gallery to mirror the design
+    const galleryImages = useMemo(
+        () => [
+            "https://images.planefinder.net/api/logo-square/BYD/w/396",
+            "/images/rencontre1-converted.webp",
+            "/images/rencontre2-converted.webp"
+        ],
+        []
+    );
+
 
     if (!listing) {
         return (
@@ -74,35 +124,25 @@ export default function AnnounceDetail() {
         );
     }
 
-    const availableRatio = listing.maxWeight > 0 ? listing.availableWeight / listing.maxWeight : 0;
-    const availablePercent = Math.round(availableRatio * 100);
 
-    // Simple gallery to mirror the design
-    const galleryImages = useMemo(
-        () => [
-            "https://images.planefinder.net/api/logo-square/BYD/w/396",
-            "/images/rencontre1-converted.webp",
-            "/images/rencontre2-converted.webp",
-        ],
-        []
-    );
 
     // Pricing calculation similar to the right-hand summary in the mock
     const pricePerKg = listing.price;
     const subtotal = kilos * pricePerKg;
     const platformCommission = 0; // can be adjusted later
     const vatRate = 0.24;
+
     const vat = subtotal * vatRate;
     const insurance = 0;
     const platformTax = 10; // flat example
     const total = Math.max(0, subtotal + platformCommission + vat + insurance + platformTax);
 
+
+
     return (
         <div className="min-h-screen bg-white dark:bg-gray-950">
             <Header />
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-
                 {/* Left: media + traveller + route + description */}
                 <div >
                     {/* top right small action */}
@@ -142,7 +182,7 @@ export default function AnnounceDetail() {
                                     }}
                                 >
                                     <img
-                                        src={galleryImages[0]}
+                                        src={listing.type === "transporter" ? listing.departure.airline : listing.images[0]}
                                         alt="main"
                                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                                     />
@@ -151,33 +191,35 @@ export default function AnnounceDetail() {
                             </div>
                             <div className="w-80  flex flex-col gap-3">
                                 <div
-                                    className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                                    className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
                                     onClick={() => {
                                         setCurrentImageIndex(1);
                                         setSliderOpen(true);
                                     }}
                                 >
                                     <img
-                                        src={galleryImages[1]}
+                                        src={listing.type === "transporter" ? listing.images[0] : listing.images[1]}
                                         alt="thumb-1"
                                         className="h-full w-full object-cover transition-transform duration-300 "
                                     />
                                     <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
                                 </div>
-                                <div
-                                    className="relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                                    onClick={() => {
-                                        setCurrentImageIndex(2);
-                                        setSliderOpen(true);
-                                    }}
-                                >
-                                    <img
-                                        src={galleryImages[2]}
-                                        alt="thumb-2"
-                                        className="h-full w-full object-cover transition-transform duration-300 "
-                                    />
-                                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
-                                </div>
+                                {listing.type === "transporter" && (
+                                    <div
+                                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                                        onClick={() => {
+                                            setCurrentImageIndex(2);
+                                            setSliderOpen(true);
+                                        }}
+                                    >
+                                        <img
+                                            src={listing.images[1]}
+                                            alt="thumb-2"
+                                            className="h-full w-full object-cover transition-transform duration-300 "
+                                        />
+                                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -212,7 +254,7 @@ export default function AnnounceDetail() {
                                         <span className="font-medium">{listing.departure.city} → {listing.destination.city}</span>
                                         <span>Départ: {formatDate(listing.departure.date)}</span>
                                         <span className="font-medium">Vol N° FRH{String(listing.id).padStart(3, "0")}</span>
-                                        <span className="text-blue-600">Espace disponible: {listing.availableWeight}kg</span>
+                                        <span className="text-blue-600">{listing.type === "transporter" ? "Espace disponible" : "Espace demandé"}: {listing.availableWeight}kg</span>
                                     </div>
                                 </div>
                                 <div className="md:col-span-3 text-left md:text-right">
@@ -320,35 +362,61 @@ export default function AnnounceDetail() {
 
                         {/* Right: booking summary */}
                         <aside className="lg:col-span-1">
-                            <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
-                                <div className="text-2xl font-bold text-gray-900 dark:text-white">${listing.price}<span className="text-base font-semibold">/Kilo</span></div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mb-6">Prix par kilogramme</div>
 
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enter n° Kilo</label>
-                                <input
-                                    type="number"
-                                    min={0}
-                                    value={kilos}
-                                    onChange={(e) => setKilos(Number(e.target.value))}
-                                    placeholder="0"
-                                    className="mb-6 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                />
+                            <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+                                {listing.type === "transporter" ? (
+                                    <>
+                                        <div className="text-2xl font-bold text-gray-900 dark:text-white">${listing.price}<span className="text-base font-semibold">/Kilo</span></div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-6">Prix par kilogramme</div>
 
-                                <div className="space-y-3 text-sm">
-                                    <div className="flex items-center justify-between text-gray-500"><span>commission plateforme</span><span>{platformCommission.toFixed(0)}</span></div>
-                                    <div className="flex items-center justify-between text-gray-500"><span>TVA 24 %</span><span>{vat.toFixed(0)}</span></div>
-                                    <div className="flex items-center justify-between text-gray-500"><span>Assurance</span><span>{insurance.toFixed(0)}</span></div>
-                                    <div className="flex items-center justify-between text-gray-500"><span>Platform Tax</span><span>{platformTax.toFixed(0)}</span></div>
-                                </div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enter n° Kilo</label>
+                                        <input
+                                            type="number"
+                                            min={0}
+                                            value={kilos}
+                                            onChange={(e) => setKilos(Number(e.target.value))}
+                                            placeholder="0"
+                                            className="mb-6 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        />
 
-                                <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-4">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-700 dark:text-gray-300">Total with taxes</span>
-                                        <span className="font-semibold text-gray-900 dark:text-white">${total.toFixed(0)}</span>
-                                    </div>
-                                </div>
+                                        <div className="space-y-3 text-sm">
+                                            <div className="flex items-center justify-between text-gray-500"><span>commission plateforme</span><span>{platformCommission.toFixed(0)}</span></div>
+                                            <div className="flex items-center justify-between text-gray-500"><span>TVA 24 %</span><span>{vat.toFixed(0)}</span></div>
+                                            <div className="flex items-center justify-between text-gray-500"><span>Assurance</span><span>{insurance.toFixed(0)}</span></div>
+                                            <div className="flex items-center justify-between text-gray-500"><span>Platform Tax</span><span>{platformTax.toFixed(0)}</span></div>
+                                        </div>
 
-                                <button onClick={() => setBookOpen(true)} className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700">Book now</button>
+                                        <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-4">
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-gray-700 dark:text-gray-300">Total with taxes</span>
+                                                <span className="font-semibold text-gray-900 dark:text-white">${total.toFixed(0)}</span>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) :
+                                    (
+                                        <>
+                                            {/* citation pour le cas du demande de transport */}
+                                            {quotes.map((quote) => (
+                                                <div key={quote.id} className={`text-gray-700 text-center my-4 dark:text-gray-300 max-w-60 ${quote.align === "center" ? "mx-auto" : quote.align === "right" ? "mr-auto" : "ml-auto"}`}>
+                                                    <p className="text-gray-700 text-xs text-center  dark:text-gray-300"> {"<< " + quote.quote + " >>"} </p>
+                                                    <span className="text-gray-900 text-sm dark:text-gray-300 font-semibold"> {"(" + quote.author + ")"}</span>
+                                                </div>
+                                            ))}
+
+                                        </>
+                                    )
+                                }
+
+
+
+                                {listing.type === "transporter" ? (
+                                    <button onClick={() => setBookOpen(true)} className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700">Book now</button>
+                                ) : (
+                                    <button onClick={() => void (0)} className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700">Créer ce voyage</button>
+                                )
+                                }
+
                             </div>
                         </aside>
                     </div>
