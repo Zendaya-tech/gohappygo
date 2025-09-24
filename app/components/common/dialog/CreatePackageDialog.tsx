@@ -18,6 +18,7 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
     const [pricePerKilo, setPricePerKilo] = useState("");
     const [flightNumber, setFlightNumber] = useState("");
     const [travelDate, setTravelDate] = useState("");
+    const [packageNature, setPackageNature] = useState<'fragile' | 'urgent' | 'standard' | 'high-value'>('standard');
 
     useEffect(() => {
         if (!open) return;
@@ -39,6 +40,7 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
         setPricePerKilo("");
         setFlightNumber("");
         setTravelDate("");
+        setPackageNature('standard');
     }, [open]);
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,6 +86,7 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
             arrivalAirport,
             baggageDescription,
             photos,
+            packageNature,
             weight,
             pricePerKilo,
             flightNumber,
@@ -159,6 +162,28 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                                         className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
                                 </Field>
+
+                                <div>
+                                    <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">Nature du colis</div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <label className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                                            <input type="radio" checked={packageNature === 'standard'} onChange={() => setPackageNature('standard')} />
+                                            Standard
+                                        </label>
+                                        <label className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                                            <input type="radio" checked={packageNature === 'fragile'} onChange={() => setPackageNature('fragile')} />
+                                            Fragile
+                                        </label>
+                                        <label className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                                            <input type="radio" checked={packageNature === 'urgent'} onChange={() => setPackageNature('urgent')} />
+                                            Urgent
+                                        </label>
+                                        <label className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                                            <input type="radio" checked={packageNature === 'high-value'} onChange={() => setPackageNature('high-value')} />
+                                            Valeur supérieure à 3000 €
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         )}
 

@@ -500,11 +500,11 @@ export default function AnnounceDetail() {
                         </button>
 
                         {/* Main image */}
-                        <div className="max-w-4xl max-h-full">
+                        <div className="max-w-4xl  w-[640px] h-full max-h-[500px] flex items-center justify-center bg-gray-900 dark:bg-gray-800 rounded-lg">
                             <img
                                 src={galleryImages[currentImageIndex]}
                                 alt={`Image ${currentImageIndex + 1}`}
-                                className="max-w-full max-h-full  object-contain  rounded-lg"
+                                className="max-w-full max-h-full w-full h-full object-cover"
                             />
                         </div>
 
@@ -520,7 +520,7 @@ export default function AnnounceDetail() {
                                     key={index}
                                     onClick={() => setCurrentImageIndex(index)}
                                     className={`w-3 h-3 rounded-full transition-all duration-200 ${index === currentImageIndex
-                                        ? 'bg-white'
+                                        ? 'bg-blue-600 dark:bg-white'
                                         : 'bg-white bg-opacity-50 hover:bg-opacity-75'
                                         }`}
                                 />
