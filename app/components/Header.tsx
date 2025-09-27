@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import NotificationPopover from './common/popover/NotificationPopover';
 import AppDownloadPopover from './common/popover/AppDownloadPopover';
@@ -37,6 +37,17 @@ export default function Header() {
             setShowCreatePackage(true);
         }
     };
+
+    useEffect(() => {
+        const onOpenCreateAnnounce = () => setShowCreateAnnounce(true);
+        const onOpenLogin = () => setShowLogin(true);
+        window.addEventListener('open-create-announce', onOpenCreateAnnounce as EventListener);
+        window.addEventListener('open-login-dialog', onOpenLogin as EventListener);
+        return () => {
+            window.removeEventListener('open-create-announce', onOpenCreateAnnounce as EventListener);
+            window.removeEventListener('open-login-dialog', onOpenLogin as EventListener);
+        };
+    }, []);
 
     return (
         <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/80  border-b border-gray-200 dark:border-gray-800 ">

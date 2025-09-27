@@ -93,7 +93,7 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
                     {/* Content */}
                     <section className="p-6 overflow-y-auto min-h-0">
                         <header className="mb-6">
-                            {t('dialogs.createAnnounce.title')}   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Step {step} of 4</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white"><span className="uppercase">{t('dialogs.createAnnounce.title')}</span> - Step {step} of 4</h2>
                         </header>
 
                         {step === 1 && (
