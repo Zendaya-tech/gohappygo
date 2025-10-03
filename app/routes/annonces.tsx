@@ -2,11 +2,10 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from 'react-router';
 import { listings } from '../data/announces';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import FooterMinimal from '~/components/FooterMinimal';
 import PropertyCard from '~/components/PropertyCard';
 import SearchFiltersBar from '~/components/SearchFiltersBar';
-import CreateAnnounceDialog from '~/components/common/dialog/CreateAnnounceDialog';
 
 export default function Annonces() {
     const [selectedFilters, setSelectedFilters] = useState<string[]>(['verified']);
@@ -16,9 +15,6 @@ export default function Annonces() {
         date: '12/10/2025',
         flight: ''
     });
-
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [prefill, setPrefill] = useState<any | null>(null);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -108,7 +104,7 @@ export default function Annonces() {
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             {listings.map((listing) => {
                                 const tripDate = formatDate(listing.departure.date);
-                                const route = `${listing.departure.name} → ${listing.destination.name}`;
+                                const route = `${listing.departure.airport} - ${listing.destination.airport}`;
 
                                 return (
                                     <PropertyCard
@@ -124,18 +120,8 @@ export default function Annonces() {
                                         weight={`${listing.availableWeight}kg`}
                                         departure={tripDate}
                                         airline={listing.departure.airline}
-                                        isRequest={listing.isRequest}
+                                        // isRequest={listing.isRequest}
                                         type={listing.type}
-                                        onCreateThisTrip={listing.isRequest ? () => {
-                                            setPrefill({
-                                                departure: listing.departure.name,
-                                                arrival: listing.destination.name,
-                                                travelDate: listing.departure.date,
-                                                pricePerKg: listing.price,
-                                                kilos: listing.availableWeight,
-                                            });
-                                            setDialogOpen(true);
-                                        } : undefined}
                                     />
                                 );
                             })}
@@ -145,14 +131,6 @@ export default function Annonces() {
             </main>
 
             <FooterMinimal />
-
-            {dialogOpen && (
-                <CreateAnnounceDialog
-                    open={dialogOpen}
-                    onClose={() => setDialogOpen(false)}
-                    initialValues={prefill ?? undefined}
-                />
-            )}
         </div>
     );
 } 

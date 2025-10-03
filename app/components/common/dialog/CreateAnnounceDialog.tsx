@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 type StepKey = 1 | 2 | 3 | 4;
 
-type CreateAnnounceInitialValues = {
+type InitialData = {
     departure?: string;
     arrival?: string;
     story?: string;
@@ -13,12 +13,12 @@ type CreateAnnounceInitialValues = {
     noSmileTax?: number;
     allowExtraGrams?: boolean;
     flightNumber?: string;
-    travelDate?: string; // yyyy-mm-dd
+    travelDate?: string; // YYYY-MM-DD
     reservationType?: "single" | "shared";
     bookingType?: "instant" | "non-instant";
 };
 
-export default function CreateAnnounceDialog({ open, onClose, initialValues }: { open: boolean; onClose: () => void; initialValues?: CreateAnnounceInitialValues }) {
+export default function CreateAnnounceDialog({ open, onClose, initialData }: { open: boolean; onClose: () => void; initialData?: InitialData }) {
     const [step, setStep] = useState<StepKey>(1);
     const { t } = useTranslation();
     // Form state
@@ -50,25 +50,21 @@ export default function CreateAnnounceDialog({ open, onClose, initialValues }: {
     useEffect(() => {
         if (!open) return;
         setStep(1);
-    }, [open]);
-
-    // Prefill when dialog opens or initial values change
-    useEffect(() => {
-        if (!open) return;
-        if (!initialValues) return;
-        setDeparture(initialValues.departure ?? "");
-        setArrival(initialValues.arrival ?? "");
-        setStory(initialValues.story ?? "");
-        setKilos(initialValues.kilos ?? "");
-        setPricePerKg(initialValues.pricePerKg ?? "");
-        setLateTax(initialValues.lateTax ?? 0);
-        setNoSmileTax(initialValues.noSmileTax ?? 0);
-        setAllowExtraGrams(initialValues.allowExtraGrams ?? false);
-        setFlightNumber(initialValues.flightNumber ?? "");
-        setTravelDate(initialValues.travelDate ?? "");
-        setReservationType(initialValues.reservationType ?? "single");
-        setBookingType(initialValues.bookingType ?? "instant");
-    }, [open, initialValues]);
+        if (initialData) {
+            setDeparture(initialData.departure ?? "");
+            setArrival(initialData.arrival ?? "");
+            setStory(initialData.story ?? "");
+            setKilos(typeof initialData.kilos === "number" ? initialData.kilos : "");
+            setPricePerKg(typeof initialData.pricePerKg === "number" ? initialData.pricePerKg : "");
+            setLateTax(typeof initialData.lateTax === "number" ? initialData.lateTax : 0);
+            setNoSmileTax(typeof initialData.noSmileTax === "number" ? initialData.noSmileTax : 0);
+            setAllowExtraGrams(Boolean(initialData.allowExtraGrams));
+            setFlightNumber(initialData.flightNumber ?? "");
+            setTravelDate(initialData.travelDate ?? "");
+            setReservationType(initialData.reservationType ?? "single");
+            setBookingType(initialData.bookingType ?? "instant");
+        }
+    }, [open, initialData]);
 
 
     const canNext = useMemo(() => {

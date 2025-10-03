@@ -9,6 +9,7 @@ import { ShareIcon } from "@heroicons/react/24/outline";
 import BookingDialog from "~/components/common/dialog/BookingDialog";
 import MessageDialog from "~/components/common/dialog/MessageDialog";
 import ShareDialog from "~/components/common/dialog/ShareDialog";
+import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
 import { getAnnounce } from "~/services/announceService";
 
 
@@ -83,6 +84,7 @@ export default function AnnounceDetail() {
     const [bookOpen, setBookOpen] = useState<boolean>(false);
     const [sliderOpen, setSliderOpen] = useState<boolean>(false);
     const [messageOpen, setMessageOpen] = useState<boolean>(false);
+    const [createOpen, setCreateOpen] = useState<boolean>(false);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
     const [isFavorite, setIsFavorite] = useState<boolean>(false);
     const [newRating, setNewRating] = useState<number>(0);
@@ -413,7 +415,7 @@ export default function AnnounceDetail() {
                                 {listing.type === "transporter" ? (
                                     <button onClick={() => setBookOpen(true)} className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700">Book now</button>
                                 ) : (
-                                    <button onClick={() => void (0)} className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700">Créer ce voyage</button>
+                                    <button onClick={() => setCreateOpen(true)} className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700">Créer ce voyage</button>
                                 )
                                 }
 
@@ -462,6 +464,31 @@ export default function AnnounceDetail() {
                 hostAvatar={listing.traveler.avatar}
                 onSend={(msg) => {
                     console.log('Message sent:', msg);
+                }}
+            />
+
+            {/* Create Announce Dialog (prefilled) */}
+            <CreateAnnounceDialog
+                open={createOpen}
+                onClose={() => setCreateOpen(false)}
+                initialData={{
+                    departure: listing.departure.city,
+                    arrival: listing.destination.city,
+                    story: listing.description,
+                    kilos: listing.availableWeight,
+                    pricePerKg: listing.price,
+                    travelDate: (() => {
+                        try {
+                            const d = new Date(listing.departure.date);
+                            if (Number.isNaN(d.getTime())) return "";
+                            return d.toISOString().slice(0, 10);
+                        } catch {
+                            return "";
+                        }
+                    })(),
+                    reservationType: "single",
+                    bookingType: "instant",
+                    allowExtraGrams: false,
                 }}
             />
 

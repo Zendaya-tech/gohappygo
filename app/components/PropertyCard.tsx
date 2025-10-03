@@ -15,10 +15,9 @@ interface PropertyCardProps {
     isRequest?: boolean;
     avatar?: string;
     type?: 'traveler' | 'transporter';
-    onCreateThisTrip?: () => void;
 }
 
-export default function PropertyCard({ id, name, location, price, type, rating, image, featured = false, weight, departure, airline, isRequest = false, avatar, onCreateThisTrip }: PropertyCardProps) {
+export default function PropertyCard({ id, name, location, price, type, rating, image, featured = false, weight, departure, airline, isRequest = false, avatar }: PropertyCardProps) {
     const [isFavorite, setIsFavorite] = useState(false);
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -84,15 +83,6 @@ export default function PropertyCard({ id, name, location, price, type, rating, 
                             <span className="text-sm text-gray-600 dark:text-gray-300">{rating}</span>
                         </div>
                     </div>
-                )}
-
-                {isRequest && onCreateThisTrip && (
-                    <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCreateThisTrip(); }}
-                        className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
-                    >
-                        Créer ce voyage
-                    </button>
                 )}
             </div>
         </Link>
