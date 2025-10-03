@@ -3,7 +3,22 @@ import { useTranslation } from "react-i18next";
 
 type StepKey = 1 | 2 | 3 | 4;
 
-export default function CreateAnnounceDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+type CreateAnnounceInitialValues = {
+    departure?: string;
+    arrival?: string;
+    story?: string;
+    kilos?: number;
+    pricePerKg?: number;
+    lateTax?: number;
+    noSmileTax?: number;
+    allowExtraGrams?: boolean;
+    flightNumber?: string;
+    travelDate?: string; // yyyy-mm-dd
+    reservationType?: "single" | "shared";
+    bookingType?: "instant" | "non-instant";
+};
+
+export default function CreateAnnounceDialog({ open, onClose, initialValues }: { open: boolean; onClose: () => void; initialValues?: CreateAnnounceInitialValues }) {
     const [step, setStep] = useState<StepKey>(1);
     const { t } = useTranslation();
     // Form state
@@ -36,6 +51,24 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
         if (!open) return;
         setStep(1);
     }, [open]);
+
+    // Prefill when dialog opens or initial values change
+    useEffect(() => {
+        if (!open) return;
+        if (!initialValues) return;
+        setDeparture(initialValues.departure ?? "");
+        setArrival(initialValues.arrival ?? "");
+        setStory(initialValues.story ?? "");
+        setKilos(initialValues.kilos ?? "");
+        setPricePerKg(initialValues.pricePerKg ?? "");
+        setLateTax(initialValues.lateTax ?? 0);
+        setNoSmileTax(initialValues.noSmileTax ?? 0);
+        setAllowExtraGrams(initialValues.allowExtraGrams ?? false);
+        setFlightNumber(initialValues.flightNumber ?? "");
+        setTravelDate(initialValues.travelDate ?? "");
+        setReservationType(initialValues.reservationType ?? "single");
+        setBookingType(initialValues.bookingType ?? "instant");
+    }, [open, initialValues]);
 
 
     const canNext = useMemo(() => {
@@ -93,7 +126,7 @@ export default function CreateAnnounceDialog({ open, onClose }: { open: boolean;
                     {/* Content */}
                     <section className="p-6 overflow-y-auto min-h-0">
                         <header className="mb-6">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white"><span className="uppercase">{t('dialogs.createAnnounce.title')}</span> - Step {step} of 4</h2>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white"><span className="uppercase">{t('dialogs.createAnnounce.title')}</span> - Step {step} of 4</h2>
                         </header>
 
                         {step === 1 && (

@@ -15,9 +15,10 @@ interface PropertyCardProps {
     isRequest?: boolean;
     avatar?: string;
     type?: 'traveler' | 'transporter';
+    onCreateThisTrip?: () => void;
 }
 
-export default function PropertyCard({ id, name, location, price, type, rating, image, featured = false, weight, departure, airline, isRequest = false, avatar }: PropertyCardProps) {
+export default function PropertyCard({ id, name, location, price, type, rating, image, featured = false, weight, departure, airline, isRequest = false, avatar, onCreateThisTrip }: PropertyCardProps) {
     const [isFavorite, setIsFavorite] = useState(false);
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
@@ -27,8 +28,8 @@ export default function PropertyCard({ id, name, location, price, type, rating, 
 
     return (
         <Link to={`/announces/${id}`} className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800">
-            <div className="relative overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-800">
-                <img src={image} alt={name} className={`${type === 'transporter' && 'max-h-full max-w-full'} w-full object-cover `} />
+            <div className="relative flex overflow-hidden rounded-2xl bg-gray-100  dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">
+                <img src={image} alt={name} className={`${type === 'transporter' ? 'max-h-full max-w-full ' : 'object-cover  w-full'} m-auto  `} />
                 {featured && (
                     <div className="absolute top-4 left-4 bg-emerald-950/80 text-white px-4 py-1 rounded-full text-xs">
                         Vérifié
@@ -54,9 +55,7 @@ export default function PropertyCard({ id, name, location, price, type, rating, 
                     </svg>
                 </button>
                 {airline && (
-                    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-medium text-gray-700">
-                        {airline}
-                    </div>
+                    <></>
                 )}
             </div>
             <div className="p-6">
@@ -85,6 +84,15 @@ export default function PropertyCard({ id, name, location, price, type, rating, 
                             <span className="text-sm text-gray-600 dark:text-gray-300">{rating}</span>
                         </div>
                     </div>
+                )}
+
+                {isRequest && onCreateThisTrip && (
+                    <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onCreateThisTrip(); }}
+                        className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+                    >
+                        Créer ce voyage
+                    </button>
                 )}
             </div>
         </Link>

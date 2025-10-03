@@ -14,8 +14,8 @@ import Footer from "../components/Footer";
 
 export function meta({ }: Route.MetaArgs) {
   return [
-    { title: "GoHappyGo - Expédiez vos colis avec des voyageurs" },
-    { name: "description", content: "Connectez-vous avec des voyageurs qui ont de l'espace dans leurs bagages. Expédiez vos colis de manière économique et écologique." },
+    { title: "GoHappyGo - Faites vous des amis, gagnez de l'argent en voyage" },
+    { name: "description", content: "Deux besoins, une entraide : les voyageurs avec des kilos en moins aident ceux qui en ont en plus. Expédiez à petit prix pendant que les voyageurs monétisent leur espace libre, en toute sécurité et simplicité." },
   ];
 }
 
