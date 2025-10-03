@@ -7,9 +7,10 @@ interface RecommendationCardProps {
     subtitle: string;
     image: string;
     videoUrl?: string;
+    videoId?: string;
 }
 
-export default function RecommendationCard({ title, subtitle, image, videoUrl }: RecommendationCardProps) {
+export default function RecommendationCard({ title, subtitle, image, videoUrl, videoId }: RecommendationCardProps) {
     const { t } = useTranslation();
     const [videoModalOpen, setVideoModalOpen] = useState(false);
 
@@ -25,7 +26,7 @@ export default function RecommendationCard({ title, subtitle, image, videoUrl }:
         <>
             <div className="relative bg-gray-900 rounded-2xl overflow-hidden h-80 group cursor-pointer">
                 <img
-                    src={image}
+                    src={'https://img.youtube.com/vi/wyTfWvtGSSY/0.jpg' || `https://img.youtube.com/vi/${videoId}/0.jpg`}
                     alt={title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />

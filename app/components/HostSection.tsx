@@ -22,11 +22,7 @@ export default function HostSection() {
                         </button>
                     </div>
                     <div className="h-64 lg:h-auto">
-                        <img
-                            src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&h=400&fit=crop"
-                            alt="Devenir transporteur"
-                            className="w-full h-full object-cover"
-                        />
+                        <video src="/videos/host.mp4" autoPlay loop muted className="w-full h-full object-cover" />
                     </div>
                 </div>
             </div>

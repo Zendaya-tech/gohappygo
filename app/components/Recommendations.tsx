@@ -8,25 +8,30 @@ export default function Recommendations() {
             title: t('home.recommendations.exploreDestinations'),
             subtitle: t('home.recommendations.popularRoutes'),
             image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=300&fit=crop",
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            videoId: "dQw4w9WgXcQ"
         },
         {
             title: t('home.recommendations.secureTransport'),
             subtitle: t('home.recommendations.fragilePackages'),
             image: "https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=400&h=300&fit=crop",
-            videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0"
+            videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0",
+            videoId: "9bZkp7q19f0"
         },
         {
+
             title: t('home.recommendations.saveOnShipping'),
             subtitle: t('home.recommendations.advantageousRates'),
             image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=300&fit=crop",
-            videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw"
+            videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw",
+            videoId: "jNQXAC9IVRw"
         },
         {
             title: t('home.recommendations.expressDelivery'),
             subtitle: t('home.recommendations.urgentPackages'),
             image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop",
-            videoUrl: "https://www.youtube.com/embed/kJQP7kiw5Fk"
+            videoUrl: "https://www.youtube.com/embed/kJQP7kiw5Fk",
+            videoId: "kJQP7kiw5Fk"
         }
     ];
 
