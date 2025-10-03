@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuthStore, type AuthState } from "../../../store/auth";
+import { login as apiLogin, type LoginResponse } from "../../../services/authService";
 
 export default function LoginDialog({
     open,
@@ -36,22 +37,31 @@ export default function LoginDialog({
         password: '',
         rememberMe: false
     });
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulated auth: set cookie via store and optional localStorage for other UI bits
-        const demoToken = 'demo-auth-token';
-        const demoUser = {
-            id: 'u_demo',
-            name: formData.email.split('@')[0] || 'Utilisateur',
-            avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=64&h=64&fit=crop&crop=face'
-        };
+        setSubmitting(true);
+        setError(null);
         try {
-            // keep ChatWidget compatibility (uses localStorage currently)
-            window.localStorage.setItem('auth_token', demoToken);
-        } catch { }
-        login(demoToken, demoUser);
-        onClose();
+            const res = (await apiLogin(formData.email, formData.password)) as LoginResponse | null;
+            if (!res || !res.access_token) {
+                setError("Identifiants invalides");
+                setSubmitting(false);
+                return;
+            }
+            const composedUser = res.user
+                ? { id: String(res.user.id), name: `${res.user.firstName ?? ''} ${res.user.lastName ?? ''}`.trim() || (res.user.email ?? 'Utilisateur') }
+                : { id: 'me', name: formData.email.split('@')[0] || 'Utilisateur' };
+            try { window.localStorage.setItem('auth_token', res.access_token); } catch { }
+            login(res.access_token, composedUser, res.refresh_token);
+            onClose();
+        } catch (err) {
+            setError("Une erreur est survenue. Réessayez.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,6 +88,7 @@ export default function LoginDialog({
                             <p className="text-gray-600">et profitez de toutes les possibilités</p>
                         </div>
                         <form className="space-y-6" onSubmit={handleSubmit}>
+                            {error && (<div className="text-sm text-red-600">{error}</div>)}
                             <div>
                                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                                     Email
@@ -122,9 +133,10 @@ export default function LoginDialog({
 
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200"
+                                disabled={submitting}
+                                className={`w-full text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 ${submitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
                             >
-                                Se connecter
+                                {submitting ? 'Connexion…' : 'Se connecter'}
                             </button>
                         </form>
 

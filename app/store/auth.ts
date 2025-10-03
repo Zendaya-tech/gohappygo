@@ -3,7 +3,7 @@ import { create } from "zustand";
 export type AuthState = {
   isLoggedIn: boolean;
   user?: { id: string; name: string; avatar?: string } | null;
-  login: (token: string, user?: AuthState["user"]) => void;
+  login: (accessToken: string, user?: AuthState["user"], refreshToken?: string) => void;
   logout: () => void;
   hydrateFromCookies: () => void;
 };
@@ -34,12 +34,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     const token = getCookie("auth_token");
     set({ isLoggedIn: Boolean(token) });
   },
-  login: (token, user) => {
-    setCookie("auth_token", token, 7);
+  login: (accessToken, user, refreshToken) => {
+    setCookie("auth_token", accessToken, 7);
+    if (refreshToken) setCookie("refresh_token", refreshToken, 30);
     set({ isLoggedIn: true, user: user ?? null });
   },
   logout: () => {
     deleteCookie("auth_token");
+    deleteCookie("refresh_token");
     set({ isLoggedIn: false, user: null });
   },
 }));

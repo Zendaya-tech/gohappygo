@@ -1,12 +1,16 @@
 import { useRef, useState } from 'react';
 import { Link } from 'react-router';
+import { register as apiRegister } from '../services/authService';
 
 export default function Login() {
     const [step, setStep] = useState<1 | 2>(1);
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        rememberMe: false
+        rememberMe: false,
+        firstName: '',
+        lastName: '',
+        phoneNumber: ''
     });
     const [code, setCode] = useState<string[]>(['', '', '', '', '', '']);
     const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
@@ -14,10 +18,31 @@ export default function Login() {
         inputsRef.current[index] = el;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (step === 1) {
-            // simulate sending code
+            setSubmitting(true);
+            setError(null);
+            setMessage(null);
+            const res = await apiRegister(
+                formData.email,
+                formData.password,
+                formData.firstName,
+                formData.lastName,
+                formData.phoneNumber
+            );
+            if (!res) {
+                setError('Échec de l’inscription. Réessayez.');
+            } else if (res.message) {
+                setMessage(res.message);
+            } else {
+                setMessage("Inscription réussie. Vérifiez votre email et téléphone.");
+            }
+            setSubmitting(false);
             setStep(2);
             return;
         }
@@ -75,6 +100,61 @@ export default function Login() {
 
                     <div className="">
                         <form className="space-y-6" onSubmit={handleSubmit}>
+                            {message && (<div className="text-sm text-green-600">{message}</div>)}
+                            {error && (<div className="text-sm text-red-600">{error}</div>)}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                                        Prénom
+                                    </label>
+                                    <div className="mt-1">
+                                        <input
+                                            id="firstName"
+                                            name="firstName"
+                                            type="text"
+                                            required
+                                            value={formData.firstName}
+                                            onChange={handleChange}
+                                            className="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/40 outline-none transition"
+                                            placeholder="Prénom"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                                        Nom
+                                    </label>
+                                    <div className="mt-1">
+                                        <input
+                                            id="lastName"
+                                            name="lastName"
+                                            type="text"
+                                            required
+                                            value={formData.lastName}
+                                            onChange={handleChange}
+                                            className="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/40 outline-none transition"
+                                            placeholder="Nom"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                                    Téléphone
+                                </label>
+                                <div className="mt-1">
+                                    <input
+                                        id="phoneNumber"
+                                        name="phoneNumber"
+                                        type="tel"
+                                        required
+                                        value={formData.phoneNumber}
+                                        onChange={handleChange}
+                                        className="block w-full rounded-xl border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/40 outline-none transition"
+                                        placeholder="Ex: +237..."
+                                    />
+                                </div>
+                            </div>
                             {step === 1 ? (
                                 <>
                                     {/* Email */}
@@ -196,9 +276,10 @@ export default function Login() {
                             <div>
                                 <button
                                     type="submit"
-                                    className="group relative w-full inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:translate-y-px"
+                                    disabled={submitting}
+                                    className={`group relative w-full inline-flex items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 active:translate-y-px ${submitting ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
                                 >
-                                    {step === 1 ? 'Suivant' : 'Valider'}
+                                    {submitting ? 'En cours…' : step === 1 ? 'Suivant' : 'Valider'}
                                 </button>
                                 {step === 2 && (
                                     <button

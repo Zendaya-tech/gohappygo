@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { register as apiRegister } from "../../../services/authService";
 
 export default function RegisterDialog({
     open,
@@ -10,6 +11,10 @@ export default function RegisterDialog({
     onSwitchToLogin: () => void;
 }) {
     const ref = useRef<HTMLDivElement | null>(null);
+    const [form, setForm] = useState({ email: '', password: '', confirmPassword: '', firstName: '', lastName: '', phoneNumber: '' });
+    const [submitting, setSubmitting] = useState(false);
+    const [message, setMessage] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!open) return;
@@ -29,6 +34,26 @@ export default function RegisterDialog({
 
     if (!open) return null;
 
+    const onSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (form.password !== form.confirmPassword) {
+            setError("Les mots de passe ne correspondent pas");
+            return;
+        }
+        setSubmitting(true);
+        setError(null);
+        setMessage(null);
+        const res = await apiRegister(form.email, form.password, form.firstName, form.lastName, form.phoneNumber);
+        if (!res) {
+            setError("Echec de l’inscription. Réessayez.");
+        } else if (res.message) {
+            setMessage(res.message);
+        } else {
+            setMessage("Inscription réussie. Vérifiez votre email et téléphone.");
+        }
+        setSubmitting(false);
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div
@@ -42,7 +67,40 @@ export default function RegisterDialog({
                             <h1 className="text-2xl font-bold text-gray-900 mb-2">Inscription</h1>
                             <p className="text-gray-600">et profitez de toutes les possibilités</p>
                         </div>
-                        <form className="space-y-6">
+                        <form className="space-y-6" onSubmit={onSubmit}>
+                            {message && (<div className="text-sm text-green-600">{message}</div>)}
+                            {error && (<div className="text-sm text-red-600">{error}</div>)}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                    placeholder="Prénom"
+                                    required
+                                    value={form.firstName}
+                                    onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))}
+                                />
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                    placeholder="Nom"
+                                    required
+                                    value={form.lastName}
+                                    onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
+                                />
+                            </div>
+                            <div>
+                                <input
+                                    type="tel"
+                                    id="phoneNumber"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                                    placeholder="Téléphone (ex: +237...)"
+                                    required
+                                    value={form.phoneNumber}
+                                    onChange={(e) => setForm((p) => ({ ...p, phoneNumber: e.target.value }))}
+                                />
+                            </div>
                             <div>
 
                                 <input
@@ -51,6 +109,8 @@ export default function RegisterDialog({
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                                     placeholder="Votre email"
                                     required
+                                    value={form.email}
+                                    onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
                                 />
                             </div>
 
@@ -62,6 +122,8 @@ export default function RegisterDialog({
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                                     placeholder="Votre mot de passe"
                                     required
+                                    value={form.password}
+                                    onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
                                 />
                             </div>
 
@@ -73,6 +135,8 @@ export default function RegisterDialog({
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                                     placeholder="Confirmez votre mot de passe"
                                     required
+                                    value={form.confirmPassword}
+                                    onChange={(e) => setForm((p) => ({ ...p, confirmPassword: e.target.value }))}
                                 />
                             </div>
 
@@ -98,9 +162,10 @@ export default function RegisterDialog({
 
                             <button
                                 type="submit"
-                                className="w-full bg-gray-400 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-500 transition-colors duration-200"
+                                disabled={submitting}
+                                className={`w-full text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 ${submitting ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
                             >
-                                S'inscrire
+                                {submitting ? 'En cours…' : "S'inscrire"}
                             </button>
                         </form>
 
