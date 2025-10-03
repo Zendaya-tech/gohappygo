@@ -18,7 +18,7 @@ export default function TermsPrivacy() {
                             personnes souhaitant expédier des objets. Les utilisateurs sont responsables du contenu transporté.
                         </p>
                         <p>
-                            2. Les transporteurs s’engagent à respecter les lois en vigueur et à refuser tout objet dangereux ou
+                            2. Les HappyVoyageurs s’engagent à respecter les lois en vigueur et à refuser tout objet dangereux ou
                             interdit. Les expéditeurs doivent décrire précisément le contenu et le poids.
                         </p>
                         <p>

@@ -51,7 +51,7 @@ export default function Transporters() {
             <Header />
             <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Transporteurs</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">HappyVoyageurs</h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-300">Trouvez un voyageur pour expédier vos colis.</p>
                 </div>
 

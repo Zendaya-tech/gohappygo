@@ -40,7 +40,7 @@ export default function FeaturedProperties() {
 
     return (
         <section className="pb-12 pt-4 px-4 mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Transporteurs <span className="text-blue-600">vérifiés</span></h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">HappyVoyageurs <span className="text-blue-600">vérifiés</span></h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {travelers.map((traveler, index) => (
                     <PropertyCard key={index} id={index.toString()} {...traveler} featured={true} type={traveler.type as 'transporter' | 'traveler'} />

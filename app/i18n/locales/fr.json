@@ -87,7 +87,7 @@
       "title": "Témoignages de nos utilisateurs",
       "noReviews": "Vous n'avez pas encore d'avis",
       "europe": {
-        "review": "J'ai envoyé un cadeau à ma famille à Londres. Le transporteur était très professionnel et le colis est arrivé en parfait état !",
+        "review": "J'ai envoyé un cadeau à ma famille à Londres. Le HappyVoyageur était très professionnel et le colis est arrivé en parfait état !",
         "name": "Marie D."
       },
       "southAmerica": {
@@ -116,8 +116,8 @@
       "startingFrom": "À partir de"
     },
     "hostSection": {
-      "title": "Devenez transporteur et gagnez de l'argent",
-      "description": "Rentabilisez vos voyages en transportant des colis pour d'autres personnes. Simple, sécurisé et rémunérateur.",
+      "title": "Devenez HappyVoyageur et gagnez de l'argent",
+      "description": "Rentabilisez vos voyages en permettant à d’autres de prendre plus bagages. Simple, Sécurisé, et heureux pour tout le monde",
       "cta": "Commencer maintenant"
     },
     "supportSection": {
@@ -257,7 +257,7 @@
     "discover": {
       "title": "Découvrir",
       "announcements": "Annonces",
-      "transporters": "Transporteurs",
+      "transporters": "HappyVoyageurs",
       "howItWorks": "Comment ça marche",
       "logos": "Logos"
     },
@@ -269,7 +269,7 @@
     },
     "transport": {
       "title": "Transporter",
-      "becomeTransporter": "Devenir transporteur",
+      "becomeTransporter": "Devenir HappyVoyageur",
       "securityRules": "Règles de sécurité",
       "identityVerification": "Vérification d'identité"
     },

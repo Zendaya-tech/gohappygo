@@ -59,7 +59,7 @@ export default function SettingsDialog({
                             <TabButton active={tab === "profile"} onClick={() => setTab("profile")}>Profil</TabButton>
                             <TabButton active={tab === "appearance"} onClick={() => setTab("appearance")}>Apparence</TabButton>
                             <TabButton active={tab === "security"} onClick={() => setTab("security")}>Sécurité</TabButton>
-                            <TabButton active={tab === "carrier"} onClick={() => setTab("carrier")}>Devenir transporteur</TabButton>
+                            <TabButton active={tab === "carrier"} onClick={() => setTab("carrier")}>Devenir HappyVoyageur</TabButton>
                         </ul>
                     </nav>
 
@@ -187,7 +187,7 @@ function SecurityPanel() {
 function CarrierPanel() {
     return (
         <div className="space-y-5">
-            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Devenir transporteur</h3>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white">Devenir HappyVoyageur</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">Indiquez vos disponibilités et validez votre identité.</p>
 
             <form className="space-y-4">

@@ -51,14 +51,19 @@ export default function Annonces() {
 
             <main className=" mx-auto max-w-7xl py-8 px-4">
                 {/* Search Bar */}
-                <SearchFiltersBar
-                    initialFrom={searchParams.from}
-                    initialTo={searchParams.to}
-                    initialDate={new Date().toISOString().slice(0, 10)}
-                    initialFlight={searchParams.flight}
-                    initialWeight={0}
-                    onChange={(f) => setSearchParams({ from: f.from, to: f.to, date: f.date, flight: f.flight })}
-                />
+
+                <div className="mb-10">
+                    <SearchFiltersBar
+
+                        initialFrom={searchParams.from}
+                        initialTo={searchParams.to}
+                        initialDate={new Date().toISOString().slice(0, 10)}
+                        initialFlight={searchParams.flight}
+                        initialWeight={0}
+                        onChange={(f) => setSearchParams({ from: f.from, to: f.to, date: f.date, flight: f.flight })}
+                    />
+                </div>
+
 
                 {/* Main Content with Filters and Results */}
                 <div className="flex gap-8 mt-10 ">

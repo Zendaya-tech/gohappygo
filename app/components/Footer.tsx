@@ -59,7 +59,7 @@ export default function Footer() {
                     <div>
                         <h4 className="font-semibold mb-4">Transporter</h4>
                         <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-                            <li><a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Devenir transporteur</a></li>
+                            <li><a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Devenir HappyVoyageur</a></li>
                             <li><a href="/security-rules" className="hover:text-gray-900 dark:hover:text-gray-100">Règles de sécurité</a></li>
                             <li><a href="/security-rules#id-check" className="hover:text-gray-900 dark:hover:text-gray-100">Vérification d'identité</a></li>
                         </ul>

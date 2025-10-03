@@ -18,12 +18,12 @@ const faqs: Faq[] = [
         a: "Le prix est généralement fixé au kilo. Le paiement est sécurisé via la plateforme.",
     },
     {
-        q: "Comment contacter un transporteur ?",
+        q: "Comment contacter un HappyVoyageur ?",
         a: "Depuis une annonce, utilisez les boutons ‘Demander un transport’ ou ‘Contacter’ pour envoyer votre message.",
     },
     {
         q: "Comment définir le poids à expédier ?",
-        a: "Indiquez le poids estimé en kilogrammes. Le transporteur confirmera la disponibilité restante.",
+        a: "Indiquez le poids estimé en kilogrammes. Le HappyVoyageur confirmera la disponibilité restante.",
     },
 ];
 
