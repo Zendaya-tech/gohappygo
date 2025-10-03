@@ -49,11 +49,12 @@ export default function Annonces() {
         <div className="min-h-screen dark:bg-gray-950 relative">
             <Header />
 
-            <main className=" mx-auto max-w-7xl py-8 px-4">
+            <main className=" mx-auto relative max-w-7xl py-8 px-4">
                 {/* Search Bar */}
 
-                <div className="mb-10">
+                <div className="sticky bg-white  z-14 top-15 pt-10  left-0 w-full">
                     <SearchFiltersBar
+
 
                         initialFrom={searchParams.from}
                         initialTo={searchParams.to}
@@ -66,9 +67,9 @@ export default function Annonces() {
 
 
                 {/* Main Content with Filters and Results */}
-                <div className="flex gap-8 mt-10 ">
+                <div className="flex  gap-8 mt-10 ">
                     {/* Left Sidebar - Filters */}
-                    <div className="w-64 flex-shrink-0 sticky top-52">
+                    <div className="w-64 fixed flex-shrink-0  top-64 left-0 ">
                         <div className="bg-gray-100 dark:bg-gray-900 rounded-2xl p-6  border border-gray-200 dark:border-gray-800">
                             <div className="flex items-center justify-between mb-6">
                                 <button className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg text-sm font-medium">
@@ -99,7 +100,7 @@ export default function Annonces() {
                     </div>
 
                     {/* Right Section - Results Grid */}
-                    <div className="flex-1">
+                    <div className="w-[calc(100%-256px)] ml-64 ">
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             {listings.map((listing) => {
                                 const tripDate = formatDate(listing.departure.date);
