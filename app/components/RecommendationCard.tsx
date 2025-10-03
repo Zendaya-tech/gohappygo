@@ -37,9 +37,9 @@ export default function RecommendationCard({ title, subtitle, image, videoUrl, v
                     </div>
 
                     <div className="flex gap-2">
-                        <button className="bg-blue-600 hover:bg-blue-700 text-sm  text-white px-4 py-2 rounded-lg">
+                        {/* <button className="bg-blue-600 hover:bg-blue-700 text-sm  text-white px-4 py-2 rounded-lg">
                             Explorer
-                        </button>
+                        </button> */}
                         <button
                             onClick={openVideoModal}
                             className="bg-white/40 backdrop-blur-2xl text-sm w-32 relative text-white px-4 py-2 rounded-lg hover:bg-white/50 transition-colors"
