@@ -52,7 +52,7 @@ export default function LoginDialog({
                 return;
             }
             const composedUser = res.user
-                ? { id: String(res.user.id), name: `${res.user.firstName ?? ''} ${res.user.lastName ?? ''}`.trim() || (res.user.email ?? 'Utilisateur') }
+                ? { id: String(res.user.id), name: `${res.user.firstName ?? ''} ${res.user.lastName ?? ''}`.trim() || (res.user.email ?? 'Utilisateur'), profilePictureURL: res.user.profilePictureURL }
                 : { id: 'me', name: formData.email.split('@')[0] || 'Utilisateur' };
             try { window.localStorage.setItem('auth_token', res.access_token); } catch { }
             login(res.access_token, composedUser, res.refresh_token);

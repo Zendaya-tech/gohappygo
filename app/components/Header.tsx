@@ -18,7 +18,7 @@ export default function Header() {
     const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const isLoggedIn = useAuthStore((s: AuthState) => { return s.isLoggedIn; });
-    const avatarUrl = useAuthStore((s: AuthState) => { return s.user?.profilePictureURL; });
+    const uqer = useAuthStore((s: AuthState) => { return s.user });
     const [showNotif, setShowNotif] = useState(false);
     const [showAvatarMenu, setShowAvatarMenu] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -49,6 +49,8 @@ export default function Header() {
             window.removeEventListener('open-login-dialog', onOpenLogin as EventListener);
         };
     }, []);
+
+    console.log(uqer)
 
     return (
         <header className="sticky top-0 z-50 bg-white/95 dark:bg-gray-900/80  border-b border-gray-200 dark:border-gray-800 ">
@@ -126,7 +128,7 @@ export default function Header() {
                                 >
                                     {isLoggedIn ? (
                                         <img
-                                            src={avatarUrl}
+                                            src={uqer?.profilePictureURL}
                                             alt="Profile"
                                             className="w-8 h-8 rounded-full object-cover"
                                         />
@@ -160,7 +162,7 @@ export default function Header() {
                         {isLoggedIn ? (
                             <a href="/profile" className="flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200">
                                 <img
-                                    src={avatarUrl}
+                                    src={uqer?.profilePictureURL}
                                     alt="Profile"
                                     className="w-8 h-8 rounded-full object-cover"
                                 />
