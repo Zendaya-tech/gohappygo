@@ -17,7 +17,8 @@ import LanguageDropdown from './common/popover/LanguageDropdown';
 export default function Header() {
     const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const isLoggedIn = useAuthStore((s: AuthState) => s.isLoggedIn);
+    const isLoggedIn = useAuthStore((s: AuthState) => { return s.isLoggedIn; });
+    const avatarUrl = useAuthStore((s: AuthState) => { return s.user?.avatar; });
     const [showNotif, setShowNotif] = useState(false);
     const [showAvatarMenu, setShowAvatarMenu] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
@@ -125,7 +126,7 @@ export default function Header() {
                                 >
                                     {isLoggedIn ? (
                                         <img
-                                            src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=32&h=32&fit=crop&crop=face"
+                                            src={avatarUrl}
                                             alt="Profile"
                                             className="w-8 h-8 rounded-full object-cover"
                                         />
@@ -159,7 +160,7 @@ export default function Header() {
                         {isLoggedIn ? (
                             <a href="/profile" className="flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200">
                                 <img
-                                    src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=32&h=32&fit=crop&crop=face"
+                                    src={avatarUrl}
                                     alt="Profile"
                                     className="w-8 h-8 rounded-full object-cover"
                                 />

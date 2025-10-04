@@ -113,8 +113,8 @@ export default function CreatePackageDialog({ open, onClose }: { open: boolean; 
                     {/* Content */}
                     <section className="p-6 overflow-y-auto min-h-0">
                         <header className="mb-6">
-                     
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white"> <span className="uppercase">{t('dialogs.createPackage.title')}</span>-{t('common.step')} {currentStep} {t('common.of')} 3</h2>
+
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white"> <span className="uppercase">{t('dialogs.createPackage.title')}</span>- {t('common.step')} {currentStep} {t('common.of')} 3</h2>
                         </header>
 
                         {currentStep === 1 && (
