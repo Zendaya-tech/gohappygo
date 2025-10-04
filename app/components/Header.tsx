@@ -18,7 +18,7 @@ export default function Header() {
     const { t } = useTranslation();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const isLoggedIn = useAuthStore((s: AuthState) => { return s.isLoggedIn; });
-    const avatarUrl = useAuthStore((s: AuthState) => { return s.user?.avatar; });
+    const avatarUrl = useAuthStore((s: AuthState) => { return s.user?.profilePictureURL; });
     const [showNotif, setShowNotif] = useState(false);
     const [showAvatarMenu, setShowAvatarMenu] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
