@@ -36,18 +36,7 @@ export default function Annonces() {
         { id: 'transport-request', label: 'Demande de Transport' }
     ];
 
-    useEffect(() => {
-        const loadQuotes = async () => {
-            const res = await getRandomQuotes();
-            if (!res) {
-                setQuotesError("Impossible de charger les citations.");
-                setQuotes([]);
-                return;
-            }
-            setQuotes(res);
-        };
-        loadQuotes();
-    }, []);
+
 
     const handleFilterChange = (filterId: string) => {
         setSelectedFilters(prev =>

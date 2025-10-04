@@ -11,6 +11,7 @@ import MessageDialog from "~/components/common/dialog/MessageDialog";
 import ShareDialog from "~/components/common/dialog/ShareDialog";
 import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
 import { getAnnounce } from "~/services/announceService";
+import { getRandomQuotes, type Quote } from "~/services/quotesService";
 
 
 const mockReviews = [
@@ -31,38 +32,7 @@ const mockReviews = [
 
 ];
 
-const quotes = [
-    {
-        id: 1,
-        quote: "le bohneur est la seule chose qui se double quand on le partage",
-        author: "Albert Einstein",
-        align: "right",
-    },
-    {
-        id: 2,
-        quote: "le bohneur n'est pas une destination , mais une facon de voyager",
-        author: "Margaret lee runbeck",
-        align: "left",
-    },
-    {
-        id: 3,
-        quote: "souris a la vie et la vie te sourira",
-        author: "Virginie Bertrand",
-        align: "right",
-    },
-    {
-        id: 4,
-        quote: "un voyage se mesure mieux en amis qu'en miles",
-        author: "Henry David Thoreau",
-        align: "center",
-    },
-    {
-        id: 5,
-        quote: "ou que vous alliez allez y avec tout votre coeur",
-        author: "confucius",
-        align: "left",
-    },
-];
+// quotes are fetched dynamically below
 
 function formatDate(dateString: string) {
     const date = new Date(dateString);
@@ -90,6 +60,8 @@ export default function AnnounceDetail() {
     const [newRating, setNewRating] = useState<number>(0);
     const averageRating = 4.0;
     const totalReviews = 1;
+    const [quotes, setQuotes] = useState<Quote[]>([]);
+    const [quotesError, setQuotesError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchAnnounce = async () => {
@@ -98,6 +70,19 @@ export default function AnnounceDetail() {
         };
         fetchAnnounce();
     }, [id]);
+
+    useEffect(() => {
+        const loadQuotes = async () => {
+            const res = await getRandomQuotes();
+            if (!res) {
+                setQuotesError("Impossible de charger les citations.");
+                setQuotes([]);
+                return;
+            }
+            setQuotes(res);
+        };
+        loadQuotes();
+    }, []);
 
     // Simple gallery to mirror the design
     const galleryImages = useMemo(
@@ -398,14 +383,15 @@ export default function AnnounceDetail() {
                                 ) :
                                     (
                                         <>
-                                            {/* citation pour le cas du demande de transport */}
-                                            {quotes.map((quote) => (
-                                                <div key={quote.id} className={`text-gray-700 text-center my-4 dark:text-gray-300 max-w-60 ${quote.align === "center" ? "mx-auto" : quote.align === "right" ? "mr-auto" : "ml-auto"}`}>
-                                                    <p className="text-gray-700 text-xs text-center  dark:text-gray-300"> {"<< " + quote.quote + " >>"} </p>
-                                                    <span className="text-gray-900 text-sm dark:text-gray-300 font-semibold"> {"(" + quote.author + ")"}</span>
+                                            {quotesError && (
+                                                <div className="text-xs text-red-600 mb-2">{quotesError}</div>
+                                            )}
+                                            {quotes.map((q) => (
+                                                <div key={q.id} className="text-gray-700 text-center my-4 dark:text-gray-300 max-w-60 mx-auto">
+                                                    <p className="text-gray-700 text-xs text-center  dark:text-gray-300">{"<< " + q.quote + " >>"}</p>
+                                                    <span className="text-gray-900 text-sm dark:text-gray-300 font-semibold">{q.author || "Anonyme"}</span>
                                                 </div>
                                             ))}
-
                                         </>
                                     )
                                 }
