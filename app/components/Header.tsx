@@ -128,7 +128,7 @@ export default function Header() {
                                 >
                                     {isLoggedIn ? (
                                         <img
-                                            src={uqer?.profilePictureURL}
+                                            src={uqer?.profilePictureUrl}
                                             alt="Profile"
                                             className="w-8 h-8 rounded-full object-cover"
                                         />
@@ -162,7 +162,7 @@ export default function Header() {
                         {isLoggedIn ? (
                             <a href="/profile" className="flex items-center space-x-2 hover:bg-gray-50 rounded-lg p-2 transition-colors duration-200">
                                 <img
-                                    src={uqer?.profilePictureURL}
+                                    src={uqer?.profilePictureUrl}
                                     alt="Profile"
                                     className="w-8 h-8 rounded-full object-cover"
                                 />

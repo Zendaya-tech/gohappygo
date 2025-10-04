@@ -38,7 +38,7 @@ export type LoginResponse = {
     access_token: string;
     refresh_token?: string;
     user?: {
-        profilePictureURL?: string;
+        profilePictureUrl?: string;
         id: string | number;
         firstName?: string;
         lastName?: string;

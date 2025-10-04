@@ -2,10 +2,11 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from 'react-router';
 import { listings } from '../data/announces';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FooterMinimal from '~/components/FooterMinimal';
 import PropertyCard from '~/components/PropertyCard';
 import SearchFiltersBar from '~/components/SearchFiltersBar';
+import { getRandomQuotes, type Quote } from '../services/quotesService';
 
 export default function Annonces() {
     const [selectedFilters, setSelectedFilters] = useState<string[]>(['verified']);
@@ -15,6 +16,8 @@ export default function Annonces() {
         date: '12/10/2025',
         flight: ''
     });
+    const [quotes, setQuotes] = useState<Quote[]>([]);
+    const [quotesError, setQuotesError] = useState<string | null>(null);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -32,6 +35,19 @@ export default function Annonces() {
         { id: 'travel-ad', label: 'Annonce de voyage' },
         { id: 'transport-request', label: 'Demande de Transport' }
     ];
+
+    useEffect(() => {
+        const loadQuotes = async () => {
+            const res = await getRandomQuotes();
+            if (!res) {
+                setQuotesError("Impossible de charger les citations.");
+                setQuotes([]);
+                return;
+            }
+            setQuotes(res);
+        };
+        loadQuotes();
+    }, []);
 
     const handleFilterChange = (filterId: string) => {
         setSelectedFilters(prev =>
@@ -104,7 +120,7 @@ export default function Annonces() {
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             {listings.map((listing) => {
                                 const tripDate = formatDate(listing.departure.date);
-                                const route = `${listing.departure.airport} - ${listing.destination.airport}`;
+                                const route = `${listing.departure.city} - ${listing.destination.city}`;
 
                                 return (
                                     <PropertyCard
@@ -129,6 +145,23 @@ export default function Annonces() {
                     </div>
                 </div>
             </main>
+
+            {/* Quotes section (does not change the existing layout) */}
+            {(quotes.length > 0 || quotesError) && (
+                <section className="mx-auto max-w-7xl px-4 pb-10">
+                    <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {quotesError && (
+                            <div className="col-span-full text-sm text-red-600">{quotesError}</div>
+                        )}
+                        {quotes.map((q) => (
+                            <div key={q.id} className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+                                <p className="text-gray-800 dark:text-gray-200 text-sm">{q.quote}</p>
+                                <div className="mt-2 text-xs text-gray-500">{q.author || 'Anonyme'}</div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             <FooterMinimal />
         </div>

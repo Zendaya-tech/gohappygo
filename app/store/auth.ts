@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export type AuthState = {
   isLoggedIn: boolean;
-  user?: { id: string; name: string; profilePictureURL?: string } | null;
+  user?: { id: string; name: string; profilePictureUrl?: string } | null;
   login: (accessToken: string, user?: AuthState["user"], refreshToken?: string) => void;
   logout: () => void;
   hydrateFromCookies: () => void;
