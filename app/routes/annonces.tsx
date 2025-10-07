@@ -1,20 +1,25 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { Link } from 'react-router';
-import { listings } from '../data/announces';
-import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router';
+import { useEffect, useMemo, useState } from 'react';
 import FooterMinimal from '~/components/FooterMinimal';
 import PropertyCard from '~/components/PropertyCard';
 import SearchFiltersBar from '~/components/SearchFiltersBar';
 import { getRandomQuotes, type Quote } from '../services/quotesService';
+import { getDemandAndTravel } from "~/services/announceService";
 
 export default function Annonces() {
+    const location = useLocation();
     const [selectedFilters, setSelectedFilters] = useState<string[]>(['verified']);
+    const urlParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+    const [results, setResults] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const [searchParams, setSearchParams] = useState({
-        from: 'Paris',
-        to: 'New-York',
-        date: '12/10/2025',
-        flight: ''
+        from: urlParams.get('from') || '',
+        to: urlParams.get('to') || '',
+        date: urlParams.get('date') || new Date().toISOString().slice(0, 10),
+        flight: urlParams.get('flight') || ''
     });
     const [quotes, setQuotes] = useState<Quote[]>([]);
     const [quotesError, setQuotesError] = useState<string | null>(null);
@@ -35,8 +40,30 @@ export default function Annonces() {
         { id: 'travel-ad', label: 'Annonce de voyage' },
         { id: 'transport-request', label: 'Demande de Transport' }
     ];
-
-
+    // Fetch from API when URL changes
+    useEffect(() => {
+        const controller = new AbortController();
+        const fetchResults = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const apiRes = await getDemandAndTravel({
+                    originAirportId: urlParams.get('from') || undefined,
+                    destinationAirportId: urlParams.get('to') || undefined,
+                    travelDate: urlParams.get('date') || undefined,
+                    flightNumber: urlParams.get('flight') || undefined,
+                });
+                const items = Array.isArray(apiRes) ? apiRes : (apiRes?.items ?? []);
+                setResults(items);
+            } catch (e: any) {
+                setError(e?.message || 'Failed to load results');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchResults();
+        return () => controller.abort();
+    }, [location.search, urlParams]);
 
     const handleFilterChange = (filterId: string) => {
         setSelectedFilters(prev =>
@@ -106,31 +133,48 @@ export default function Annonces() {
 
                     {/* Right Section - Results Grid */}
                     <div className="w-[calc(100%-256px)] ml-64 ">
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {listings.map((listing) => {
-                                const tripDate = formatDate(listing.departure.date);
-                                const route = `${listing.departure.city} - ${listing.destination.city}`;
+                        {loading && <div className="text-sm text-gray-500">Chargement…</div>}
+                        {error && <div className="text-sm text-red-600">{error}</div>}
+                        {!loading && !error && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {results.map((item: any) => {
+                                    // Try to map generic API fields to card fields; adjust as needed
+                                    const id = item.id || item._id || Math.random().toString(36).slice(2);
+                                    const name = item.user?.name || item.traveler?.name || item.title || 'Voyageur';
+                                    const avatar = item.user?.avatar || item.traveler?.avatar || '/favicon.ico';
+                                    const originName = item.origin?.name || item.originAirport?.name || item.originAirportName || item.originCity || '';
+                                    const destName = item.destination?.name || item.destinationAirport?.name || item.destinationAirportName || item.destinationCity || '';
+                                    const route = `${originName} - ${destName}`;
+                                    const pricePerKg = item.pricePerKg ?? item.price ?? 0;
+                                    const rating = (item.rating ?? item.user?.rating ?? 4.7).toString();
+                                    const image = avatar;
+                                    const featured = Boolean(item.user?.verified || item.traveler?.verified);
+                                    const availableWeight = item.weightAvailable ?? item.availableWeight ?? item.maxWeight ?? 0;
+                                    const departureDateRaw = item.travelDate || item.departureDate || item.date;
+                                    const departure = departureDateRaw ? formatDate(departureDateRaw) : undefined;
+                                    const airline = item.airlineLogo || item.airline;
+                                    const type = item.type === 'travel' ? 'transporter' : (item.type === 'demand' ? 'traveler' : undefined);
 
-                                return (
-                                    <PropertyCard
-                                        key={listing.id}
-                                        id={listing.id}
-                                        name={listing.traveler.name}
-                                        avatar={listing.traveler.avatar}
-                                        location={route}
-                                        price={`${listing.price}`}
-                                        rating={listing.traveler.rating.toString()}
-                                        image={listing.traveler.avatar}
-                                        featured={listing.traveler.verified}
-                                        weight={`${listing.availableWeight}kg`}
-                                        departure={tripDate}
-                                        airline={listing.departure.airline}
-                                        // isRequest={listing.isRequest}
-                                        type={listing.type}
-                                    />
-                                );
-                            })}
-                        </div>
+                                    return (
+                                        <PropertyCard
+                                            key={id}
+                                            id={id}
+                                            name={name}
+                                            avatar={avatar}
+                                            location={route}
+                                            price={`${pricePerKg}`}
+                                            rating={rating}
+                                            image={image}
+                                            featured={featured}
+                                            weight={availableWeight ? `${availableWeight}kg` : undefined}
+                                            departure={departure}
+                                            airline={airline}
+                                            type={type as any}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 </div>
             </main>

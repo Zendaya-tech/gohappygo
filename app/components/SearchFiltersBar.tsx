@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import AirportComboBox from "./common/AirportComboBox";
+import type { Airport } from "~/services/airportService";
 
 type Props = {
     initialFrom?: string;
@@ -10,12 +12,7 @@ type Props = {
     onChange?: (filters: { from: string; to: string; date: string; flight: string; weight: number }) => void;
 };
 
-const AIRPORTS = [
-    { code: 'CDG', label: 'Paris Charles de Gaulle (CDG)' },
-    { code: 'ORY', label: 'Paris Orly (ORY)' },
-    { code: 'JFK', label: 'New York John F. Kennedy (JFK)' },
-    { code: 'LHR', label: 'London Heathrow (LHR)' },
-];
+// Airports are now fetched dynamically via AirportComboBox
 
 export default function SearchFiltersBar({
     initialFrom = 'CDG',
@@ -39,7 +36,13 @@ export default function SearchFiltersBar({
     };
 
     const handleSearch = () => {
-        navigate('/annonces');
+        const params = new URLSearchParams();
+        if (from) params.set('from', from);
+        if (to) params.set('to', to);
+        if (date) params.set('date', date);
+        if (flight) params.set('flight', flight);
+        if (typeof weight === 'number' && weight > 0) params.set('weight', String(weight));
+        navigate(`/annonces?${params.toString()}`);
     };
 
     return (
@@ -47,30 +50,30 @@ export default function SearchFiltersBar({
             <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
                 {/* From */}
                 <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">De</label>
-                    <select
+                    <AirportComboBox
+                        label="De"
                         value={from}
-                        onChange={(e) => { setFrom(e.target.value); emit({ from: e.target.value }); }}
-                        className="w-full text-sm text-gray-700 dark:text-gray-200 bg-transparent border-none outline-none truncate"
-                    >
-                        {AIRPORTS.map(a => (
-                            <option key={a.code} value={a.code}>{a.label}</option>
-                        ))}
-                    </select>
+                        placeholder="Saisir le nom de l'aéroport"
+                        onChange={(airport: Airport | null) => {
+                            const code = airport?.id || '';
+                            setFrom(code);
+                            emit({ from: code });
+                        }}
+                    />
                 </div>
 
                 {/* To */}
                 <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Vers</label>
-                    <select
+                    <AirportComboBox
+                        label="Vers"
                         value={to}
-                        onChange={(e) => { setTo(e.target.value); emit({ to: e.target.value }); }}
-                        className="w-full text-sm text-gray-700 dark:text-gray-200 bg-transparent border-none outline-none truncate"
-                    >
-                        {AIRPORTS.map(a => (
-                            <option key={a.code} value={a.code}>{a.label}</option>
-                        ))}
-                    </select>
+                        placeholder="Saisir le nom de l'aéroport"
+                        onChange={(airport: Airport | null) => {
+                            const code = airport?.id || '';
+                            setTo(code);
+                            emit({ to: code });
+                        }}
+                    />
                 </div>
 
                 {/* Date */}

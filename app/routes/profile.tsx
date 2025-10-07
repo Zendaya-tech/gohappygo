@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Header from '../components/Header';
 import FooterMinimal from '~/components/FooterMinimal';
 import ProfileDialog from '../components/common/dialogs/ProfileDialog';
@@ -9,6 +9,8 @@ import {
     HeartIcon,
     CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
+import ReservationCard, { type Reservation } from "~/components/common/ReservationCard";
+import ProfileTravelCard, { type ProfileTravel } from "~/components/common/ProfileTravelCard";
 
 interface ProfileSection {
     id: string;
@@ -17,11 +19,44 @@ interface ProfileSection {
     count: number;
 }
 
+
+const sampleReservations: Reservation[] = [
+    { id: 'r1', originCity: 'Paris', destinationCity: 'New-York', travelDate: '2024-06-24', flightNumber: 'XC456Y', weightKg: 18, priceEuro: 198, status: 'waiting_payment', imageUrl: '/images/paris.jpg' },
+    { id: 'r2', originCity: 'Paris', destinationCity: 'New-York', travelDate: '2024-06-24', flightNumber: 'XC456Y', weightKg: 5, priceEuro: 30, status: 'waiting_payment', imageUrl: '/images/paris.jpg' },
+    { id: 'r3', originCity: 'Paris', destinationCity: 'New-York', travelDate: '2024-06-24', flightNumber: 'XC456Y', weightKg: 15, priceEuro: 170, status: 'waiting_proposal', customer: { name: 'Angele . O', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face' } },
+    { id: 'r4', originCity: 'Paris', destinationCity: 'New-York', travelDate: '2024-06-24', flightNumber: 'XC456Y', weightKg: 10, priceEuro: 90, status: 'waiting_proposal', customer: { name: 'Arthur . O', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face' } },
+]
+
+const ReservationsSection = () => {
+    const [tab, setTab] = useState<'waiting_proposal' | 'waiting_payment' | 'archived'>('waiting_proposal');
+    const filtered = sampleReservations.filter(r => (tab === 'archived' ? r.status === 'archived' : r.status === tab));
+    return (
+        <div>
+            <div className="flex items-center gap-6 mb-6">
+                <button onClick={() => setTab('waiting_proposal')} className={`text-sm font-semibold ${tab === 'waiting_proposal' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>| Waiting for proposal</button>
+                <button onClick={() => setTab('waiting_payment')} className={`text-sm font-semibold ${tab === 'waiting_payment' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>| Waiting for payment</button>
+                <button onClick={() => setTab('archived')} className={`text-sm font-semibold ${tab === 'archived' ? 'text-gray-900 dark:text-white' : 'text-gray-500'}`}>| Archived reservations</button>
+            </div>
+            <div className="space-y-4">
+                {filtered.map((r) => (
+                    <ReservationCard key={r.id} reservation={r} />
+                ))}
+            </div>
+        </div>
+    );
+};
+
 export default function Profile() {
-    const [activeSection, setActiveSection] = useState<string>('reviews');
+    const [activeSection, setActiveSection] = useState<string>('reservations');
     const [profileDialogOpen, setProfileDialogOpen] = useState<boolean>(false);
 
     const profileSections: ProfileSection[] = [
+        {
+            id: 'reservations',
+            label: 'Mes Réservations',
+            icon: <PaperAirplaneIcon className="h-5 w-5" />, // reuse icon
+            count: 0
+        },
         {
             id: 'reviews',
             label: 'Mes Avis',
@@ -54,8 +89,18 @@ export default function Profile() {
         }
     ];
 
+
+
+
     const renderContent = () => {
         switch (activeSection) {
+            case 'reservations':
+                return (
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <div className="mb-4 text-lg font-semibold">Reservations</div>
+                        <ReservationsSection />
+                    </div>
+                );
             case 'reviews':
                 return (
                     <div className="bg-white rounded-2xl border border-gray-200 p-8">
@@ -79,14 +124,15 @@ export default function Profile() {
                     </div>
                 );
             case 'travels':
+                const travels: ProfileTravel[] = [
+                    { id: 't1', originCity: 'Paris', destinationCity: 'New-York', travelDate: '2024-06-24', flightNumber: 'XC456Y', availableWeightKg: 12, pricePerKg: 15, verified: true, imageUrl: '/images/paris.jpg' },
+                    { id: 't2', originCity: 'Lyon', destinationCity: 'Tokyo', travelDate: '2024-07-02', flightNumber: 'AF1234', availableWeightKg: 6, pricePerKg: 18, imageUrl: '/images/rencontre2-converted.webp' },
+                ];
                 return (
-                    <div className="bg-white rounded-2xl border border-gray-200 p-8">
-                        <div className="flex items-center justify-center h-64">
-                            <div className="text-center">
-                                <PaperAirplaneIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                <p className="text-gray-500 text-lg">Aucun voyage</p>
-                            </div>
-                        </div>
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+                        {travels.map(t => (
+                            <ProfileTravelCard key={t.id} travel={t} />
+                        ))}
                     </div>
                 );
             case 'favorites':
@@ -164,7 +210,7 @@ export default function Profile() {
                                         <div className="flex items-center gap-3">
                                             {section.icon}
                                             <span className="text-sm font-medium">{section.label}</span>
-                            </div>
+                                        </div>
                                         <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
                                             {section.count}
                                         </span>
