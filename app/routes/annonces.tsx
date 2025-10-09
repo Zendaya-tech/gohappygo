@@ -124,6 +124,13 @@ export default function Annonces() {
                 </button>
               </div>
 
+              {/* Filtrer non disponible button */}
+              <div className="mb-4">
+                <button className="w-full text-left px-4 py-2 text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                  Filtrer non disponible
+                </button>
+              </div>
+
               <div className="space-y-3">
                 {filters.map((filter) => (
                   <label
@@ -151,7 +158,80 @@ export default function Annonces() {
               <div className="text-sm text-gray-500">Chargement…</div>
             )}
             {error && <div className="text-sm text-red-600">{error}</div>}
-            {!loading && !error && (
+            {!loading && !error && results.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-16 px-4">
+                {/* Empty state illustration */}
+                <div className="mb-8">
+                  <svg
+                    width="120"
+                    height="120"
+                    viewBox="0 0 120 120"
+                    fill="none"
+                    className="text-blue-500"
+                  >
+                    {/* Suitcase body */}
+                    <rect
+                      x="25"
+                      y="45"
+                      width="70"
+                      height="50"
+                      rx="8"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    {/* Suitcase handle */}
+                    <path
+                      d="M45 45V35C45 30 48 27 53 27H67C72 27 75 30 75 35V45"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    {/* Suitcase lock */}
+                    <rect
+                      x="57"
+                      y="60"
+                      width="6"
+                      height="8"
+                      rx="1"
+                      fill="currentColor"
+                    />
+                    {/* Sad face */}
+                    <circle cx="50" cy="75" r="2" fill="currentColor" />
+                    <circle cx="70" cy="75" r="2" fill="currentColor" />
+                    <path
+                      d="M45 85C45 85 52 80 60 80C68 80 75 85 75 85"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </div>
+
+                {/* Empty state text */}
+                <div className="text-center max-w-md">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    Nous n'avons trouvé aucun bagage disponible
+                  </h3>
+                  <p className="text-lg text-gray-600 dark:text-gray-400 mb-1">
+                    pour ce vol... encore !
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
+                    Activez une alerte, nous vous préviendrons
+                    <br />
+                    dès qu'une offre correspond.
+                  </p>
+
+                  {/* Alert button */}
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Activer une alerte
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!loading && !error && results.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {results.map((item: any) => {
                   // Try to map generic API fields to card fields; adjust as needed
