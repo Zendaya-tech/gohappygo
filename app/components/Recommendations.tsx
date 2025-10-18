@@ -1,49 +1,55 @@
-import { useTranslation } from 'react-i18next';
-import RecommendationCard from './RecommendationCard';
+import { useTranslation } from "react-i18next";
+import RecommendationCard from "./RecommendationCard";
 
 export default function Recommendations() {
-    const { t } = useTranslation();
-    const recommendations = [
-        {
-            title: t('home.recommendations.exploreDestinations'),
-            subtitle: t('home.recommendations.popularRoutes'),
-            image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=300&fit=crop",
-            videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-            videoId: "dQw4w9WgXcQ"
-        },
-        {
-            title: t('home.recommendations.secureTransport'),
-            subtitle: t('home.recommendations.fragilePackages'),
-            image: "https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=400&h=300&fit=crop",
-            videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0",
-            videoId: "9bZkp7q19f0"
-        },
-        {
+  const { t } = useTranslation();
+  const recommendations = [
+    {
+      title: t("home.recommendations.exploreDestinations"),
+      subtitle: t("home.recommendations.popularRoutes"),
+      image:
+        "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400&h=300&fit=crop",
+      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      videoId: "dQw4w9WgXcQ",
+    },
+    {
+      title: t("home.recommendations.secureTransport"),
+      subtitle: t("home.recommendations.fragilePackages"),
+      image:
+        "https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=400&h=300&fit=crop",
+      videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0",
+      videoId: "9bZkp7q19f0",
+    },
+    {
+      title: t("home.recommendations.saveOnShipping"),
+      subtitle: t("home.recommendations.advantageousRates"),
+      image:
+        "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=300&fit=crop",
+      videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw",
+      videoId: "jNQXAC9IVRw",
+    },
+    {
+      title: t("home.recommendations.expressDelivery"),
+      subtitle: t("home.recommendations.urgentPackages"),
+      image:
+        "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop",
+      videoUrl: "https://www.youtube.com/embed/kJQP7kiw5Fk",
+      videoId: "kJQP7kiw5Fk",
+    },
+  ];
 
-            title: t('home.recommendations.saveOnShipping'),
-            subtitle: t('home.recommendations.advantageousRates'),
-            image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=300&fit=crop",
-            videoUrl: "https://www.youtube.com/embed/jNQXAC9IVRw",
-            videoId: "jNQXAC9IVRw"
-        },
-        {
-            title: t('home.recommendations.expressDelivery'),
-            subtitle: t('home.recommendations.urgentPackages'),
-            image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop",
-            videoUrl: "https://www.youtube.com/embed/kJQP7kiw5Fk",
-            videoId: "kJQP7kiw5Fk"
-        }
-    ];
+  return (
+    <section className="py-12 px-4 mx-auto">
+      <h2 className="text-3xl font-bold   dark:text-white mb-8">
+        {t("home.recommendations.title")}{" "}
+        <span className="text-blue-600">recommandation</span>{" "}
+      </h2>
 
-    return (
-        <section className="py-12 px-4 mx-auto">
-            <h2 className="text-3xl font-bold text-blue-600 dark:text-white mb-8">{t('home.recommendations.title')}</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recommendations.map((recommendation, index) => (
-                    <RecommendationCard key={index} {...recommendation} />
-                ))}
-            </div>
-        </section>
-    );
-} 
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {recommendations.map((recommendation, index) => (
+          <RecommendationCard key={index} {...recommendation} />
+        ))}
+      </div>
+    </section>
+  );
+}

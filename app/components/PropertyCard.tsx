@@ -114,7 +114,7 @@ export default function PropertyCard({
         )}
         {departure && (
           <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">
-            {type === "transporter" ? "Livraison" : "Voyage"}: {departure}
+            Date : {departure}
           </p>
         )}
         {airline && (
