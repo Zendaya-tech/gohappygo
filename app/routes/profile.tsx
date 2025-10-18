@@ -525,9 +525,6 @@ export default function Profile() {
                                 </span>
                               )}
                             </div>
-                            <button className="text-xs text-blue-600 hover:text-blue-700">
-                              Répondre
-                            </button>
                           </div>
                         </div>
                       </div>

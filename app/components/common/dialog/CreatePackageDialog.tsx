@@ -217,7 +217,7 @@ export default function CreatePackageDialog({
                     value={flightNumber}
                     onChange={(e) => setFlightNumber(e.target.value)}
                     placeholder={t("dialogs.createAnnounce.flightNumber")}
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full uppercase rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </Field>
                 <Field label={t("dialogs.createAnnounce.travelDate")}>

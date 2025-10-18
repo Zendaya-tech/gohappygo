@@ -267,7 +267,7 @@ export default function CreateAnnounceDialog({
                     value={flightNumber}
                     onChange={(e) => setFlightNumber(e.target.value)}
                     placeholder="Add numero de vol sur votre billet d’avion"
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full rounded-xl uppercase border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </Field>
                 <Field label="Date de votre Voyage">
