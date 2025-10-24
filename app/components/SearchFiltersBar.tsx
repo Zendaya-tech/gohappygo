@@ -68,7 +68,7 @@ export default function SearchFiltersBar({
         {/* From */}
         <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
           <AirportComboBox
-            label="De"
+            label="Départ"
             value={from}
             placeholder="Saisir le nom de l'aéroport"
             onChange={(airport: Airport | null) => {
@@ -82,7 +82,7 @@ export default function SearchFiltersBar({
         {/* To */}
         <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
           <AirportComboBox
-            label="Vers"
+            label="arrivée"
             value={to}
             placeholder="Saisir le nom de l'aéroport"
             onChange={(airport: Airport | null) => {
