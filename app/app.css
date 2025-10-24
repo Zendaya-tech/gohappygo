@@ -10,6 +10,22 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-poppins: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-cinzel: "Cinzel", serif;
+  --font-sacramento: "Sacramento", cursive;
+  --font-playfair: "Playfair Display", serif;
+}
+
+/* Font family utility classes */
+.font-cinzel {
+  font-family: var(--font-cinzel);
+}
+
+.font-sacramento {
+  font-family: var(--font-sacramento);
+}
+
+.font-playfair {
+  font-family: var(--font-playfair);
 }
 
 html,

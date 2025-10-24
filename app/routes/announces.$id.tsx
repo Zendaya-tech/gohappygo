@@ -21,6 +21,7 @@ const mockReviews = [
     avatar:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     comment: "Super annonce !",
+    fontFamily: "cinzel",
   },
   {
     id: 2,
@@ -30,6 +31,17 @@ const mockReviews = [
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     comment:
       "le voyage c'est déroulé sans problème, la livraison a été rapide et le colis a été bien reçu.",
+    fontFamily: "sacramento",
+  },
+  {
+    id: 3,
+    rating: 5,
+    name: "Marie Dubois",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+    comment:
+      "Excellent service, très professionnel et ponctuel. Je recommande vivement !",
+    fontFamily: "playfair",
   },
 ];
 
@@ -59,8 +71,10 @@ export default function AnnounceDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [newRating, setNewRating] = useState<number>(0);
-  const averageRating = 4.0;
-  const totalReviews = 1;
+  const averageRating =
+    mockReviews.reduce((sum, review) => sum + review.rating, 0) /
+    mockReviews.length;
+  const totalReviews = mockReviews.length;
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [quotesError, setQuotesError] = useState<string | null>(null);
 
@@ -365,7 +379,7 @@ export default function AnnounceDetail() {
                 <div className="mt-8">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      1 Comments
+                      {mockReviews.length} Comments
                     </h4>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="flex items-center">
@@ -392,47 +406,56 @@ export default function AnnounceDetail() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex flex-col mt-10  gap-5">
-                    {mockReviews.map((review) => (
-                      <div key={review.id} className="flex items-start gap-3">
-                        <img
-                          src={review.avatar}
-                          alt="avatar"
-                          className="h-10 w-10 rounded-full"
-                        />
-                        <div className="flex-1">
-                          <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {review.name} •{" "}
-                            {new Date()
-                              .toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                year: "numeric",
-                              })
-                              .toUpperCase()}
-                          </div>
-                          <p className="mt-1 text-gray-800 dark:text-gray-200">
-                            {review.comment}
-                          </p>
-                        </div>
-                        <div className="flex items-center">
-                          {[1, 2, 3, 4, 5].map((i) => (
-                            <svg
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i <= review.rating
-                                  ? "text-yellow-400"
-                                  : "text-gray-300"
-                              }`}
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
+                  <div className="flex flex-col mt-10 gap-5">
+                    {mockReviews.map((review, index) => {
+                      return (
+                        <div
+                          key={review.id}
+                          className={`flex items-start gap-3 `}
+                        >
+                          <img
+                            src={review.avatar}
+                            alt="avatar"
+                            className="h-10 w-10 rounded-full"
+                          />
+                          <div className="flex-1">
+                            <div
+                              className={`text-sm text-gray-600 dark:text-gray-400 `}
                             >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.176 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81H7.03a1 1 0 00.95-.69l1.07-3.293z" />
-                            </svg>
-                          ))}
+                              {review.name} •{" "}
+                              {new Date()
+                                .toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })
+                                .toUpperCase()}
+                            </div>
+                            <p
+                              className={`mt-1 text-gray-800 dark:text-gray-200 `}
+                            >
+                              {review.comment}
+                            </p>
+                          </div>
+                          <div className="flex items-center">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                              <svg
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i <= review.rating
+                                    ? "text-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.176 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81H7.03a1 1 0 00.95-.69l1.07-3.293z" />
+                              </svg>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -500,19 +523,41 @@ export default function AnnounceDetail() {
                         {quotesError}
                       </div>
                     )}
-                    {quotes.map((q) => (
-                      <div
-                        key={q.id}
-                        className="text-gray-700 text-center my-4 dark:text-gray-300 max-w-60 mx-auto"
-                      >
-                        <p className="text-gray-700 text-xs text-center  dark:text-gray-300">
-                          {"<< " + q.quote + " >>"}
-                        </p>
-                        <span className="text-gray-900 text-sm dark:text-gray-300 font-semibold">
-                          {q.author || "Anonyme"}
-                        </span>
-                      </div>
-                    ))}
+                    {quotes.map((q, index) => {
+                      const fontClass = q.fontFamily
+                        ? `font-${q.fontFamily.toLowerCase()}`
+                        : "";
+                      const isEven = index % 2 === 0;
+                      const alignmentClass = isEven ? "ml-auto" : "mr-auto";
+
+                      // Adjust text size based on font family
+                      const textSizeClass =
+                        q.fontFamily === "sacramento"
+                          ? "text-base"
+                          : q.fontFamily === "cinzel"
+                          ? "text-xs font-medium"
+                          : q.fontFamily === "playfair"
+                          ? "text-sm"
+                          : "text-xs";
+
+                      return (
+                        <div
+                          key={q.id}
+                          className={`text-gray-700 my-4 w-[80%] min-w-52 text-center dark:text-gray-300 max-w-60  ${alignmentClass}`}
+                        >
+                          <p
+                            className={`text-gray-700 dark:text-gray-300 ${fontClass} ${textSizeClass} ${alignmentClass}`}
+                          >
+                            {"<< " + q.quote + " >>"}
+                          </p>
+                          <span
+                            className={`text-gray-900 text-sm dark:text-gray-300 font-semibold block mt-2 ${alignmentClass}`}
+                          >
+                            {q.author || "Anonyme"}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </>
                 )}
 
