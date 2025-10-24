@@ -93,7 +93,7 @@ export default function Annonces() {
           <SearchFiltersBar
             initialFrom={searchParams.from}
             initialTo={searchParams.to}
-            initialDate={new Date().toISOString().slice(0, 10)}
+            // initialDate={new Date().toISOString().slice(0, 10)}
             initialFlight={searchParams.flight}
             initialWeight={0}
             onChange={(f) =>

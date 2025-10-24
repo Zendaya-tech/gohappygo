@@ -42,7 +42,7 @@ export default function Recommendations() {
     <section className="py-12 px-4 mx-auto">
       <h2 className="text-3xl font-bold   dark:text-white mb-8">
         {t("home.recommendations.title")}{" "}
-        <span className="text-blue-600">recommandation</span>{" "}
+        <span className="text-blue-600">Recommandations</span>{" "}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

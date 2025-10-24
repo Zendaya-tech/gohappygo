@@ -202,8 +202,26 @@ export default function CreateAnnounceDialog({
           "Erreur lors de la création de l'annonce. Veuillez réessayer."
         );
       }
-    } catch (err) {
-      setError("Erreur lors de la création de l'annonce. Veuillez réessayer.");
+    } catch (err: any) {
+      // Check if it's a 401 error (user not authenticated)
+      if (err?.response?.status === 401 || err?.status === 401) {
+        setError(
+          "Vous devez être connecté pour créer une annonce. Veuillez vous connecter."
+        );
+      } else {
+        // Handle validation errors from backend
+        if (err?.response?.data?.message) {
+          if (Array.isArray(err.response.data.message)) {
+            setError(err.response.data.message.join(", "));
+          } else {
+            setError(err.response.data.message);
+          }
+        } else {
+          setError(
+            "Erreur lors de la création de l'annonce. Veuillez réessayer."
+          );
+        }
+      }
     } finally {
       setSubmitting(false);
     }

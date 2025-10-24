@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { createDemand } from "../../../services/transportService";
 import AirportComboBox from "../AirportComboBox";
 import type { Airport } from "../../../services/airportService";
@@ -12,6 +13,7 @@ export default function CreatePackageDialog({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
 
   // Step 1: General
@@ -151,8 +153,26 @@ export default function CreatePackageDialog({
           "Erreur lors de la création de la demande. Veuillez réessayer."
         );
       }
-    } catch (err) {
-      setError("Erreur lors de la création de la demande. Veuillez réessayer.");
+    } catch (err: any) {
+      // Check if it's a 401 error (user not authenticated)
+      if (err?.response?.status === 401 || err?.status === 401) {
+        setError(
+          "Vous devez être connecté pour créer une demande de transport. Veuillez vous connecter."
+        );
+      } else {
+        // Handle validation errors from backend
+        if (err?.response?.data?.message) {
+          if (Array.isArray(err.response.data.message)) {
+            setError(err.response.data.message.join(", "));
+          } else {
+            setError(err.response.data.message);
+          }
+        } else {
+          setError(
+            "Erreur lors de la création de la demande. Veuillez réessayer."
+          );
+        }
+      }
     } finally {
       setSubmitting(false);
     }

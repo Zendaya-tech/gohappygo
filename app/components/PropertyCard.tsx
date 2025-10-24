@@ -59,7 +59,7 @@ export default function PropertyCard({
             Vérifié
           </div>
         )}
-        {type && (
+        {/* {type && (
           <div
             className={`absolute bottom-4 left-4 px-3 py-1 rounded-full text-xs font-medium ${
               type === "transporter"
@@ -69,7 +69,7 @@ export default function PropertyCard({
           >
             {type === "transporter" ? "Transporteur" : "Voyageur"}
           </div>
-        )}
+        )} */}
         <button
           onClick={handleFavoriteClick}
           className={`absolute top-4 right-4 backdrop-blur-sm p-2 rounded-full transition-all duration-200 hover:scale-110 ${
@@ -117,11 +117,11 @@ export default function PropertyCard({
             Date : {departure}
           </p>
         )}
-        {airline && (
+        {/* {airline && (
           <p className="text-gray-500 dark:text-gray-400 text-xs mb-4">
             Compagnie: {airline}
           </p>
-        )}
+        )} */}
 
         {departure && (
           <div className="flex items-center justify-between">

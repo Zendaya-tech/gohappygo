@@ -21,16 +21,18 @@ type Props = {
 // Airports are now fetched dynamically via AirportComboBox
 
 export default function SearchFiltersBar({
-  initialFrom = "CDG",
-  initialTo = "JFK",
-  initialDate = new Date().toISOString(),
+  initialFrom,
+  initialTo,
+  initialDate,
   initialFlight = "",
   initialWeight = 0,
   onChange,
 }: Props) {
   const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState(initialTo);
-  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState<Date | undefined>(
+    initialDate ? new Date(initialDate) : undefined
+  );
   const [flight, setFlight] = useState(initialFlight);
   const [weight, setWeight] = useState<number>(initialWeight);
   const navigate = useNavigate();

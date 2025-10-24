@@ -216,8 +216,7 @@
       "create": "Create"
     },
     "createPackage": {
-      "title": "Create package request",
-      "title": "Package title",
+      "title": "Package title ",
       "description": "Description",
       "weight": "Weight (kg)",
       "maxDeliveryDate": "Max delivery date",

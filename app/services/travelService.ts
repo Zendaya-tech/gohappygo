@@ -53,6 +53,6 @@ export const createTravel = async (data: CreateTravelData) => {
     return response.data;
   } catch (error) {
     console.error("Error creating travel:", error);
-    return null;
+    throw error; // Propagate the error instead of returning null
   }
 };

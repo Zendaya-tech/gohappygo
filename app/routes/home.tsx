@@ -12,10 +12,17 @@ import Reviews from "../components/features/home/Reviews";
 import SupportSection from "../components/SupportSection";
 import Footer from "../components/Footer";
 
-export function meta({ }: Route.MetaArgs) {
+export function meta({}: Route.MetaArgs) {
   return [
-    { title: "GoHappyGo - Faites vous des amis, gagnez de l'argent en voyage" },
-    { name: "description", content: "Deux besoins, une entraide : les voyageurs avec des kilos en moins aident ceux qui en ont en plus. Expédiez à petit prix pendant que les voyageurs monétisent leur espace libre, en toute sécurité et simplicité." },
+    {
+      title:
+        "GoHappyGo -  Faites plus qu'un voyage, Faites des bagages Heureux",
+    },
+    {
+      name: "description",
+      content:
+        "Deux besoins, une entraide : les voyageurs avec des kilos en moins aident ceux qui en ont en plus. Expédiez à petit prix pendant que les voyageurs monétisent leur espace libre, en toute sécurité et simplicité.",
+    },
   ];
 }
 
@@ -25,7 +32,6 @@ export default function Home() {
       <Header />
 
       <div className="min-h-screen max-w-7xl mx-auto relative bg-white dark:bg-gray-950">
-
         <HeroSection />
         <FeaturesSection />
         {/* <PlacesByCategory /> */}
@@ -36,11 +42,9 @@ export default function Home() {
         <SelectedPlaces />
         <Reviews />
         <SupportSection />
-
       </div>
 
       <Footer />
     </>
-
   );
 }

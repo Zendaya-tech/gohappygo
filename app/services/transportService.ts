@@ -42,6 +42,6 @@ export const createDemand = async (data: CreateDemandData) => {
     return response.data;
   } catch (error) {
     console.error("Error creating demand:", error);
-    return null;
+    throw error; // Propagate the error instead of returning null
   }
 };

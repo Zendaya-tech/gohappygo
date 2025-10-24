@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import Header from "../components/Header";
 import FooterMinimal from "~/components/FooterMinimal";
 import ProfileDialog from "../components/common/dialogs/ProfileDialog";
+import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
+import CreatePackageDialog from "~/components/common/dialog/CreatePackageDialog";
 import {
   StarIcon,
   QuestionMarkCircleIcon,
@@ -132,6 +134,10 @@ const ReservationsSection = () => {
 export default function Profile() {
   const [activeSection, setActiveSection] = useState<string>("reservations");
   const [profileDialogOpen, setProfileDialogOpen] = useState<boolean>(false);
+  const [createAnnounceDialogOpen, setCreateAnnounceDialogOpen] =
+    useState<boolean>(false);
+  const [createPackageDialogOpen, setCreatePackageDialogOpen] =
+    useState<boolean>(false);
 
   const profileSections: ProfileSection[] = [
     {
@@ -507,24 +513,7 @@ export default function Profile() {
 
                           {/* Footer */}
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              {review.verified && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                  <svg
-                                    className="w-3 h-3 mr-1"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                  Vérifié
-                                </span>
-                              )}
-                            </div>
+                            <div className="flex items-center gap-2"></div>
                           </div>
                         </div>
                       </div>
@@ -774,10 +763,16 @@ export default function Profile() {
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl">
+              <button
+                onClick={() => setCreateAnnounceDialogOpen(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl"
+              >
                 Publier une annonce de voyage
               </button>
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl">
+              <button
+                onClick={() => setCreatePackageDialogOpen(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl"
+              >
                 Publier une demande de transport
               </button>
             </div>
@@ -802,6 +797,18 @@ export default function Profile() {
       <ProfileDialog
         open={profileDialogOpen}
         onClose={() => setProfileDialogOpen(false)}
+      />
+
+      {/* Create Announce Dialog */}
+      <CreateAnnounceDialog
+        open={createAnnounceDialogOpen}
+        onClose={() => setCreateAnnounceDialogOpen(false)}
+      />
+
+      {/* Create Package Dialog */}
+      <CreatePackageDialog
+        open={createPackageDialogOpen}
+        onClose={() => setCreatePackageDialogOpen(false)}
       />
 
       <FooterMinimal />
