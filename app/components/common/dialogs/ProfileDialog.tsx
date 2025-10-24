@@ -19,7 +19,7 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    countryCode: "",
+    countryCode: "+33",
     phoneNumber: "",
     aboutMe: "",
   });
@@ -203,30 +203,87 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
                     />
                   </div>
 
-                  {/* Country Code */}
+                  {/* Phone Number with Country Code */}
                   <div>
-                    <input
-                      type="text"
-                      placeholder="Indicatif du Pays"
-                      value={formData.countryCode}
-                      onChange={(e) =>
-                        handleInputChange("countryCode", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
+                    <div className="flex gap-2">
+                      {/* Country Code Dropdown */}
+                      <select
+                        value={formData.countryCode}
+                        onChange={(e) =>
+                          handleInputChange("countryCode", e.target.value)
+                        }
+                        className="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white min-w-[100px]"
+                      >
+                        <option value="+33">🇫🇷 +33</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+49">🇩🇪 +49</option>
+                        <option value="+39">🇮🇹 +39</option>
+                        <option value="+34">🇪🇸 +34</option>
+                        <option value="+31">🇳🇱 +31</option>
+                        <option value="+32">🇧🇪 +32</option>
+                        <option value="+41">🇨🇭 +41</option>
+                        <option value="+43">🇦🇹 +43</option>
+                        <option value="+351">🇵🇹 +351</option>
+                        <option value="+45">🇩🇰 +45</option>
+                        <option value="+46">🇸🇪 +46</option>
+                        <option value="+47">🇳🇴 +47</option>
+                        <option value="+358">🇫🇮 +358</option>
+                        <option value="+353">🇮🇪 +353</option>
+                        <option value="+30">🇬🇷 +30</option>
+                        <option value="+48">🇵🇱 +48</option>
+                        <option value="+420">🇨🇿 +420</option>
+                        <option value="+421">🇸🇰 +421</option>
+                        <option value="+36">🇭🇺 +36</option>
+                        <option value="+40">🇷🇴 +40</option>
+                        <option value="+359">🇧🇬 +359</option>
+                        <option value="+385">🇭🇷 +385</option>
+                        <option value="+386">🇸🇮 +386</option>
+                        <option value="+372">🇪🇪 +372</option>
+                        <option value="+371">🇱🇻 +371</option>
+                        <option value="+370">🇱🇹 +370</option>
+                        <option value="+356">🇲🇹 +356</option>
+                        <option value="+357">🇨🇾 +357</option>
+                        <option value="+352">🇱🇺 +352</option>
+                        <option value="+212">🇲🇦 +212</option>
+                        <option value="+213">🇩🇿 +213</option>
+                        <option value="+216">🇹🇳 +216</option>
+                        <option value="+20">🇪🇬 +20</option>
+                        <option value="+27">🇿🇦 +27</option>
+                        <option value="+234">🇳🇬 +234</option>
+                        <option value="+254">🇰🇪 +254</option>
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+86">🇨🇳 +86</option>
+                        <option value="+81">🇯🇵 +81</option>
+                        <option value="+82">🇰🇷 +82</option>
+                        <option value="+65">🇸🇬 +65</option>
+                        <option value="+60">🇲🇾 +60</option>
+                        <option value="+66">🇹🇭 +66</option>
+                        <option value="+84">🇻🇳 +84</option>
+                        <option value="+63">🇵🇭 +63</option>
+                        <option value="+62">🇮🇩 +62</option>
+                        <option value="+61">🇦🇺 +61</option>
+                        <option value="+64">🇳🇿 +64</option>
+                        <option value="+55">🇧🇷 +55</option>
+                        <option value="+54">🇦🇷 +54</option>
+                        <option value="+56">🇨🇱 +56</option>
+                        <option value="+57">🇨🇴 +57</option>
+                        <option value="+51">🇵🇪 +51</option>
+                        <option value="+52">🇲🇽 +52</option>
+                        <option value="+1">🇨🇦 +1</option>
+                      </select>
 
-                  {/* Phone Number */}
-                  <div>
-                    <input
-                      type="tel"
-                      placeholder="Phone number"
-                      value={formData.phoneNumber}
-                      onChange={(e) =>
-                        handleInputChange("phoneNumber", e.target.value)
-                      }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+                      {/* Phone Number Input */}
+                      <input
+                        type="tel"
+                        placeholder="Numéro de téléphone"
+                        value={formData.phoneNumber}
+                        onChange={(e) =>
+                          handleInputChange("phoneNumber", e.target.value)
+                        }
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </div>
                     <p className="text-xs text-gray-500 mt-1">
                       (Nous vous enverrons un code pour confirmer votre numéro.)
                     </p>
