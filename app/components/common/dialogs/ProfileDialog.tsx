@@ -6,6 +6,7 @@ import {
   EyeSlashIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
+import { useAuth } from "../../../hooks/useAuth";
 
 interface ProfileDialogProps {
   open: boolean;
@@ -34,9 +35,14 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
     confirm: false,
   });
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hasActiveTransactions] = useState(true); // Simulate active transactions
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { updateProfile, changePassword, user } = useAuth();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -62,6 +68,7 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setProfileImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         setProfileImage(e.target?.result as string);
@@ -70,10 +77,29 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Profile data:", { ...formData, profileImage });
-    onClose();
+    setSubmitting(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      await updateProfile({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        bio: formData.aboutMe,
+        profilePicture: profileImageFile || undefined,
+      });
+
+      setSuccess("Profil mis à jour avec succès!");
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+    } catch (err: any) {
+      setError(err.message || "Erreur lors de la mise à jour du profil");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!open) return null;
@@ -140,6 +166,16 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
           <div className="p-6">
             {activeTab === "profile" && (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+                    {success}
+                  </div>
+                )}
                 {/* Profile Picture Upload */}
                 <div className="text-center">
                   <div className="relative inline-block">
@@ -306,22 +342,63 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                  disabled={submitting}
+                  className={`w-full py-3 rounded-lg font-medium transition-colors ${
+                    submitting
+                      ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
                 >
-                  Sauvegarder les modifications
+                  {submitting
+                    ? "Sauvegarde en cours..."
+                    : "Sauvegarder les modifications"}
                 </button>
               </form>
             )}
 
             {activeTab === "password" && (
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  console.log("Password data:", passwordData);
-                  onClose();
+                  setSubmitting(true);
+                  setError(null);
+                  setSuccess(null);
+
+                  try {
+                    await changePassword({
+                      currentPassword: passwordData.currentPassword,
+                      newPassword: passwordData.newPassword,
+                    });
+
+                    setSuccess("Mot de passe modifié avec succès!");
+                    setPasswordData({
+                      currentPassword: "",
+                      newPassword: "",
+                      confirmPassword: "",
+                    });
+                    setTimeout(() => {
+                      onClose();
+                    }, 1500);
+                  } catch (err: any) {
+                    setError(
+                      err.message || "Erreur lors du changement de mot de passe"
+                    );
+                  } finally {
+                    setSubmitting(false);
+                  }
                 }}
                 className="space-y-6"
               >
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+                    {success}
+                  </div>
+                )}
                 <div className="space-y-4">
                   {/* Current Password */}
                   <div>
@@ -424,13 +501,23 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
                 <button
                   type="submit"
                   disabled={
+                    submitting ||
                     !passwordData.currentPassword ||
                     !passwordData.newPassword ||
                     passwordData.newPassword !== passwordData.confirmPassword
                   }
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className={`w-full py-3 rounded-lg font-medium transition-colors ${
+                    submitting ||
+                    !passwordData.currentPassword ||
+                    !passwordData.newPassword ||
+                    passwordData.newPassword !== passwordData.confirmPassword
+                      ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  }`}
                 >
-                  Mettre à jour le mot de passe
+                  {submitting
+                    ? "Mise à jour en cours..."
+                    : "Mettre à jour le mot de passe"}
                 </button>
               </form>
             )}

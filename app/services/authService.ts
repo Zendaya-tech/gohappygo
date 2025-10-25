@@ -45,6 +45,41 @@ export const verifyEmail = async (email: string, verificationCode: string) => {
   }
 };
 
+export const updateProfile = async (data: UpdateProfileData) => {
+  try {
+    const formData = new FormData();
+
+    if (data.firstName) formData.append("firstName", data.firstName);
+    if (data.lastName) formData.append("lastName", data.lastName);
+    if (data.bio) formData.append("bio", data.bio);
+    if (data.profilePicture)
+      formData.append("profilePicture", data.profilePicture);
+
+    const response = await api.put(`/user/update-profile`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Update profile error:", error);
+    throw error;
+  }
+};
+
+export const changePassword = async (data: ChangePasswordData) => {
+  try {
+    const response = await api.put(`/user/change-password`, {
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Change password error:", error);
+    throw error;
+  }
+};
+
 export type LoginResponse = {
   access_token: string;
   refresh_token?: string;
@@ -55,4 +90,16 @@ export type LoginResponse = {
     lastName?: string;
     email?: string;
   };
+};
+
+export type UpdateProfileData = {
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  profilePicture?: File;
+};
+
+export type ChangePasswordData = {
+  currentPassword: string;
+  newPassword: string;
 };

@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  register as apiRegister,
-  verifyEmail as apiVerifyEmail,
-} from "../../../services/authService";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function RegisterDialog({
   open,
@@ -33,6 +30,7 @@ export default function RegisterDialog({
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { register, verifyEmail } = useAuth();
 
   useEffect(() => {
     if (!open) return;
@@ -63,23 +61,22 @@ export default function RegisterDialog({
       setSubmitting(true);
       setError(null);
       setMessage(null);
-      const res = await apiRegister(
-        form.email,
-        form.password,
-        form.firstName,
-        form.lastName,
-        form.phoneNumber
-      );
-      if (!res) {
-        setError("Echec de l'inscription. Réessayez.");
-      } else if (res.message) {
+
+      try {
+        const res = await register(
+          form.email,
+          form.password,
+          form.firstName,
+          form.lastName,
+          form.phoneNumber
+        );
         setMessage(res.message);
         setStep(2);
-      } else {
-        setMessage("Inscription réussie. Vérifiez votre email et téléphone.");
-        setStep(2);
+      } catch (err: any) {
+        setError(err.message || "Échec de l'inscription. Réessayez.");
+      } finally {
+        setSubmitting(false);
       }
-      setSubmitting(false);
       return;
     }
 
@@ -92,24 +89,19 @@ export default function RegisterDialog({
       setSubmitting(true);
       setError(null);
 
-      const verifyRes = await apiVerifyEmail(form.email, verification);
-      if (!verifyRes) {
-        setError("Code de vérification invalide. Réessayez.");
-        setSubmitting(false);
-        return;
-      }
-
-      if (verifyRes.message) {
+      try {
+        const verifyRes = await verifyEmail(form.email, verification);
         setMessage(verifyRes.message);
-      } else {
-        setMessage("Email vérifié avec succès!");
-      }
 
-      setSubmitting(false);
-      // Close dialog after successful verification
-      setTimeout(() => {
-        onClose();
-      }, 1500);
+        // Close dialog after successful verification
+        setTimeout(() => {
+          onClose();
+        }, 1500);
+      } catch (err: any) {
+        setError(err.message || "Code de vérification invalide. Réessayez.");
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 

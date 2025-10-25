@@ -10,8 +10,8 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import { useEffect } from "react";
-import { useAuthStore, type AuthState } from "./store/auth";
-import { useThemeStore, type Theme } from "./store/theme";
+import { useThemeStore } from "./store/theme";
+import { useAuth } from "./hooks/useAuth";
 import ChatWidget from "./components/ChatWidget";
 import CookieConsent from "./components/common/dialog/CookieConsent";
 import "./i18n";
@@ -61,13 +61,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const hydrateAuth = useAuthStore((s: AuthState) => s.hydrateFromCookies);
+  const { authenticate } = useAuth();
   const hydrateTheme = useThemeStore((s: { hydrate: () => void }) => s.hydrate);
 
   useEffect(() => {
-    hydrateAuth();
+    authenticate();
     hydrateTheme();
-  }, [hydrateAuth, hydrateTheme]);
+  }, [authenticate, hydrateTheme]);
 
   return (
     <>
