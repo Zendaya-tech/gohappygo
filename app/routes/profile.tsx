@@ -4,6 +4,7 @@ import FooterMinimal from "~/components/FooterMinimal";
 import ProfileDialog from "../components/common/dialogs/ProfileDialog";
 import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
 import CreatePackageDialog from "~/components/common/dialog/CreatePackageDialog";
+import { useAuth } from "~/hooks/useAuth";
 import {
   StarIcon,
   QuestionMarkCircleIcon,
@@ -138,6 +139,7 @@ export default function Profile() {
     useState<boolean>(false);
   const [createPackageDialogOpen, setCreatePackageDialogOpen] =
     useState<boolean>(false);
+  const { user, isAuthenticated } = useAuth();
 
   const profileSections: ProfileSection[] = [
     {
@@ -707,22 +709,45 @@ export default function Profile() {
           <aside className="space-y-6">
             {/* Profile Card */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center">
-              {/* Profile Picture Placeholder */}
-              <div className="w-24 h-24 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <div className="w-16 h-16 bg-blue-300 rounded-full flex items-center justify-center">
-                  <svg
-                    className="w-8 h-8 text-blue-600"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
-                </div>
+              {/* Profile Picture */}
+              <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden">
+                {isAuthenticated && user?.profilePictureUrl ? (
+                  <img
+                    src={user.profilePictureUrl}
+                    alt={user.name || "Profile"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-blue-100 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-blue-300 rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-8 h-8 text-blue-600"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* User Name */}
+              {isAuthenticated && user?.name ? (
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {user.name}
+                </h3>
+              ) : (
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Utilisateur
+                </h3>
+              )}
 
               {/* Profile Information Prompt */}
               <p className="text-gray-500 text-sm mb-4">
-                Please add information about yourself in your profile settings.
+                {isAuthenticated
+                  ? "Gérez vos informations personnelles et vos préférences"
+                  : "Veuillez vous connecter pour accéder à votre profil"}
               </p>
 
               {/* Edit Profile Button */}

@@ -176,7 +176,7 @@ export const useAuth = () => {
     // State
     user: authStore.user,
     token: authStore.token,
-    isAuthenticated: authStore.isAuthenticated,
+    isAuthenticated: authStore.isLoggedIn,
 
     // Methods
     login,
