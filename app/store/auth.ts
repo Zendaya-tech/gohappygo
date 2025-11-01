@@ -2,8 +2,18 @@ import { create } from "zustand";
 
 export type AuthState = {
   isLoggedIn: boolean;
-  user?: { id: string; name: string; profilePictureUrl?: string } | null;
-  login: (accessToken: string, user?: AuthState["user"], refreshToken?: string) => void;
+  user?: {
+    id: string;
+    name: string;
+    profilePictureUrl?: string;
+    bio?: string;
+  } | null;
+  token?: string | null;
+  login: (
+    accessToken: string,
+    user?: AuthState["user"],
+    refreshToken?: string
+  ) => void;
   logout: () => void;
   hydrateFromCookies: () => void;
 };
@@ -30,19 +40,19 @@ function deleteCookie(name: string) {
 export const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: false,
   user: null,
+  token: null,
   hydrateFromCookies: () => {
     const token = getCookie("auth_token");
-    set({ isLoggedIn: Boolean(token) });
+    set({ isLoggedIn: Boolean(token), token });
   },
   login: (accessToken, user, refreshToken) => {
     setCookie("auth_token", accessToken, 7);
     if (refreshToken) setCookie("refresh_token", refreshToken, 30);
-    set({ isLoggedIn: true, user: user ?? null });
+    set({ isLoggedIn: true, user: user ?? null, token: accessToken });
   },
   logout: () => {
     deleteCookie("auth_token");
     deleteCookie("refresh_token");
-    set({ isLoggedIn: false, user: null });
+    set({ isLoggedIn: false, user: null, token: null });
   },
 }));
-

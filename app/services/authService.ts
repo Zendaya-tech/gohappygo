@@ -80,6 +80,26 @@ export const changePassword = async (data: ChangePasswordData) => {
   }
 };
 
+export const getMe = async () => {
+  try {
+    const response = await api.get(`/auth/me`);
+    return response.data;
+  } catch (error) {
+    console.error("Get me error:", error);
+    throw error;
+  }
+};
+
+export const deleteAccount = async () => {
+  try {
+    const response = await api.delete(`/auth/delete`);
+    return response.data;
+  } catch (error) {
+    console.error("Delete account error:", error);
+    throw error;
+  }
+};
+
 export type LoginResponse = {
   access_token: string;
   refresh_token?: string;
@@ -89,6 +109,7 @@ export type LoginResponse = {
     firstName?: string;
     lastName?: string;
     email?: string;
+    bio?: string;
   };
 };
 

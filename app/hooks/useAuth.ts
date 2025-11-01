@@ -6,6 +6,8 @@ import {
   verifyEmail as apiVerifyEmail,
   updateProfile as apiUpdateProfile,
   changePassword as apiChangePassword,
+  getMe as apiGetMe,
+  deleteAccount as apiDeleteAccount,
   type LoginResponse,
   type UpdateProfileData,
   type ChangePasswordData,
@@ -37,6 +39,7 @@ export const useAuth = () => {
                 }`.trim() ||
                 (res.user.email ?? "Utilisateur"),
               profilePictureUrl: res.user.profilePictureUrl,
+              bio: res.user.bio,
             }
           : {
               id: "me",
@@ -124,9 +127,46 @@ export const useAuth = () => {
     storeLogout();
   }, [storeLogout]);
 
-  const authenticate = useCallback(() => {
-    hydrateFromCookies();
-  }, [hydrateFromCookies]);
+  const authenticate = useCallback(async () => {
+    try {
+      // First try to get token from localStorage
+      const token = window.localStorage.getItem("auth_token");
+      // if (!token) {
+      //   // If no token, try hydrating from cookies as fallback
+      //   hydrateFromCookies();
+      //   return;
+      // }
+
+      // If we have a token, verify it with the server
+      const userData = await apiGetMe();
+
+      if (userData) {
+        const composedUser = {
+          id: String(userData.id),
+          name:
+            `${userData.firstName ?? ""} ${userData.lastName ?? ""}`.trim() ||
+            (userData.email ?? "Utilisateur"),
+          profilePictureUrl: userData.profilePictureUrl,
+          bio: userData.bio,
+        };
+
+        storeLogin(token!, composedUser);
+      } else {
+        // If API call fails, remove invalid token and fallback to cookies
+        window.localStorage.removeItem("auth_token");
+        hydrateFromCookies();
+      }
+    } catch (error) {
+      console.error("Authentication error:", error);
+      // If API call fails, remove invalid token and fallback to cookies
+      try {
+        window.localStorage.removeItem("auth_token");
+      } catch (e) {
+        console.warn("Could not remove token from localStorage:", e);
+      }
+      hydrateFromCookies();
+    }
+  }, [hydrateFromCookies, storeLogin]);
 
   const updateProfile = useCallback(
     async (data: UpdateProfileData) => {
@@ -143,6 +183,7 @@ export const useAuth = () => {
                 : authStore.user.name,
             profilePictureUrl:
               res.profilePictureUrl || authStore.user.profilePictureUrl,
+            bio: data.bio || authStore.user.bio,
           };
           storeLogin(authStore.token!, updatedUser);
         }
@@ -172,6 +213,23 @@ export const useAuth = () => {
     }
   }, []);
 
+  const deleteAccount = useCallback(async () => {
+    try {
+      const res = await apiDeleteAccount();
+
+      // Logout user after successful account deletion
+      logout();
+
+      return {
+        success: true,
+        message: res.message || "Compte supprimé avec succès!",
+      };
+    } catch (error) {
+      console.error("Delete account error:", error);
+      throw error;
+    }
+  }, [logout]);
+
   return {
     // State
     user: authStore.user,
@@ -184,6 +242,7 @@ export const useAuth = () => {
     verifyEmail,
     updateProfile,
     changePassword,
+    deleteAccount,
     logout,
     authenticate,
   };

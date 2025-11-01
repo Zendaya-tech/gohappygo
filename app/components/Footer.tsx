@@ -18,7 +18,7 @@ export default function Footer() {
             </p>
             <div className="mt-4 flex items-center gap-3 text-gray-900 dark:text-gray-100">
               <a
-                href="#"
+                href="https://x.com/GoHappyGo1"
                 aria-label="Twitter"
                 className="hover:text-gray-900 dark:hover:text-gray-100"
               >
@@ -191,5 +191,3 @@ export default function Footer() {
     </footer>
   );
 }
-
-

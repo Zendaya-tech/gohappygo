@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createTravel } from "../../../services/travelService";
 import AirportComboBox from "../AirportComboBox";
+import CurrencyComboBox from "../CurrencyComboBox";
 import type { Airport } from "../../../services/airportService";
+import type { Currency } from "../../../services/currencyService";
 
 type StepKey = 1 | 2 | 3 | 4;
 
@@ -12,6 +14,7 @@ type InitialData = {
   story?: string;
   kilos?: number;
   pricePerKg?: number;
+  currency?: Currency | null;
   lateTax?: number;
   noSmileTax?: number;
   allowExtraGrams?: boolean;
@@ -41,6 +44,7 @@ export default function CreateAnnounceDialog({
   const [fileUrls, setFileUrls] = useState<string[]>([]);
   const [kilos, setKilos] = useState<number | "">("");
   const [pricePerKg, setPricePerKg] = useState<number | "">("");
+  const [currency, setCurrency] = useState<Currency | null>(null);
   const [lateTax, setLateTax] = useState<number | "">(0);
   const [noSmileTax, setNoSmileTax] = useState<number | "">(0);
   const [allowExtraGrams, setAllowExtraGrams] = useState<boolean>(false);
@@ -79,6 +83,7 @@ export default function CreateAnnounceDialog({
       setPricePerKg(
         typeof initialData.pricePerKg === "number" ? initialData.pricePerKg : ""
       );
+      setCurrency(initialData.currency ?? null);
       setLateTax(
         typeof initialData.lateTax === "number" ? initialData.lateTax : 0
       );
@@ -100,6 +105,7 @@ export default function CreateAnnounceDialog({
       setFileUrls([]);
       setKilos("");
       setPricePerKg("");
+      setCurrency(null);
       setLateTax(0);
       setNoSmileTax(0);
       setAllowExtraGrams(false);
@@ -431,46 +437,62 @@ export default function CreateAnnounceDialog({
                   />
                 </Field>
                 <Field label="What is your price per kilos?">
-                  <input
-                    type="number"
-                    min={0}
-                    value={pricePerKg}
-                    onChange={(e) =>
-                      setPricePerKg(
-                        e.target.value === "" ? "" : Number(e.target.value)
-                      )
-                    }
-                    placeholder="enter  your price per kilos"
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                  <div className="flex">
+                    <input
+                      type="number"
+                      min={0}
+                      value={pricePerKg}
+                      onChange={(e) =>
+                        setPricePerKg(
+                          e.target.value === "" ? "" : Number(e.target.value)
+                        )
+                      }
+                      placeholder="enter  your price per kilos"
+                      className="flex-1 rounded-l-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-r-0"
+                    />
+                    <CurrencyComboBox
+                      value={currency?.code}
+                      onChange={setCurrency}
+                      placeholder="EUR"
+                      compact
+                    />
+                  </div>
                 </Field>
                 <Field
                   label={
                     <span>
-                      Taxe pour les personnes en retard %{" "}
+                      Taxe pour les personnes en retard{" "}
                       <span className="text-gray-400">
                         (juste pour préciser à quel point vous êtes ponctuel)
                       </span>
                     </span>
                   }
                 >
-                  <input
-                    type="number"
-                    min={0}
-                    value={lateTax as number}
-                    onChange={(e) =>
-                      setLateTax(
-                        e.target.value === "" ? "" : Number(e.target.value)
-                      )
-                    }
-                    placeholder="0"
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                  <div className="flex">
+                    <input
+                      type="number"
+                      min={0}
+                      value={lateTax as number}
+                      onChange={(e) =>
+                        setLateTax(
+                          e.target.value === "" ? "" : Number(e.target.value)
+                        )
+                      }
+                      placeholder="0"
+                      className="flex-1 rounded-l-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-r-0"
+                    />
+                    <CurrencyComboBox
+                      value={currency?.code}
+                      onChange={setCurrency}
+                      placeholder="EUR"
+                      compact
+                    />
+                  </div>
                 </Field>
                 <Field
                   label={
                     <span>
-                      Taxe pour les personnes pas souriantes ?{" "}
+                      Taxe pour les personnes pas souriantes{" "}
                       <span className="text-gray-400">
                         ( parce que vous êtes heureux de rencontrer des
                         personnes heureuses)
@@ -478,18 +500,26 @@ export default function CreateAnnounceDialog({
                     </span>
                   }
                 >
-                  <input
-                    type="number"
-                    min={0}
-                    value={noSmileTax as number}
-                    onChange={(e) =>
-                      setNoSmileTax(
-                        e.target.value === "" ? "" : Number(e.target.value)
-                      )
-                    }
-                    placeholder="0"
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                  <div className="flex">
+                    <input
+                      type="number"
+                      min={0}
+                      value={noSmileTax as number}
+                      onChange={(e) =>
+                        setNoSmileTax(
+                          e.target.value === "" ? "" : Number(e.target.value)
+                        )
+                      }
+                      placeholder="0"
+                      className="flex-1 rounded-l-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-r-0"
+                    />
+                    <CurrencyComboBox
+                      value={currency?.code}
+                      onChange={setCurrency}
+                      placeholder="EUR"
+                      compact
+                    />
+                  </div>
                 </Field>
                 <div>
                   <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">

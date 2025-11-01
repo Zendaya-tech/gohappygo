@@ -90,7 +90,7 @@ export default function SearchFiltersBar({
         {/* To */}
         <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
           <AirportComboBox
-            label="arrivée"
+            label="Arrivée"
             value={to}
             placeholder="Saisir le nom de l'aéroport"
             onChange={(airport: Airport | null) => {

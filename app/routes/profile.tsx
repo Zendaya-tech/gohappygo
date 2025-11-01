@@ -484,9 +484,6 @@ export default function Profile() {
                               <h4 className="text-sm font-semibold text-gray-900">
                                 {review.route}
                               </h4>
-                              <p className="text-xs text-gray-500">
-                                avec {review.travelerName}
-                              </p>
                             </div>
                             <div className="flex items-center gap-2">
                               {/* Rating stars */}
@@ -743,12 +740,18 @@ export default function Profile() {
                 </h3>
               )}
 
-              {/* Profile Information Prompt */}
-              <p className="text-gray-500 text-sm mb-4">
-                {isAuthenticated
-                  ? "Gérez vos informations personnelles et vos préférences"
-                  : "Veuillez vous connecter pour accéder à votre profil"}
-              </p>
+              {/* User Bio */}
+              {isAuthenticated && user?.bio ? (
+                <p className="text-gray-600 text-sm mb-4 italic">
+                  "{user.bio}"
+                </p>
+              ) : (
+                <p className="text-gray-500 text-sm mb-4">
+                  {isAuthenticated
+                    ? "Ajoutez une bio pour vous présenter aux autres utilisateurs"
+                    : "Veuillez vous connecter pour accéder à votre profil"}
+                </p>
+              )}
 
               {/* Edit Profile Button */}
               <button

@@ -6,6 +6,8 @@ import {
   EyeSlashIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
 import { useAuth } from "../../../hooks/useAuth";
 
 interface ProfileDialogProps {
@@ -20,7 +22,6 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    countryCode: "+33",
     phoneNumber: "",
     aboutMe: "",
   });
@@ -37,12 +38,12 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [hasActiveTransactions] = useState(true); // Simulate active transactions
+  const [hasActiveTransactions] = useState(false); // Simulate active transactions
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { updateProfile, changePassword, user } = useAuth();
+  const { updateProfile, changePassword, deleteAccount, user } = useAuth();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -105,7 +106,7 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="absolute  inset-0 z-50 ">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm"
@@ -241,85 +242,21 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
 
                   {/* Phone Number with Country Code */}
                   <div>
-                    <div className="flex gap-2">
-                      {/* Country Code Dropdown */}
-                      <select
-                        value={formData.countryCode}
-                        onChange={(e) =>
-                          handleInputChange("countryCode", e.target.value)
-                        }
-                        className="px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white min-w-[100px]"
-                      >
-                        <option value="+33">🇫🇷 +33</option>
-                        <option value="+1">🇺🇸 +1</option>
-                        <option value="+44">🇬🇧 +44</option>
-                        <option value="+49">🇩🇪 +49</option>
-                        <option value="+39">🇮🇹 +39</option>
-                        <option value="+34">🇪🇸 +34</option>
-                        <option value="+31">🇳🇱 +31</option>
-                        <option value="+32">🇧🇪 +32</option>
-                        <option value="+41">🇨🇭 +41</option>
-                        <option value="+43">🇦🇹 +43</option>
-                        <option value="+351">🇵🇹 +351</option>
-                        <option value="+45">🇩🇰 +45</option>
-                        <option value="+46">🇸🇪 +46</option>
-                        <option value="+47">🇳🇴 +47</option>
-                        <option value="+358">🇫🇮 +358</option>
-                        <option value="+353">🇮🇪 +353</option>
-                        <option value="+30">🇬🇷 +30</option>
-                        <option value="+48">🇵🇱 +48</option>
-                        <option value="+420">🇨🇿 +420</option>
-                        <option value="+421">🇸🇰 +421</option>
-                        <option value="+36">🇭🇺 +36</option>
-                        <option value="+40">🇷🇴 +40</option>
-                        <option value="+359">🇧🇬 +359</option>
-                        <option value="+385">🇭🇷 +385</option>
-                        <option value="+386">🇸🇮 +386</option>
-                        <option value="+372">🇪🇪 +372</option>
-                        <option value="+371">🇱🇻 +371</option>
-                        <option value="+370">🇱🇹 +370</option>
-                        <option value="+356">🇲🇹 +356</option>
-                        <option value="+357">🇨🇾 +357</option>
-                        <option value="+352">🇱🇺 +352</option>
-                        <option value="+212">🇲🇦 +212</option>
-                        <option value="+213">🇩🇿 +213</option>
-                        <option value="+216">🇹🇳 +216</option>
-                        <option value="+20">🇪🇬 +20</option>
-                        <option value="+27">🇿🇦 +27</option>
-                        <option value="+234">🇳🇬 +234</option>
-                        <option value="+254">🇰🇪 +254</option>
-                        <option value="+91">🇮🇳 +91</option>
-                        <option value="+86">🇨🇳 +86</option>
-                        <option value="+81">🇯🇵 +81</option>
-                        <option value="+82">🇰🇷 +82</option>
-                        <option value="+65">🇸🇬 +65</option>
-                        <option value="+60">🇲🇾 +60</option>
-                        <option value="+66">🇹🇭 +66</option>
-                        <option value="+84">🇻🇳 +84</option>
-                        <option value="+63">🇵🇭 +63</option>
-                        <option value="+62">🇮🇩 +62</option>
-                        <option value="+61">🇦🇺 +61</option>
-                        <option value="+64">🇳🇿 +64</option>
-                        <option value="+55">🇧🇷 +55</option>
-                        <option value="+54">🇦🇷 +54</option>
-                        <option value="+56">🇨🇱 +56</option>
-                        <option value="+57">🇨🇴 +57</option>
-                        <option value="+51">🇵🇪 +51</option>
-                        <option value="+52">🇲🇽 +52</option>
-                        <option value="+1">🇨🇦 +1</option>
-                      </select>
-
-                      {/* Phone Number Input */}
-                      <input
-                        type="tel"
-                        placeholder="Numéro de téléphone"
-                        value={formData.phoneNumber}
-                        onChange={(e) =>
-                          handleInputChange("phoneNumber", e.target.value)
-                        }
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
+                    <PhoneInput
+                      defaultCountry="fr"
+                      value={formData.phoneNumber}
+                      onChange={(phone) =>
+                        handleInputChange("phoneNumber", phone)
+                      }
+                      inputClassName="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      countrySelectorStyleProps={{
+                        className:
+                          "border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                      }}
+                      inputProps={{
+                        placeholder: "Numéro de téléphone",
+                      }}
+                    />
                     <p className="text-xs text-gray-500 mt-1">
                       (Nous vous enverrons un code pour confirmer votre numéro.)
                     </p>
@@ -524,6 +461,16 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
 
             {activeTab === "account" && (
               <div className="space-y-6">
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+                    {error}
+                  </div>
+                )}
+                {success && (
+                  <div className="p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+                    {success}
+                  </div>
+                )}
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <div className="flex items-start">
                     <ExclamationTriangleIcon className="h-5 w-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" />
@@ -571,13 +518,38 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
                         Annuler
                       </button>
                       <button
-                        onClick={() => {
-                          console.log("Account deleted");
-                          onClose();
+                        onClick={async () => {
+                          setSubmitting(true);
+                          setError(null);
+                          setSuccess(null);
+
+                          try {
+                            await deleteAccount();
+                            setSuccess("Compte supprimé avec succès!");
+                            setTimeout(() => {
+                              onClose();
+                              // Redirect to home page or login page
+                              window.location.href = "/";
+                            }, 2000);
+                          } catch (err: any) {
+                            setError(
+                              err.message ||
+                                "Erreur lors de la suppression du compte"
+                            );
+                          } finally {
+                            setSubmitting(false);
+                          }
                         }}
-                        className="flex-1 bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors"
+                        disabled={submitting}
+                        className={`flex-1 py-3 rounded-lg font-medium transition-colors ${
+                          submitting
+                            ? "bg-gray-300 cursor-not-allowed text-gray-500"
+                            : "bg-red-600 text-white hover:bg-red-700"
+                        }`}
                       >
-                        Confirmer la suppression
+                        {submitting
+                          ? "Suppression en cours..."
+                          : "Confirmer la suppression"}
                       </button>
                     </div>
                   </div>

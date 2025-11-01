@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { createDemand } from "../../../services/transportService";
 import AirportComboBox from "../AirportComboBox";
+import CurrencyComboBox from "../CurrencyComboBox";
 import type { Airport } from "../../../services/airportService";
+import type { Currency } from "../../../services/currencyService";
 
 export default function CreatePackageDialog({
   open,
@@ -32,6 +34,7 @@ export default function CreatePackageDialog({
   // Step 3: Price & Booking
   const [weight, setWeight] = useState("");
   const [pricePerKilo, setPricePerKilo] = useState("");
+  const [currency, setCurrency] = useState<Currency | null>(null);
   const [flightNumber, setFlightNumber] = useState("");
   const [travelDate, setTravelDate] = useState("");
   const [packageNature, setPackageNature] = useState<
@@ -56,6 +59,7 @@ export default function CreatePackageDialog({
     setPhotos([]);
     setWeight("");
     setPricePerKilo("");
+    setCurrency(null);
     setFlightNumber("");
     setTravelDate("");
     setPackageNature("STANDARD");
@@ -362,15 +366,23 @@ export default function CreatePackageDialog({
                   />
                 </Field>
                 <Field label={t("dialogs.createAnnounce.pricePerKilo")}>
-                  <input
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    value={pricePerKilo}
-                    onChange={(e) => setPricePerKilo(e.target.value)}
-                    placeholder={t("dialogs.createAnnounce.pricePerKilo")}
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                  <div className="flex">
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.01}
+                      value={pricePerKilo}
+                      onChange={(e) => setPricePerKilo(e.target.value)}
+                      placeholder={t("dialogs.createAnnounce.pricePerKilo")}
+                      className="flex-1 rounded-l-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-r-0"
+                    />
+                    <CurrencyComboBox
+                      value={currency?.code}
+                      onChange={setCurrency}
+                      placeholder="EUR"
+                      compact
+                    />
+                  </div>
                 </Field>
               </div>
             )}
