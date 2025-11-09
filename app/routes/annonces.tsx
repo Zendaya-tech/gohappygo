@@ -234,72 +234,34 @@ export default function Annonces() {
             {!loading && !error && results.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {results.map((item: any) => {
-                  // Try to map generic API fields to card fields; adjust as needed
-                  const id =
-                    item.id || item._id || Math.random().toString(36).slice(2);
-                  const name =
-                    item.user?.name ||
-                    item.traveler?.name ||
-                    item.title ||
-                    "Voyageur";
-                  const avatar =
-                    item.user?.avatar ||
-                    item.traveler?.avatar ||
-                    "/favicon.ico";
-                  const originName =
-                    item.departureAirport?.name ||
-                    item.origin?.name ||
-                    item.originAirport?.name ||
-                    item.originAirportName ||
-                    item.originCity ||
-                    "";
-                  const destName =
-                    item.arrivalAirport?.name ||
-                    item.destination?.name ||
-                    item.destinationAirport?.name ||
-                    item.destinationAirportName ||
-                    item.destinationCity ||
-                    "";
+                  const id = item.id?.toString() || Math.random().toString(36).slice(2);
+                  const name = item.user?.name || item.title || "Voyageur";
+                  const avatar = item.user?.selfieImage || item.images?.[0]?.fileUrl || "/favicon.ico";
+                  const originName = item.departureAirport?.name || "";
+                  const destName = item.arrivalAirport?.name || "";
                   const route = `${originName} - ${destName}`;
-                  const pricePerKg = item.pricePerKg ?? item.price ?? 0;
-                  const rating = (
-                    item.rating ??
-                    item.user?.rating ??
-                    4.7
-                  ).toString();
-                  const image = avatar;
-                  const featured = Boolean(
-                    item.user?.verified || item.traveler?.verified
-                  );
-                  // Pour les travels (transporteurs), utiliser weightAvailable
-                  // Pour les demands (voyageurs), utiliser weight
-                  const availableWeight =
-                    item.type === "travel"
-                      ? item.weightAvailable ??
-                        item.availableWeight ??
-                        item.maxWeight ??
-                        0
-                      : item.weight ?? 0;
-                  // Pour les travels, utiliser deliveryDate, pour les demands utiliser travelDate
-                  const departureDateRaw =
-                    item.type === "travel"
-                      ? item.deliveryDate ||
-                        item.departureDate ||
-                        item.travelDate
-                      : item.deliveryDate ||
-                        item.travelDate ||
-                        item.departureDate;
-                  const departure = departureDateRaw
-                    ? formatDate(departureDateRaw)
+                  const pricePerKg = item.pricePerKg ?? 0;
+                  const rating = "4.7"; // Default rating since it's not in the new structure
+                  
+                  // Pour les transporteurs (travel), utiliser le logo de la compagnie
+                  // Pour les voyageurs (demand), utiliser l'avatar de l'utilisateur
+                  const image = item.type === "travel" 
+                    ? item.airline?.logoUrl || avatar
+                    : avatar;
+                  
+                  const featured = Boolean(item.user?.isVerified);
+                  
+                  // Use weightAvailable for travel type, weight for demand type
+                  const availableWeight = item.type === "travel" 
+                    ? item.weightAvailable ?? 0
+                    : item.weight ?? 0;
+                  
+                  const departure = item.deliveryDate 
+                    ? formatDate(item.deliveryDate)
                     : undefined;
-                  const airline =
-                    item.airline?.name || item.airlineLogo || item.airline;
-                  const type =
-                    item.type === "travel"
-                      ? "transporter"
-                      : item.type === "demand"
-                      ? "traveler"
-                      : undefined;
+                  
+                  const airline = item.airline?.name;
+                  const type = item.type === "travel" ? "transporter" : "traveler";
 
                   return (
                     <PropertyCard
@@ -318,6 +280,7 @@ export default function Annonces() {
                       departure={departure}
                       airline={airline}
                       type={type as any}
+                      isBookmarked={item.isBookmarked}
                     />
                   );
                 })}

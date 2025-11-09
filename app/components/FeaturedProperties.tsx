@@ -1,51 +1,105 @@
 import PropertyCard from './PropertyCard';
+import { useEffect, useState } from "react";
+import { getLatestTravels, type DemandTravelItem } from "~/services/announceService";
 
-// mock data  font write fullname   just name+ cropped lastname exemple  patrick  olong = patrick O
 export default function FeaturedProperties() {
-    const travelers = [
-        {
-            avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face",
-            name: "Marie L",
-            location: "Paris → New York",
-            price: "15",
-            rating: "4.8",
-            image: "https://images.planefinder.net/api/logo-square/BYD/w/396",
-            weight: "8kg",
-            departure: "15 Mars 2024",
-            type: "transporter"
-        },
-        {
-            avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b5bc?w=400&h=300&fit=crop&crop=face",
-            name: "Thomas D",
-            location: "Lyon → Tokyo",
-            price: "12",
-            rating: "4.9",
-            image: "https://images.planefinder.net/api/logo-square/NTB/w/396",
-            weight: "5kg",
-            departure: "20 Mars 2024",
-            type: "transporter"
-        },
-        {
-            avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop&crop=face",
-            name: "Sophie E",
-            location: "Marseille → Londres",
-            price: "8",
-            rating: "4.7",
-            image: "https://images.planefinder.net/api/logo-square/AFB/w/396",
-            weight: "12kg",
-            departure: "18 Mars 2024",
-            type: "transporter"
+    const [travels, setTravels] = useState<DemandTravelItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchLatestTravels = async () => {
+            try {
+                const latestTravels = await getLatestTravels(3);
+                setTravels(latestTravels);
+            } catch (error) {
+                console.error("Error fetching latest travels:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLatestTravels();
+    }, []);
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("fr-FR", {
+            day: "numeric",
+            month: "short",
+        });
+    };
+
+    // Fonction pour formater le nom (prénom + première lettre du nom)
+    const formatName = (fullName: string) => {
+        const parts = fullName.split(' ');
+        if (parts.length >= 2) {
+            return `${parts[0]} ${parts[1].charAt(0)}`;
         }
-    ];
+        return fullName;
+    };
+
+    if (loading) {
+        return (
+            <section className="pb-12 pt-4 px-4 mx-auto">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+                    HappyVoyageurs <span className="text-blue-600">vérifiés</span>
+                </h2>
+                <div className="text-center text-gray-500">
+                    Chargement des voyageurs vérifiés...
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="pb-12 pt-4 px-4 mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">HappyVoyageurs <span className="text-blue-600">vérifiés</span></h2>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+                HappyVoyageurs <span className="text-blue-600">vérifiés</span>
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {travelers.map((traveler, index) => (
-                    <PropertyCard key={index} id={index.toString()} {...traveler} featured={true} type={traveler.type as 'transporter' | 'traveler'} />
-                ))}
+                {travels.map((travel) => {
+                    const id = travel.id?.toString() || Math.random().toString(36).slice(2);
+                    const name = formatName(travel.user?.name || "Voyageur");
+                    const avatar = travel.user?.selfieImage || "/favicon.ico";
+                    const originName = travel.departureAirport?.name || "";
+                    const destName = travel.arrivalAirport?.name || "";
+                    const route = `${originName} → ${destName}`;
+                    const pricePerKg = travel.pricePerKg?.toString() || "0";
+                    const rating = "4.8"; // Rating par défaut
+                    
+                    // Pour les transporteurs, utiliser le logo de la compagnie
+                    const image = travel.airline?.logoUrl || avatar;
+                    const featured = Boolean(travel.user?.isVerified);
+                    const availableWeight = travel.weightAvailable ? `${travel.weightAvailable}kg` : undefined;
+                    const departure = travel.deliveryDate ? formatDate(travel.deliveryDate) : undefined;
+                    const type = "transporter"; // Puisqu'on récupère que les travels
+
+                    return (
+                        <PropertyCard 
+                            key={id} 
+                            id={id} 
+                            name={name}
+                            avatar={avatar}
+                            location={route}
+                            price={pricePerKg}
+                            rating={rating}
+                            image={image}
+                            weight={availableWeight}
+                            departure={departure}
+                            airline={travel.airline?.name}
+                            featured={featured} 
+                            type={type}
+                            isBookmarked={travel.isBookmarked}
+                        />
+                    );
+                })}
             </div>
+            
+            {travels.length === 0 && (
+                <div className="text-center text-gray-500 dark:text-gray-400">
+                    Aucun voyageur vérifié disponible pour le moment
+                </div>
+            )}
         </section>
     );
 } 

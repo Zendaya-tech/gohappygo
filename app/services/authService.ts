@@ -41,7 +41,7 @@ export const verifyEmail = async (email: string, verificationCode: string) => {
     return response.data;
   } catch (error) {
     console.error(error);
-    return null;
+    throw error;
   }
 };
 
@@ -123,4 +123,32 @@ export type UpdateProfileData = {
 export type ChangePasswordData = {
   currentPassword: string;
   newPassword: string;
+};
+
+export type VerifyEmailResponse = {
+  message: string;
+  access_token?: string;
+  refresh_token?: string;
+  user?: {
+    id: string | number;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    username?: string;
+    profilePictureUrl?: string;
+    bio?: string;
+    role?: {
+      id: number;
+      name: string;
+      code: string;
+      description: string;
+    };
+    isDeactivated: boolean;
+    isPhoneVerified: boolean;
+    isVerified: boolean;
+    isAwaitingVerification: boolean;
+    createdAt: string;
+    updatedAt: string;
+  };
 };

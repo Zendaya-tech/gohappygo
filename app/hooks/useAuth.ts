@@ -106,16 +106,40 @@ export const useAuth = () => {
           throw new Error("Code de vérification invalide. Réessayez.");
         }
 
+        // Si la réponse contient un token d'accès, connecter automatiquement l'utilisateur
+        if (res.access_token && res.user) {
+          const composedUser = {
+            id: String(res.user.id),
+            name:
+              `${res.user.firstName ?? ""} ${res.user.lastName ?? ""}`.trim() ||
+              (res.user.email ?? "Utilisateur"),
+            profilePictureUrl: res.user.profilePictureUrl,
+            bio: res.user.bio,
+          };
+
+          // Stocker le token dans localStorage
+          try {
+            window.localStorage.setItem("auth_token", res.access_token);
+          } catch (e) {
+            console.warn("Could not store token in localStorage:", e);
+          }
+
+          // Connecter l'utilisateur
+          storeLogin(res.access_token, composedUser, res.refresh_token);
+        }
+
         return {
           success: true,
           message: res.message || "Email vérifié avec succès!",
+          user: res.user,
+          isLoggedIn: !!res.access_token,
         };
       } catch (error) {
         console.error("Verify email error:", error);
         throw error;
       }
     },
-    []
+    [storeLogin]
   );
 
   const logout = useCallback(() => {

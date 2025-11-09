@@ -20,6 +20,7 @@ interface PropertyCardProps {
   isRequest?: boolean;
   avatar?: string;
   type?: "traveler" | "transporter";
+  isBookmarked?: boolean;
 }
 
 export default function PropertyCard({
@@ -36,27 +37,31 @@ export default function PropertyCard({
   airline,
   isRequest = false,
   avatar,
+  isBookmarked = false,
 }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if item is bookmarked on component mount
+  // Use the isBookmarked prop from API response or check bookmark status
   useEffect(() => {
-    const checkBookmarkStatus = async () => {
-      try {
-        const bookmarkType = type === "transporter" ? "TRAVEL" : "DEMAND";
-        const isBookmarked = await checkIfBookmarked(
-          bookmarkType,
-          parseInt(id)
-        );
-        setIsFavorite(isBookmarked);
-      } catch (error) {
-        console.error("Error checking bookmark status:", error);
-      }
-    };
-
-    checkBookmarkStatus();
-  }, [id, type]);
+    if (isBookmarked !== undefined) {
+      setIsFavorite(isBookmarked);
+    } else {
+      const checkBookmarkStatus = async () => {
+        try {
+          const bookmarkType = type === "transporter" ? "TRAVEL" : "DEMAND";
+          const bookmarkStatus = await checkIfBookmarked(
+            bookmarkType,
+            parseInt(id)
+          );
+          setIsFavorite(bookmarkStatus);
+        } catch (error) {
+          console.error("Error checking bookmark status:", error);
+        }
+      };
+      checkBookmarkStatus();
+    }
+  }, [id, type, isBookmarked]);
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault(); // Empêche la navigation vers le lien

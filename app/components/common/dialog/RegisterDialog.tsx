@@ -93,10 +93,15 @@ export default function RegisterDialog({
         const verifyRes = await verifyEmail(form.email, verification);
         setMessage(verifyRes.message);
 
-        // Close dialog after successful verification
-        setTimeout(() => {
+        // Si l'utilisateur est maintenant connecté, fermer immédiatement
+        if (verifyRes.isLoggedIn) {
           onClose();
-        }, 1500);
+        } else {
+          // Sinon, fermer après un délai pour montrer le message
+          setTimeout(() => {
+            onClose();
+          }, 1500);
+        }
       } catch (err: any) {
         setError(err.message || "Code de vérification invalide. Réessayez.");
       } finally {

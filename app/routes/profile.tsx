@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Header from "../components/Header";
 import FooterMinimal from "~/components/FooterMinimal";
 import ProfileDialog from "../components/common/dialogs/ProfileDialog";
@@ -19,6 +19,8 @@ import ProfileTravelCard, {
   type ProfileTravel,
 } from "~/components/common/ProfileTravelCard";
 import PropertyCard from "~/components/PropertyCard";
+import { getBookmarks, type BookmarkItem } from "~/services/announceService";
+import { removeBookmark } from "~/services/bookmarkService";
 
 interface ProfileSection {
   id: string;
@@ -128,6 +130,172 @@ const ReservationsSection = () => {
           <ReservationCard key={r.id} reservation={r} />
         ))}
       </div>
+    </div>
+  );
+};
+
+const FavoritesSection = () => {
+  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBookmarks = async () => {
+      try {
+        const response = await getBookmarks();
+        setBookmarks(response.items || []);
+      } catch (error) {
+        console.error("Error fetching bookmarks:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBookmarks();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+    });
+  };
+
+  const formatName = (fullName: string) => {
+    const parts = fullName.split(' ');
+    if (parts.length >= 2) {
+      return `${parts[0]} ${parts[1].charAt(0)}.`;
+    }
+    return fullName;
+  };
+
+  const handleRemoveBookmark = async (bookmarkType: "TRAVEL" | "DEMAND", itemId: number) => {
+    try {
+      // Convert to lowercase for API endpoint
+      const type = bookmarkType.toLowerCase();
+      await removeBookmark(type, itemId);
+      // Refresh bookmarks after removal
+      const response = await getBookmarks();
+      setBookmarks(response.items || []);
+    } catch (error) {
+      console.error("Error removing bookmark:", error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="text-center text-gray-500">
+          Chargement de vos favoris...
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      {bookmarks.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <HeartIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">Aucun favori</p>
+            <p className="text-gray-400 text-sm mt-2">
+              Ajoutez des annonces à vos favoris pour les retrouver facilement
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Mes Favoris ({bookmarks.length})
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {bookmarks.map((bookmark) => {
+              // Determine if it's a travel or demand
+              const isTravel = bookmark.bookmarkType === "TRAVEL" && bookmark.travel;
+              const isDemand = bookmark.bookmarkType === "DEMAND" && bookmark.demand;
+              
+              if (!isTravel && !isDemand) return null;
+
+              const id = bookmark.id.toString();
+              let name, avatar, location, price, rating, image, weight, departure, type, featured;
+
+              if (isTravel && bookmark.travel) {
+                // For travel bookmarks
+                name = "Transporteur"; // We don't have user info in travel object
+                avatar = "/favicon.ico";
+                location = `Vol ${bookmark.travel.flightNumber}`;
+                price = bookmark.travel.pricePerKg.toString();
+                rating = "4.8";
+                image = "/favicon.ico"; // Could use airline logo if available
+                weight = `${bookmark.travel.totalWeightAllowance}kg`;
+                departure = formatDate(bookmark.travel.departureDatetime);
+                type = "transporter" as const;
+                featured = true;
+              } else if (isDemand && bookmark.demand) {
+                // For demand bookmarks
+                console.log("errod",bookmark.demandId)
+                name = (bookmark.demand.user)? formatName(`${bookmark.demand.user.firstName} ${bookmark.demand.user.lastName}`):"inconnu";
+                avatar = (bookmark.demand.user)? bookmark.demand.user.profilePictureUrl || "/favicon.ico":"/favicon.ico";
+                const originName = bookmark.demand.originAirport?.name || "";
+                const destName = bookmark.demand.destinationAirport?.name || "";
+                location = `${originName} → ${destName}`;
+                price = bookmark.demand.pricePerKg.toString();
+                rating = "4.7";
+                image = avatar; // Use user avatar for demands
+                weight = `${bookmark.demand.weight}kg`;
+                departure = formatDate(bookmark.demand.deliveryDate);
+                type = "traveler" as const;
+                featured = bookmark.demand.user? bookmark.demand.user.isVerified :false;
+              }
+
+              return (
+                <div key={id} className="relative">
+                  <PropertyCard
+                    
+                    id={id}
+                    name={name!}
+                    avatar={avatar!}
+                    location={location!}
+                    price={price!}
+                    rating={rating!}
+                    image={image!}
+                    featured={featured!}
+                    weight={weight}
+                    departure={departure}
+                    type={type!}
+                    isBookmarked={true}
+                  />
+                  {/* Remove from favorites button */}
+                  <button 
+                    onClick={() => handleRemoveBookmark(
+                      bookmark.bookmarkType, 
+                      isTravel ? bookmark.travelId! : bookmark.demandId!
+                    )}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -575,111 +743,7 @@ export default function Profile() {
           </div>
         );
       case "favorites":
-        // Sample favorites data
-        const favorites = [
-          {
-            id: "f1",
-            name: "Marie L.",
-            avatar:
-              "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=80&h=80&fit=crop&crop=face",
-            location: "Paris - New York",
-            price: "15",
-            rating: "4.8",
-            weight: "12kg",
-            departure: "24 Jun",
-            type: "transporter" as const,
-            featured: true,
-          },
-          {
-            id: "f2",
-            name: "Thomas K.",
-            avatar:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
-            location: "Lyon - Tokyo",
-            price: "18",
-            rating: "4.9",
-            weight: "8kg",
-            departure: "2 Jul",
-            type: "traveler" as const,
-            featured: false,
-          },
-          {
-            id: "f3",
-            name: "Sophie M.",
-            avatar:
-              "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face",
-            location: "Marseille - Londres",
-            price: "12",
-            rating: "4.7",
-            weight: "15kg",
-            departure: "15 Jul",
-            type: "transporter" as const,
-            featured: true,
-          },
-        ];
-
-        return (
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            {favorites.length === 0 ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="text-center">
-                  <HeartIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">Aucun favori</p>
-                  <p className="text-gray-400 text-sm mt-2">
-                    Ajoutez des annonces à vos favoris pour les retrouver
-                    facilement
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Mes Favoris ({favorites.length})
-                  </h3>
-                  <button className="text-sm text-red-600 hover:text-red-700">
-                    Tout supprimer
-                  </button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {favorites.map((favorite) => (
-                    <div key={favorite.id} className="relative">
-                      <PropertyCard
-                        id={favorite.id}
-                        name={favorite.name}
-                        avatar={favorite.avatar}
-                        location={favorite.location}
-                        price={favorite.price}
-                        rating={favorite.rating}
-                        image={favorite.avatar}
-                        featured={favorite.featured}
-                        weight={favorite.weight}
-                        departure={favorite.departure}
-                        type={favorite.type}
-                      />
-                      {/* Remove from favorites button */}
-                      <button className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        );
+        return <FavoritesSection />;
       case "payments":
         return (
           <div className="bg-white rounded-2xl border border-gray-200 p-8">
