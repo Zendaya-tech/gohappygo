@@ -59,7 +59,7 @@ export default function FavoriteCard({
                 : "bg-orange-500/90 text-white"
             }`}
           >
-            {type === "transporter" ? "Transporteur" : "Demande"}
+            {type === "transporter" ? "Voyage" : "Demande"}
           </div>
         )}
         

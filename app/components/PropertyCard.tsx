@@ -128,7 +128,7 @@ export default function PropertyCard({
                 : "bg-orange-500/90 text-white"
             }`}
           >
-            {type === "transporter" ? "Transporteur" : "Demande"}
+            {type === "transporter" ? "Voyage" : "Demande"}
           </div>
         )}
         <button
