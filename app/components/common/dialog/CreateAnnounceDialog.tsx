@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { createTravel } from "../../../services/travelService";
+import {
+  createTravel,
+  getAirlineFromFlightNumber,
+} from "../../../services/travelService";
 import AirportComboBox from "../AirportComboBox";
 import CurrencyComboBox from "../CurrencyComboBox";
 import type { Airport } from "../../../services/airportService";
@@ -52,6 +55,7 @@ export default function CreateAnnounceDialog({
   const [flightNumber, setFlightNumber] = useState("");
   const [airline, setAirline] = useState("");
   const [travelDate, setTravelDate] = useState("");
+  const [fetchingAirline, setFetchingAirline] = useState(false);
   // API integration state
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +75,35 @@ export default function CreateAnnounceDialog({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
+
+  // Fetch airline when flight number changes
+  useEffect(() => {
+    const fetchAirline = async () => {
+      if (!flightNumber || flightNumber.length < 2) {
+        setAirline("");
+        return;
+      }
+
+      setFetchingAirline(true);
+      try {
+        const airlineName = await getAirlineFromFlightNumber(flightNumber);
+        if (airlineName) {
+          setAirline(airlineName);
+        } else {
+          setAirline("");
+        }
+      } catch (error) {
+        console.error("Error fetching airline:", error);
+        setAirline("");
+      } finally {
+        setFetchingAirline(false);
+      }
+    };
+
+    // Debounce the API call
+    const timeoutId = setTimeout(fetchAirline, 500);
+    return () => clearTimeout(timeoutId);
+  }, [flightNumber]);
 
   useEffect(() => {
     if (!open) return;
@@ -178,10 +211,14 @@ export default function CreateAnnounceDialog({
         ? `${travelDate}T12:00:00Z`
         : new Date().toISOString();
 
+      if (!currency) {
+        setError("Veuillez sélectionner une devise");
+        return;
+      }
+
       const travelData = {
         description: story,
         flightNumber,
-        airline,
         isSharedWeight: reservationType === "shared",
         isInstant: bookingType === "instant",
         isAllowExtraWeight: allowExtraGrams,
@@ -191,6 +228,7 @@ export default function CreateAnnounceDialog({
         arrivalAirportId: parseInt(arrival.id),
         departureDatetime,
         pricePerKg: typeof pricePerKg === "number" ? pricePerKg : 0,
+        currencyId: parseInt(currency.id),
         totalWeightAllowance: typeof kilos === "number" ? kilos : 0,
         image1: files[0],
         image2: files[1],
@@ -304,12 +342,48 @@ export default function CreateAnnounceDialog({
                   />
                 </Field>
                 <Field label="Compagnie aérienne">
-                  <input
-                    value={airline}
-                    onChange={(e) => setAirline(e.target.value)}
-                    placeholder="Ex: Air France, Emirates, etc."
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                  <div className="relative">
+                    <input
+                      value={airline}
+                      disabled
+                      placeholder={
+                        fetchingAirline
+                          ? "Recherche en cours..."
+                          : flightNumber
+                          ? "Détectée automatiquement"
+                          : "Entrez d'abord le numéro de vol"
+                      }
+                      className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-3 text-sm text-gray-600 dark:text-gray-400 cursor-not-allowed"
+                    />
+                    {fetchingAirline && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <svg
+                          className="animate-spin h-5 w-5 text-indigo-600"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    La compagnie aérienne est détectée automatiquement à partir
+                    du numéro de vol
+                  </p>
                 </Field>
 
                 <Field label="Tell a bit more  about your travel">
@@ -479,14 +553,13 @@ export default function CreateAnnounceDialog({
                         )
                       }
                       placeholder="0"
-                      className="flex-1 rounded-l-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-r-0"
+                      className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
-                    <CurrencyComboBox
-                      value={currency?.code}
-                      onChange={setCurrency}
-                      placeholder="EUR"
-                      compact
-                    />
+                    {currency && (
+                      <div className="ml-3 flex items-center px-3 text-sm text-gray-600 dark:text-gray-400">
+                        {currency.code}
+                      </div>
+                    )}
                   </div>
                 </Field>
                 <Field
@@ -511,14 +584,13 @@ export default function CreateAnnounceDialog({
                         )
                       }
                       placeholder="0"
-                      className="flex-1 rounded-l-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-r-0"
+                      className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
-                    <CurrencyComboBox
-                      value={currency?.code}
-                      onChange={setCurrency}
-                      placeholder="EUR"
-                      compact
-                    />
+                    {currency && (
+                      <div className="ml-3 flex items-center px-3 text-sm text-gray-600 dark:text-gray-400">
+                        {currency.code}
+                      </div>
+                    )}
                   </div>
                 </Field>
                 <div>

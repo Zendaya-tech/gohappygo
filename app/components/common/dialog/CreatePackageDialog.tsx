@@ -131,6 +131,12 @@ export default function CreatePackageDialog({
         return;
       }
 
+      if (!currency) {
+        setError("Veuillez sélectionner une devise");
+        setSubmitting(false);
+        return;
+      }
+
       const demandData = {
         flightNumber,
         description: baggageDescription,
@@ -139,6 +145,7 @@ export default function CreatePackageDialog({
         travelDate,
         weight: parseFloat(weight),
         pricePerKg: parseFloat(pricePerKilo),
+        currencyId: parseInt(currency.id),
         packageKind: packageNature,
         image1: photos[0],
         image2: photos[1],
@@ -383,6 +390,9 @@ export default function CreatePackageDialog({
                       compact
                     />
                   </div>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Cette devise sera utilisée pour tous les montants
+                  </p>
                 </Field>
               </div>
             )}

@@ -3,7 +3,6 @@ import api from "./Api";
 export interface CreateTravelData {
   description: string;
   flightNumber: string;
-  airline: string;
   isSharedWeight: boolean;
   isInstant: boolean;
   isAllowExtraWeight: boolean;
@@ -13,10 +12,28 @@ export interface CreateTravelData {
   arrivalAirportId: number;
   departureDatetime: string;
   pricePerKg: number;
+  currencyId: number;
   totalWeightAllowance: number;
   image1: File;
   image2: File;
 }
+
+export const getAirlineFromFlightNumber = async (
+  flightNumber: string
+): Promise<string | null> => {
+  try {
+    const response = await api.get(
+      "/demand-and-travel/airline-from-flight-number",
+      {
+        params: { flightNumber },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching airline from flight number:", error);
+    return null;
+  }
+};
 
 export const createTravel = async (data: CreateTravelData) => {
   try {
@@ -25,7 +42,6 @@ export const createTravel = async (data: CreateTravelData) => {
     // Add all the form fields
     formData.append("description", data.description);
     formData.append("flightNumber", data.flightNumber);
-    formData.append("airline", data.airline);
     formData.append("isSharedWeight", data.isSharedWeight.toString());
     formData.append("isInstant", data.isInstant.toString());
     formData.append("isAllowExtraWeight", data.isAllowExtraWeight.toString());
@@ -35,6 +51,7 @@ export const createTravel = async (data: CreateTravelData) => {
     formData.append("arrivalAirportId", data.arrivalAirportId.toString());
     formData.append("departureDatetime", data.departureDatetime);
     formData.append("pricePerKg", data.pricePerKg.toString());
+    formData.append("currencyId", data.currencyId.toString());
     formData.append(
       "totalWeightAllowance",
       data.totalWeightAllowance.toString()

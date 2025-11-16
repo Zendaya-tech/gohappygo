@@ -8,6 +8,7 @@ export interface CreateDemandData {
   travelDate: string;
   weight: number;
   pricePerKg: number;
+  currencyId: number;
   packageKind: string;
   image1: File;
   image2: File;
@@ -26,6 +27,7 @@ export const createDemand = async (data: CreateDemandData) => {
     formData.append("travelDate", data.travelDate);
     formData.append("weight", data.weight.toString());
     formData.append("pricePerKg", data.pricePerKg.toString());
+    formData.append("currencyId", data.currencyId.toString());
     formData.append("packageKind", data.packageKind);
 
     // Add the three required images
