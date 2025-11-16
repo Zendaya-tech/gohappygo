@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
 import { useAuth } from "../../../hooks/useAuth";
 
 export default function RegisterDialog({
@@ -163,16 +165,21 @@ export default function RegisterDialog({
                     />
                   </div>
                   <div>
-                    <input
-                      type="tel"
-                      id="phoneNumber"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                      placeholder="Téléphone (ex: +237...)"
-                      required
+                    <PhoneInput
+                      defaultCountry="fr"
                       value={form.phoneNumber}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, phoneNumber: e.target.value }))
+                      onChange={(phone) =>
+                        setForm((p) => ({ ...p, phoneNumber: phone }))
                       }
+                      inputClassName="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      countrySelectorStyleProps={{
+                        className:
+                          "border border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent",
+                      }}
+                      inputProps={{
+                        placeholder: "Numéro de téléphone",
+                        required: true,
+                      }}
                     />
                   </div>
                   <div>

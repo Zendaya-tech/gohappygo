@@ -111,7 +111,7 @@ export default function PropertyCard({
           alt={name}
           className={`${
             type === "transporter"
-              ? "max-h-full max-w-full "
+              ? "max-h-full h-52 p-5 object-contain max-w-full "
               : "object-cover  w-full"
           } m-auto  `}
         />
@@ -128,7 +128,7 @@ export default function PropertyCard({
                 : "bg-orange-500/90 text-white"
             }`}
           >
-            {type === "transporter" ? "Transporteur" : "Voyageur"}
+            {type === "transporter" ? "Transporteur" : "Demande"}
           </div>
         )}
         <button
@@ -187,7 +187,7 @@ export default function PropertyCard({
             {name}
           </h3>
         </div>
-        <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
+        <p className="text-gray-600 h-12 dark:text-gray-300 text-sm mb-2">
           {location}
         </p>
         {weight && (

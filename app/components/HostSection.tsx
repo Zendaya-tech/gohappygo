@@ -13,7 +13,7 @@ export default function HostSection() {
             <div className="bg-slate-950 rounded-3xl overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                     <div className="p-12 text-white">
-                        <h2 className="text-4xl font-bold mb-6">Devenez <span className="text-blue-600">voyageur</span> GoHappyGo</h2>
+                        <h2 className="text-4xl font-bold mb-6">Devenez <span className="text-blue-600">HappyVoyageur</span> et donnez du bonheur à d'autre voyageur</h2>
                         <p className="text-blue-100 mb-8">
                             {t('home.hostSection.description')}
                         </p>

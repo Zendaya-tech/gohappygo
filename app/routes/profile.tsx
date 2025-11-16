@@ -5,6 +5,7 @@ import ProfileDialog from "../components/common/dialogs/ProfileDialog";
 import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
 import CreatePackageDialog from "~/components/common/dialog/CreatePackageDialog";
 import { useAuth } from "~/hooks/useAuth";
+import FavoriteCard from "~/components/FavoriteCard";
 import {
   StarIcon,
   QuestionMarkCircleIcon,
@@ -211,7 +212,7 @@ const FavoritesSection = () => {
               Mes Favoris ({bookmarks.length})
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {bookmarks.map((bookmark) => {
               // Determine if it's a travel or demand
               const isTravel = bookmark.bookmarkType === "TRAVEL" && bookmark.travel;
@@ -253,7 +254,7 @@ const FavoritesSection = () => {
 
               return (
                 <div key={id} className="relative">
-                  <PropertyCard
+                  <FavoriteCard
                     
                     id={id}
                     name={name!}
@@ -269,7 +270,7 @@ const FavoritesSection = () => {
                     isBookmarked={true}
                   />
                   {/* Remove from favorites button */}
-                  <button 
+                  {/* <button 
                     onClick={() => handleRemoveBookmark(
                       bookmark.bookmarkType, 
                       isTravel ? bookmark.travelId! : bookmark.demandId!
@@ -289,7 +290,7 @@ const FavoritesSection = () => {
                         d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>
-                  </button>
+                  </button> */}
                 </div>
               );
             })}
