@@ -41,6 +41,7 @@ export const getAnnounces = async () => {
 export type DemandAndTravelFilters = {
     originAirportId?: string;
     destinationAirportId?: string;
+    departureDatetime?: string;
     flightNumber?: string;
     travelDate?: string; // YYYY-MM-DD (ISO 8601)
     minWeight?: number;
@@ -73,6 +74,7 @@ export interface User {
     selfieImage: string;
     createdAt: string;
     isVerified: boolean;
+    profilePictureUrl:string;
 }
 
 export interface Image {

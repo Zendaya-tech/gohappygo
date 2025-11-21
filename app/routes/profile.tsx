@@ -185,7 +185,7 @@ const FavoritesSection = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      <div className="bg-white rounded-2x p-6">
         <div className="text-center text-gray-500">
           Chargement de vos favoris...
         </div>
@@ -194,7 +194,7 @@ const FavoritesSection = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+    <div className="bg-white rounded-2xl ">
       {bookmarks.length === 0 ? (
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
@@ -212,7 +212,7 @@ const FavoritesSection = () => {
               Mes Favoris ({bookmarks.length})
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {bookmarks.map((bookmark) => {
               // Determine if it's a travel or demand
               const isTravel = bookmark.bookmarkType === "TRAVEL" && bookmark.travel;
@@ -238,7 +238,7 @@ const FavoritesSection = () => {
               } else if (isDemand && bookmark.demand) {
                 // For demand bookmarks
                 console.log("errod",bookmark.demandId)
-                name = (bookmark.demand.user)? formatName(`${bookmark.demand.user.firstName} ${bookmark.demand.user.lastName}`):"inconnu";
+                name = (bookmark.demand.user)? bookmark.demand.user.name || "inconnu" : "inconnu";
                 avatar = (bookmark.demand.user)? bookmark.demand.user.profilePictureUrl || "/favicon.ico":"/favicon.ico";
                 const originName = bookmark.demand.originAirport?.name || "";
                 const destName = bookmark.demand.destinationAirport?.name || "";
@@ -255,7 +255,6 @@ const FavoritesSection = () => {
               return (
                 <div key={id} className="relative">
                   <FavoriteCard
-                    
                     id={id}
                     name={name!}
                     avatar={avatar!}
@@ -267,7 +266,10 @@ const FavoritesSection = () => {
                     weight={weight}
                     departure={departure}
                     type={type!}
-                    isBookmarked={true}
+                    onRemove={() => handleRemoveBookmark(
+                      bookmark.bookmarkType, 
+                      isTravel ? bookmark.travelId! : bookmark.demandId!
+                    )}
                   />
                   {/* Remove from favorites button */}
                   {/* <button 
@@ -309,13 +311,33 @@ export default function Profile() {
   const [createPackageDialogOpen, setCreatePackageDialogOpen] =
     useState<boolean>(false);
   const { user, isAuthenticated } = useAuth();
+  const [profileStats, setProfileStats] = useState<any>(null);
+
+  // Fetch profile stats
+  useEffect(() => {
+    const fetchProfileStats = async () => {
+      if (!isAuthenticated) return;
+      
+      try {
+        const { getMe } = await import("~/services/authService");
+        const meData = await getMe();
+        if (meData?.profileStats) {
+          setProfileStats(meData.profileStats);
+        }
+      } catch (error) {
+        console.error("Error fetching profile stats:", error);
+      }
+    };
+
+    fetchProfileStats();
+  }, [isAuthenticated]);
 
   const profileSections: ProfileSection[] = [
     {
       id: "reservations",
       label: "Mes Réservations",
-      icon: <PaperAirplaneIcon className="h-5 w-5" />, // reuse icon
-      count: 0,
+      icon: <PaperAirplaneIcon className="h-5 w-5" />,
+      count: profileStats?.requestsAcceptedCount || 0,
     },
     {
       id: "messages",
@@ -335,37 +357,37 @@ export default function Profile() {
           />
         </svg>
       ),
-      count: 5,
+      count: 0, // Messages count not in profileStats
     },
     {
       id: "reviews",
       label: "Mes Avis",
       icon: <StarIcon className="h-5 w-5" />,
-      count: 2,
+      count: profileStats?.reviewsReceivedCount || 0,
     },
     {
       id: "travel-requests",
       label: "Mes Demandes de Voyages",
       icon: <QuestionMarkCircleIcon className="h-5 w-5" />,
-      count: 0,
+      count: profileStats?.demandsCount || 0,
     },
     {
       id: "travels",
       label: "Mes Voyages",
       icon: <PaperAirplaneIcon className="h-5 w-5" />,
-      count: 0,
+      count: profileStats?.travelsCount || 0,
     },
     {
       id: "favorites",
       label: "Mes Favoris",
       icon: <HeartIcon className="h-5 w-5" />,
-      count: 3,
+      count: (profileStats?.bookMarkTravelCount || 0) + (profileStats?.bookMarkDemandCount || 0),
     },
     {
       id: "payments",
       label: "Payments",
       icon: <CurrencyDollarIcon className="h-5 w-5" />,
-      count: 0,
+      count: profileStats?.transactionsCompletedCount || 0,
     },
   ];
 
@@ -762,10 +784,10 @@ export default function Profile() {
   };
 
   return (
-    <div className=" bg-gray-50">
+    <div className=" bg-white">
       <Header />
 
-      <main className="max-w-7xl min-h-screen mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="min-h-screen mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
           {/* Sidebar */}
           <aside className="space-y-6">

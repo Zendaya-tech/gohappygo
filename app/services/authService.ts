@@ -80,7 +80,7 @@ export const changePassword = async (data: ChangePasswordData) => {
   }
 };
 
-export const getMe = async () => {
+export const getMe = async (): Promise<GetMeResponse | null> => {
   try {
     const response = await api.get(`/auth/me`);
     return response.data;
@@ -151,4 +151,43 @@ export type VerifyEmailResponse = {
     createdAt: string;
     updatedAt: string;
   };
+};
+
+export type ProfileStats = {
+  demandsCount: number;
+  travelsCount: number;
+  bookMarkTravelCount: number;
+  bookMarkDemandCount: number;
+  requestsCompletedCount: number;
+  requestsNegotiatingCount: number;
+  requestsCancelledCount: number;
+  requestsAcceptedCount: number;
+  requestsRejectedCount: number;
+  reviewsReceivedCount: number;
+  reviewsGivenCount: number;
+  transactionsCompletedCount: number;
+};
+
+export type GetMeResponse = {
+  id: string | number;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  username?: string;
+  profilePictureUrl?: string;
+  bio?: string;
+  role?: {
+    id: number;
+    name: string;
+    code: string;
+    description: string;
+  };
+  isDeactivated: boolean;
+  isPhoneVerified: boolean;
+  isVerified: boolean;
+  isAwaitingVerification: boolean;
+  createdAt: string;
+  updatedAt: string;
+  profileStats?: ProfileStats;
 };
