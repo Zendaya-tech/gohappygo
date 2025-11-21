@@ -192,12 +192,12 @@ export default function PropertyCard({
         <p className="text-gray-600 h-12 dark:text-gray-300 text-sm mb-2">
           {location}
         </p>
-        {weight && (
+        {
           <p className="text-blue-600 text-sm font-medium mb-2">
             {type === "transporter" ? "Espace disponible" : "Espace demandé"}:{" "}
-             {weight??0}
+             {weight??"0 kg"}
           </p>
-        )}
+        }
         {departure && (
           <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">
             Date : {departure}

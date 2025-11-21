@@ -323,7 +323,7 @@ export default function AnnounceDetail() {
               <div className="mt-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <img
-                    src={listing.user?.selfieImage || "/favicon.ico"}
+                    src={listing.user?.profilePictureUrl || "/favicon.ico"}
                     alt={listing.user?.name || "User"}
                     className="h-12 w-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-900 shadow"
                   />
@@ -360,7 +360,7 @@ export default function AnnounceDetail() {
                     <span className="font-medium">
                       {listing.departureAirport?.name || "Départ"} → {listing.arrivalAirport?.name || "Arrivée"}
                     </span>
-                    <span>Départ: {formatDate(listing.deliveryDate)}</span>
+                    <span>Départ: {formatDate(listing.departudeDatetime)}</span>
                     <span className="font-medium">
                       Vol N° {listing.flightNumber}
                     </span>
@@ -383,7 +383,7 @@ export default function AnnounceDetail() {
               {/* Description */}
               <div className="mt-6">
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {listing.title || "Description non disponible"}
+                  {listing.description || "Description non disponible"}
                 </p>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
                   Je retourne sur {listing.arrivalAirport?.name} prochainement. Vous
@@ -656,7 +656,7 @@ export default function AnnounceDetail() {
           bedrooms: 1,
           beds: 1,
           bathrooms: 1,
-          image: listing.user?.selfieImage || "/favicon.ico",
+          image: listing.user?.profilePictureUrl || "/favicon.ico",
         }}
       />
       {/* Booking Dialog */}
@@ -676,7 +676,7 @@ export default function AnnounceDetail() {
         onClose={() => setMessageOpen(false)}
         title={`${listing.departureAirport?.name} → ${listing.arrivalAirport?.name}`}
         hostName={listing.user?.name || "Voyageur"}
-        hostAvatar={listing.user?.selfieImage || "/favicon.ico"}
+        hostAvatar={listing.user?.profilePictureUrl || "/favicon.ico"}
         onSend={(msg) => {
           console.log("Message sent:", msg);
         }}
@@ -701,7 +701,7 @@ export default function AnnounceDetail() {
             city: listing.arrivalAirport?.municipality || "",
             country: listing.arrivalAirport?.isoCountry || "",
           },
-          story: listing.title || "",
+          story: listing.description || "",
           kilos: availableWeight,
           pricePerKg: listing.pricePerKg,
           travelDate: (() => {
