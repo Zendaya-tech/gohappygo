@@ -1,8 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { Route } from "../+types/root";
-import { type Listing } from "../data/announces";
-import { Link, useParams, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { useEffect, useMemo, useState } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
 import { ShareIcon } from "@heroicons/react/24/outline";
@@ -10,7 +9,7 @@ import BookingDialog from "~/components/common/dialog/BookingDialog";
 import MessageDialog from "~/components/common/dialog/MessageDialog";
 import ShareDialog from "~/components/common/dialog/ShareDialog";
 import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
-import { getAnnounce } from "~/services/announceService";
+import { getAnnounceByIdAndType, type DemandTravelItem } from "~/services/announceService";
 import { getRandomQuotes, type Quote } from "~/services/quotesService";
 
 const mockReviews = [
@@ -57,11 +56,13 @@ function formatDate(dateString: string) {
 }
 
 export default function AnnounceDetail() {
-  const params = useParams<"id">();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const id = params.id ?? "";
+  const id = searchParams.get("id") ?? "";
+  const type = (searchParams.get("type") as "demand" | "travel") ?? "travel";
 
-  const [listing, setListing] = useState<Listing | undefined>(undefined);
+  const [listing, setListing] = useState<DemandTravelItem | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [kilos, setKilos] = useState<number>(0);
   const [shareOpen, setShareOpen] = useState<boolean>(false);
   const [bookOpen, setBookOpen] = useState<boolean>(false);
@@ -80,11 +81,22 @@ export default function AnnounceDetail() {
 
   useEffect(() => {
     const fetchAnnounce = async () => {
-      const announce = await getAnnounce(id);
-      setListing(announce);
+      if (!id || !type) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const announce = await getAnnounceByIdAndType(id, type);
+        setListing(announce);
+      } catch (error) {
+        console.error("Error fetching announce:", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchAnnounce();
-  }, [id]);
+  }, [id, type]);
 
   useEffect(() => {
     const loadQuotes = async () => {
@@ -100,14 +112,69 @@ export default function AnnounceDetail() {
   }, []);
 
   // Simple gallery to mirror the design
-  const galleryImages = useMemo(
-    () => [
-      "https://images.planefinder.net/api/logo-square/BYD/w/396",
-      "/images/rencontre1-converted.webp",
-      "/images/rencontre2-converted.webp",
-    ],
-    []
-  );
+  const galleryImages = useMemo(() => {
+    if (!listing) return [];
+    const images = listing.images?.map(img => img.fileUrl) || [];
+    if (listing.airline?.logoUrl) {
+      return [listing.airline.logoUrl, ...images];
+    }
+    return images;
+  }, [listing]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+        <Header />
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="max-w-7xl mx-auto">
+            {/* Skeleton loader */}
+            <div className="animate-pulse">
+              {/* Gallery skeleton */}
+              <div className="flex h-[400px] gap-4 mb-6">
+                <div className="flex-1 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
+                <div className="w-80 flex flex-col gap-3">
+                  <div className="flex-1 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
+                  <div className="flex-1 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <div className="lg:col-span-2 space-y-6">
+                  {/* User info skeleton */}
+                  <div className="flex items-center gap-4">
+                    <div className="h-12 w-12 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-32"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-24"></div>
+                    </div>
+                  </div>
+
+                  {/* Route info skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-1/2"></div>
+                  </div>
+
+                  {/* Description skeleton */}
+                  <div className="space-y-2">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
+                  </div>
+                </div>
+
+                {/* Sidebar skeleton */}
+                <div className="lg:col-span-1">
+                  <div className="bg-gray-200 dark:bg-gray-800 rounded-2xl h-96"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <FooterMinimal />
+      </div>
+    );
+  }
 
   if (!listing) {
     return (
@@ -135,7 +202,7 @@ export default function AnnounceDetail() {
   }
 
   // Pricing calculation similar to the right-hand summary in the mock
-  const pricePerKg = listing.price;
+  const pricePerKg = listing.pricePerKg || 0;
   const subtotal = kilos * pricePerKg;
   const platformCommission = 0; // can be adjusted later
   const vatRate = 0.24;
@@ -147,6 +214,8 @@ export default function AnnounceDetail() {
     0,
     subtotal + platformCommission + vat + insurance + platformTax
   );
+
+  const availableWeight = type === "travel" ? listing.weightAvailable : listing.weight;
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
@@ -201,9 +270,9 @@ export default function AnnounceDetail() {
                 >
                   <img
                     src={
-                      listing.type === "transporter"
-                        ? listing.departure.airline
-                        : listing.images[0]
+                      type === "travel"
+                        ? listing.airline?.logoUrl || "/favicon.ico"
+                        : listing.images?.[0]?.fileUrl || "/favicon.ico"
                     }
                     alt="main"
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
@@ -212,25 +281,23 @@ export default function AnnounceDetail() {
                 </div>
               </div>
               <div className="w-80  flex flex-col gap-3">
-                <div
-                  className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  onClick={() => {
-                    setCurrentImageIndex(1);
-                    setSliderOpen(true);
-                  }}
-                >
-                  <img
-                    src={
-                      listing.type === "transporter"
-                        ? listing.images[0]
-                        : listing.images[1]
-                    }
-                    alt="thumb-1"
-                    className="h-full w-full object-cover transition-transform duration-300 "
-                  />
-                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
-                </div>
-                {listing.type === "transporter" && (
+                {listing.images?.[0] && (
+                  <div
+                    className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    onClick={() => {
+                      setCurrentImageIndex(1);
+                      setSliderOpen(true);
+                    }}
+                  >
+                    <img
+                      src={listing.images[0].fileUrl}
+                      alt="thumb-1"
+                      className="h-full w-full object-cover transition-transform duration-300 "
+                    />
+                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                  </div>
+                )}
+                {listing.images?.[1] && (
                   <div
                     className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
                     onClick={() => {
@@ -239,7 +306,7 @@ export default function AnnounceDetail() {
                     }}
                   >
                     <img
-                      src={listing.images[1]}
+                      src={listing.images[1].fileUrl}
                       alt="thumb-2"
                       className="h-full w-full object-cover transition-transform duration-300 "
                     />
@@ -256,17 +323,17 @@ export default function AnnounceDetail() {
               <div className="mt-6 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <img
-                    src={listing.traveler.avatar}
-                    alt={listing.traveler.name}
+                    src={listing.user?.selfieImage || "/favicon.ico"}
+                    alt={listing.user?.name || "User"}
                     className="h-12 w-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-900 shadow"
                   />
                   <div>
                     <div className="font-semibold text-gray-900 dark:text-white">
-                      {listing.traveler.name}
+                      {listing.user?.name || "Voyageur"}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      Note {listing.traveler.rating} •{" "}
-                      {listing.traveler.verified ? "Vérifié" : "Non vérifié"}
+                      Note 4.7 •{" "}
+                      {listing.user?.isVerified ? "Vérifié" : "Non vérifié"}
                     </div>
                   </div>
                 </div>
@@ -291,23 +358,23 @@ export default function AnnounceDetail() {
                 <div className="md:col-span-9">
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-gray-700 dark:text-gray-300">
                     <span className="font-medium">
-                      {listing.departure.city} → {listing.destination.city}
+                      {listing.departureAirport?.name || "Départ"} → {listing.arrivalAirport?.name || "Arrivée"}
                     </span>
-                    <span>Départ: {formatDate(listing.departure.date)}</span>
+                    <span>Départ: {formatDate(listing.deliveryDate)}</span>
                     <span className="font-medium">
-                      Vol N° FRH{String(listing.id).padStart(3, "0")}
+                      Vol N° {listing.flightNumber}
                     </span>
                     <span className="text-blue-600">
-                      {listing.type === "transporter"
+                      {type === "travel"
                         ? "Espace disponible"
                         : "Espace demandé"}
-                      : {listing.availableWeight}kg
+                      : {availableWeight}kg
                     </span>
                   </div>
                 </div>
                 <div className="md:col-span-3 text-left md:text-right">
                   <div className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                    ${listing.price}
+                    ${listing.pricePerKg}
                     <span className="text-base font-semibold">/Kilo</span>
                   </div>
                 </div>
@@ -316,13 +383,10 @@ export default function AnnounceDetail() {
               {/* Description */}
               <div className="mt-6">
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {listing.description}. Cela correspond à mes convictions
-                  écologiques, et aussi je pense que les compagnies nous plument
-                  avec le frais de bagages, autant que ce soit un particulier
-                  qui en profite.
+                  {listing.title || "Description non disponible"}
                 </p>
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
-                  Je retourne sur {listing.destination.city} prochainement. Vous
+                  Je retourne sur {listing.arrivalAirport?.name} prochainement. Vous
                   pouvez retrouver mes voyages sur la plateforme.
                 </p>
               </div>
@@ -464,10 +528,10 @@ export default function AnnounceDetail() {
             {/* Right: booking summary */}
             <aside className="lg:col-span-1">
               <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
-                {listing.type === "transporter" ? (
+                {type === "travel" ? (
                   <>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      ${listing.price}
+                      ${listing.pricePerKg}
                       <span className="text-base font-semibold">/Kilo</span>
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-6">
@@ -561,7 +625,7 @@ export default function AnnounceDetail() {
                   </>
                 )}
 
-                {listing.type === "transporter" ? (
+                {type === "travel" ? (
                   <button
                     onClick={() => setBookOpen(true)}
                     className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700"
@@ -586,13 +650,13 @@ export default function AnnounceDetail() {
         open={shareOpen}
         onClose={() => setShareOpen(false)}
         listing={{
-          title: `Transport ${listing.departure.city} → ${listing.destination.city}`,
-          location: `${listing.departure.city}, ${listing.destination.city}`,
-          rating: listing.traveler.rating,
+          title: `Transport ${listing.departureAirport?.name} → ${listing.arrivalAirport?.name}`,
+          location: `${listing.departureAirport?.name}, ${listing.arrivalAirport?.name}`,
+          rating: 4.7,
           bedrooms: 1,
           beds: 1,
           bathrooms: 1,
-          image: listing.traveler.avatar,
+          image: listing.user?.selfieImage || "/favicon.ico",
         }}
       />
       {/* Booking Dialog */}
@@ -610,9 +674,9 @@ export default function AnnounceDetail() {
       <MessageDialog
         open={messageOpen}
         onClose={() => setMessageOpen(false)}
-        title={`${listing.departure.city} → ${listing.destination.city}`}
-        hostName={listing.traveler.name}
-        hostAvatar={listing.traveler.avatar}
+        title={`${listing.departureAirport?.name} → ${listing.arrivalAirport?.name}`}
+        hostName={listing.user?.name || "Voyageur"}
+        hostAvatar={listing.user?.selfieImage || "/favicon.ico"}
         onSend={(msg) => {
           console.log("Message sent:", msg);
         }}
@@ -623,23 +687,36 @@ export default function AnnounceDetail() {
         open={createOpen}
         onClose={() => setCreateOpen(false)}
         initialData={{
-          departure: listing.departure.city,
-          arrival: listing.destination.city,
-          story: listing.description,
-          kilos: listing.availableWeight,
-          pricePerKg: listing.price,
+          departure: {
+            id: listing.departureAirportId?.toString() || "",
+            code: "",
+            name: listing.departureAirport?.name || "",
+            city: listing.departureAirport?.municipality || "",
+            country: listing.departureAirport?.isoCountry || "",
+          },
+          arrival: {
+            id: listing.arrivalAirportId?.toString() || "",
+            code: "",
+            name: listing.arrivalAirport?.name || "",
+            city: listing.arrivalAirport?.municipality || "",
+            country: listing.arrivalAirport?.isoCountry || "",
+          },
+          story: listing.title || "",
+          kilos: availableWeight,
+          pricePerKg: listing.pricePerKg,
           travelDate: (() => {
             try {
-              const d = new Date(listing.departure.date);
+              const d = new Date(listing.deliveryDate);
               if (Number.isNaN(d.getTime())) return "";
               return d.toISOString().slice(0, 10);
             } catch {
               return "";
             }
           })(),
-          reservationType: "single",
-          bookingType: "instant",
-          allowExtraGrams: false,
+          flightNumber: listing.flightNumber,
+          reservationType: listing.isSharedWeight ? "shared" : "single",
+          bookingType: listing.isInstant ? "instant" : "non-instant",
+          allowExtraGrams: listing.isAllowExtraWeight || false,
         }}
       />
 
@@ -751,9 +828,11 @@ export default function AnnounceDetail() {
   );
 }
 
-export const meta: Route.MetaFunction = ({ params }) => {
+export const meta: Route.MetaFunction = ({ location }) => {
+  const searchParams = new URLSearchParams(location.search);
+  const id = searchParams.get("id") || "unknown";
   return [
-    { title: `Annonce #${params.id} - GoHappyGo` },
+    { title: `Annonce #${id} - GoHappyGo` },
     { name: "description", content: "Détails de l'annonce de transport." },
   ];
 };

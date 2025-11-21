@@ -10,9 +10,7 @@ import { getDemandAndTravel } from "~/services/announceService";
 
 export default function Annonces() {
   const location = useLocation();
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([
-    "verified",
-  ]);
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const urlParams = useMemo(
     () => new URLSearchParams(location.search),
     [location.search]
@@ -28,6 +26,8 @@ export default function Annonces() {
   });
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [quotesError, setQuotesError] = useState<string | null>(null);
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
+  const [weightRange, setWeightRange] = useState({ min: "", max: "" });
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -45,20 +45,62 @@ export default function Annonces() {
     { id: "travel-ad", label: "Annonce de voyage" },
     { id: "transport-request", label: "Demande de Transport" },
   ];
-  // Fetch from API when URL changes
+  // Fetch from API when URL changes or filters change
   useEffect(() => {
     const controller = new AbortController();
     const fetchResults = async () => {
       setLoading(true);
       setError(null);
       try {
-        const apiRes = await getDemandAndTravel({
+        const filters: any = {
           originAirportId: urlParams.get("from") || undefined,
           destinationAirportId: urlParams.get("to") || undefined,
           travelDate: urlParams.get("date") || undefined,
           flightNumber: urlParams.get("flight") || undefined,
-        });
-        const items = Array.isArray(apiRes) ? apiRes : apiRes?.items ?? [];
+        };
+
+        // Apply selected filters
+        if (selectedFilters.includes("verified")) {
+          filters.isVerified = true;
+        }
+        if (selectedFilters.includes("travel-ad")) {
+          filters.type = "travel";
+        }
+        if (selectedFilters.includes("transport-request")) {
+          filters.type = "demand";
+        }
+
+        // Apply price range filters
+        if (priceRange.min) {
+          filters.minPricePerKg = parseFloat(priceRange.min);
+        }
+        if (priceRange.max) {
+          filters.maxPricePerKg = parseFloat(priceRange.max);
+        }
+
+        // Apply weight range filters
+        if (weightRange.min) {
+          filters.minWeight = parseFloat(weightRange.min);
+        }
+        if (weightRange.max) {
+          filters.maxWeight = parseFloat(weightRange.max);
+        }
+
+        const apiRes = await getDemandAndTravel(filters);
+        let items = Array.isArray(apiRes) ? apiRes : apiRes?.items ?? [];
+
+        // Apply client-side sorting for "lowest-price"
+        if (selectedFilters.includes("lowest-price")) {
+          items = [...items].sort((a, b) => (a.pricePerKg || 0) - (b.pricePerKg || 0));
+        }
+
+        // Apply client-side sorting for "travel-date"
+        if (selectedFilters.includes("travel-date")) {
+          items = [...items].sort((a, b) => 
+            new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime()
+          );
+        }
+
         setResults(items);
       } catch (e: any) {
         setError(e?.message || "Failed to load results");
@@ -68,7 +110,7 @@ export default function Annonces() {
     };
     fetchResults();
     return () => controller.abort();
-  }, [location.search, urlParams]);
+  }, [location.search, urlParams, selectedFilters, priceRange, weightRange]);
 
   const handleFilterChange = (filterId: string) => {
     setSelectedFilters((prev) =>
@@ -80,6 +122,8 @@ export default function Annonces() {
 
   const clearAllFilters = () => {
     setSelectedFilters([]);
+    setPriceRange({ min: "", max: "" });
+    setWeightRange({ min: "", max: "" });
   };
 
   return (
@@ -108,10 +152,10 @@ export default function Annonces() {
         </div>
 
         {/* Main Content with Filters and Results */}
-        <div className="flex  gap-8 mt-10 ">
+        <div className="flex relative  gap-8 mt-10 ">
           {/* Left Sidebar - Filters */}
-          <div className="w-64 fixed flex-shrink-0  top-64 xl:left-1/12  lg:left-10  ">
-            <div className="bg-gray-100 dark:bg-gray-900 rounded-2xl p-6  border border-gray-200 dark:border-gray-800">
+          <div className="w-64 flex-shrink-0">
+            <div className="sticky top-24 bg-gray-100 dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 max-h-[calc(100vh-7rem)] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
                 <button className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg text-sm font-medium">
                   Filtrer par
@@ -149,11 +193,65 @@ export default function Annonces() {
                   </label>
                 ))}
               </div>
+
+              {/* Price Range Filter */}
+              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                  Prix par kg (€)
+                </h4>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={priceRange.min}
+                    onChange={(e) =>
+                      setPriceRange((prev) => ({ ...prev, min: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={priceRange.max}
+                    onChange={(e) =>
+                      setPriceRange((prev) => ({ ...prev, max: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Weight Range Filter */}
+              <div className="mt-4">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+                  Poids (kg)
+                </h4>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={weightRange.min}
+                    onChange={(e) =>
+                      setWeightRange((prev) => ({ ...prev, min: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={weightRange.max}
+                    onChange={(e) =>
+                      setWeightRange((prev) => ({ ...prev, max: e.target.value }))
+                    }
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Right Section - Results Grid */}
-          <div className="w-[calc(100%-256px)] ml-64 ">
+          <div className=" ">
             {loading && (
               <div className="text-sm text-gray-500">Chargement…</div>
             )}

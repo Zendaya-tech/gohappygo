@@ -71,10 +71,10 @@ export default function SearchFiltersBar({
   };
 
   return (
-    <div className="bg-white max-w-7xl mx-auto  dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl rounded-r-full px-4 py-4  shadow-lg">
+    <div className="bg-white max-w-7xl mx-auto   border border-gray-200  rounded-2xl rounded-r-full px-4 py-4  shadow-lg">
       <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
         {/* From */}
-        <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
+        <div className="border-r border-gray-200  pr-4">
           <AirportComboBox
             label="Départ"
             value={from}
@@ -88,7 +88,7 @@ export default function SearchFiltersBar({
         </div>
 
         {/* To */}
-        <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
+        <div className="border-r border-gray-200  pr-4">
           <AirportComboBox
             label="Arrivée"
             value={to}
@@ -102,8 +102,8 @@ export default function SearchFiltersBar({
         </div>
 
         {/* Date */}
-        <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <div className="border-r border-gray-200  pr-4">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Date
           </label>
           <input
@@ -114,13 +114,13 @@ export default function SearchFiltersBar({
               console.log(e.target.value);
               emit({ date: e.target.value });
             }}
-            className="w-full text-sm text-gray-700 dark:text-gray-200 bg-transparent border-none outline-none truncate"
+            className="w-full text-sm text-gray-700  bg-transparent border-none outline-none truncate"
           />
         </div>
 
         {/* Flight */}
-        <div className="border-r border-gray-200 dark:border-gray-800 pr-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <div className="border-r border-gray-200  pr-4">
+          <label className="block text-sm font-medium text-gray-700  mb-1">
             Vol
           </label>
           <input
@@ -131,7 +131,7 @@ export default function SearchFiltersBar({
               emit({ flight: e.target.value });
             }}
             placeholder="Numéro de vol"
-            className="w-full uppercase text-sm text-gray-700 dark:text-gray-200 bg-transparent border-none outline-none truncate"
+            className="w-full uppercase text-sm text-gray-700  bg-transparent border-none outline-none truncate"
           />
         </div>
 

@@ -16,6 +16,17 @@ export const getAnnounce = async (id: string) => {
 
 };
 
+export const getAnnounceByIdAndType = async (id: string, type: "demand" | "travel"): Promise<DemandTravelItem | null> => {
+    try {
+        const endpoint = type === "demand" ? `/demand/${id}` : `/travel/${id}`;
+        const response = await api.get(endpoint);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching announce:", error);
+        return null;
+    }
+};
+
 export const getAnnounces = async () => {
     try {
         const response = await api.get(`/announces`);
@@ -31,10 +42,17 @@ export type DemandAndTravelFilters = {
     originAirportId?: string;
     destinationAirportId?: string;
     flightNumber?: string;
-    travelDate?: string; // YYYY-MM-DD
+    travelDate?: string; // YYYY-MM-DD (ISO 8601)
     minWeight?: number;
     maxWeight?: number;
+    minPricePerKg?: number;
+    maxPricePerKg?: number;
+    weightAvailable?: number; // travels only
+    isVerified?: boolean;
+    status?: string; // active, expired, cancelled, resolved
     type?: "demand" | "travel";
+    description?: string;
+    airlineId?: number;
 };
 
 export interface Airport {
@@ -95,14 +113,35 @@ export interface DemandTravelItem {
 }
 
 export async function getDemandAndTravel(filters: DemandAndTravelFilters & { page?: number; limit?: number }) {
-    const params: Record<string, string | number | undefined> = {};
+    const params: Record<string, string | number | boolean | undefined> = {};
+    
+    // Airport filters
     if (filters.originAirportId) params.departureAirportId = filters.originAirportId;
     if (filters.destinationAirportId) params.arrivalAirportId = filters.destinationAirportId;
+    
+    // Flight and airline filters
     if (filters.flightNumber) params.flightNumber = filters.flightNumber;
-    if (filters.travelDate) params.deliveryDate = filters.travelDate; // Updated to match new structure
+    if (typeof filters.airlineId === 'number') params.airlineId = filters.airlineId;
+    
+    // Date filter
+    if (filters.travelDate) params.travelDate = filters.travelDate;
+    
+    // Weight filters
     if (typeof filters.minWeight === 'number') params.minWeight = filters.minWeight;
     if (typeof filters.maxWeight === 'number') params.maxWeight = filters.maxWeight;
+    if (typeof filters.weightAvailable === 'number') params.weightAvailable = filters.weightAvailable;
+    
+    // Price filters
+    if (typeof filters.minPricePerKg === 'number') params.minPricePerKg = filters.minPricePerKg;
+    if (typeof filters.maxPricePerKg === 'number') params.maxPricePerKg = filters.maxPricePerKg;
+    
+    // Other filters
     if (filters.type) params.type = filters.type;
+    if (filters.description) params.description = filters.description;
+    if (filters.status) params.status = filters.status;
+    if (typeof filters.isVerified === 'boolean') params.isVerified = filters.isVerified;
+    
+    // Pagination
     if (typeof filters.page === 'number') params.page = filters.page;
     if (typeof filters.limit === 'number') params.limit = filters.limit;
 

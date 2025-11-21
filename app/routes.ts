@@ -4,7 +4,7 @@ export default [
   index("routes/home.tsx"),
   //
   route("/annonces", "routes/annonces.tsx"),
-  route("/announces/:id", "routes/announces.$id.tsx"),
+  route("/announces", "routes/announces.$id.tsx"),
   route("/login", "routes/login.tsx"),
   route("/register", "routes/register.tsx"),
   route("/profile", "routes/profile.tsx"),

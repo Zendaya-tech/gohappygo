@@ -100,9 +100,11 @@ export default function PropertyCard({
     }
   };
 
+  const announceType = type === "transporter" ? "travel" : "demand";
+
   return (
     <Link
-      to={`/announces/${id}`}
+      to={`/announces?id=${id}&type=${announceType}`}
       className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800"
     >
       <div className="relative flex overflow-hidden rounded-2xl bg-gray-100  dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">
@@ -193,7 +195,7 @@ export default function PropertyCard({
         {weight && (
           <p className="text-blue-600 text-sm font-medium mb-2">
             {type === "transporter" ? "Espace disponible" : "Espace demandé"}:{" "}
-            {weight}
+             {weight??0}
           </p>
         )}
         {departure && (
