@@ -22,7 +22,7 @@ type InitialData = {
   noSmileTax?: number;
   allowExtraGrams?: boolean;
   flightNumber?: string;
-  airline?: string;
+  airline?: any;
   travelDate?: string; // YYYY-MM-DD
   reservationType?: "single" | "shared";
   bookingType?: "instant" | "non-instant";
@@ -53,7 +53,7 @@ export default function CreateAnnounceDialog({
   const [allowExtraGrams, setAllowExtraGrams] = useState<boolean>(false);
   // Supplementary info for Step 1
   const [flightNumber, setFlightNumber] = useState("");
-  const [airline, setAirline] = useState("");
+  const [airline, setAirline] = useState({});
   const [travelDate, setTravelDate] = useState("");
   const [fetchingAirline, setFetchingAirline] = useState(false);
   // API integration state
@@ -344,7 +344,7 @@ export default function CreateAnnounceDialog({
                 <Field label="Compagnie aérienne">
                   <div className="relative">
                     <input
-                      value={airline}
+                      value={airline.name}
                       disabled
                       placeholder={
                         fetchingAirline
