@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuthStore, type AuthState } from "~/store/auth";
 
 interface AnnounceType {
     id: string;
@@ -20,7 +21,8 @@ export default function AnnounceTypeDropdown({
     onSelectType,
 }: AnnounceTypeDropdownProps) {
     const ref = useRef<HTMLDivElement | null>(null);
-    const { t } = useTranslation()
+    const { t } = useTranslation();
+    const isLoggedIn = useAuthStore((s: AuthState) => s.isLoggedIn);
     useEffect(() => {
         if (!open) return;
         const onKey = (e: KeyboardEvent) => {
@@ -43,7 +45,7 @@ export default function AnnounceTypeDropdown({
         {
             id: 'travel',
             title: 'Voyage',
-            description: 'Publier un trajet pour transporter des colis',
+            description: 'Publier un trajet pour faire voyager des colis',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -54,7 +56,7 @@ export default function AnnounceTypeDropdown({
         {
             id: 'package',
             title: 'Colis',
-            description: 'Demander le transport d\'un colis',
+            description: 'Demander le voyage d\'un colis',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -75,6 +77,11 @@ export default function AnnounceTypeDropdown({
                     <button
                         key={type.id}
                         onClick={() => {
+                            if (!isLoggedIn) {
+                                window.dispatchEvent(new Event('open-login-dialog'));
+                                onClose();
+                                return;
+                            }
                             onSelectType(type.id as 'travel' | 'package');
                             onClose();
                         }}

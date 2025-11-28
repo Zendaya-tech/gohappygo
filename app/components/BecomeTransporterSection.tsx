@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useAuthStore, type AuthState } from '../store/auth';
 
-export default function HostSection() {
+export default function BecomeTransporterSection() {
     const { t } = useTranslation();
     const isLoggedIn = useAuthStore((s: AuthState) => s.isLoggedIn);
     const handleCtaClick = () => {

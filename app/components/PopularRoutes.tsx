@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 
-export default function PopularPlaces() {
+export default function PopularRoutes() {
   const { t } = useTranslation();
   const routes = [
     { name: "PARIS → NEW YORK", price: "15€/kg", image: "./images/paris.jpg" },

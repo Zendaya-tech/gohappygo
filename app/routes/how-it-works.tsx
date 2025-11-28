@@ -12,7 +12,7 @@ const steps = [
         ),
     },
     {
-        title: "Faites une demande de transport",
+        title: "Faites une demande de voyage",
         desc: "Indiquez le poids à expédier, les détails et vos préférences. Le HappyVoyageur valide ou vous contacte.",
         icon: (
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">

@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import PropertyCard from "./PropertyCard";
+import AnnounceCard from "./AnnounceCard";
 import { getLatestDemands, type DemandTravelItem } from "~/services/announceService";
 
-export default function SelectedPlaces() {
+export default function LatestDemands() {
   const { t } = useTranslation();
   const [demands, setDemands] = useState<DemandTravelItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,7 +86,7 @@ export default function SelectedPlaces() {
           const type = "traveler"; // Puisqu'on récupère que les demands
 
           return (
-            <PropertyCard
+            <AnnounceCard
               key={id}
               id={id}
               avatar={avatar}

@@ -1,4 +1,4 @@
-export default function PlacesByCategory() {
+export default function PackageCategories() {
     const categories = [
         {
             name: "Documents",

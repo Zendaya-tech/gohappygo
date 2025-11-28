@@ -89,7 +89,7 @@ export default function AirportComboBox({ label, value, onChange, placeholder }:
 
     const onPick = (airport: Airport) => {
         onChange(airport);
-        setQuery(`${airport.name} (${airport.code})`);
+        setQuery(`${airport.name}`);
         setOpen(false);
     };
 
@@ -145,7 +145,7 @@ export default function AirportComboBox({ label, value, onChange, placeholder }:
                                 onClick={() => onPick(a)}
                                 className={`w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-100 ${idx === activeIndex ? "bg-gray-100 dark:bg-gray-800" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
                             >
-                                <div className="font-medium">{a.name} <span className="text-gray-500">({a.code})</span></div>
+                                <div className="font-medium">{a.name} <span className="text-gray-500">({a.iataCode})</span></div>
                                 <div className="text-xs text-gray-500">{[a.city, a.country].filter(Boolean).join(", ")}</div>
                             </button>
                         ))}

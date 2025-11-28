@@ -63,28 +63,28 @@ export default function LoginDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div
         ref={ref}
-        className="relative w-full max-w-4xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[95vh] overflow-y-auto"
       >
-        <div className="flex">
+        <div className="flex flex-col md:flex-row">
           {/* Côté gauche - Formulaire */}
-          <div className="w-1/2 p-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="w-full md:w-1/2 p-6 md:p-8">
+            <div className="mb-6 md:mb-8">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
                 Connexion
               </h1>
-              <p className="text-gray-600">
+              <p className="text-sm md:text-base text-gray-600">
                 et profitez de toutes les possibilités
               </p>
             </div>
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
               {error && <div className="text-sm text-red-600">{error}</div>}
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2"
                 >
                   Email
                 </label>
@@ -92,7 +92,7 @@ export default function LoginDialog({
                   type="email"
                   id="email"
                   name="email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                   placeholder="Votre email"
                   required
                   value={formData.email}
@@ -103,7 +103,7 @@ export default function LoginDialog({
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-xs md:text-sm font-medium text-gray-700 mb-1 md:mb-2"
                 >
                   Mot de passe
                 </label>
@@ -111,7 +111,7 @@ export default function LoginDialog({
                   type="password"
                   id="password"
                   name="password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                   placeholder="Votre mot de passe"
                   required
                   value={formData.password}
@@ -154,18 +154,18 @@ export default function LoginDialog({
             </form>
 
             {/* Séparateur */}
-            <div className="my-6 flex items-center">
+            <div className="my-4 md:my-6 flex items-center">
               <div className="flex-1 border-t border-gray-300"></div>
-              <span className="px-4 text-sm text-gray-500">
+              <span className="px-3 md:px-4 text-xs md:text-sm text-gray-500">
                 Ou continuer avec
               </span>
               <div className="flex-1 border-t border-gray-300"></div>
             </div>
 
             {/* Boutons sociaux */}
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+            <div className="grid grid-cols-2 gap-3 md:gap-4">
+              <button className="flex items-center justify-center px-3 md:px-4 py-2 text-xs md:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                <svg className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -185,9 +185,9 @@ export default function LoginDialog({
                 </svg>
                 Google
               </button>
-              <button className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+              <button className="flex items-center justify-center px-3 md:px-4 py-2 text-xs md:text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 <svg
-                  className="w-5 h-5 mr-2"
+                  className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2"
                   fill="#1877F2"
                   viewBox="0 0 24 24"
                 >
@@ -198,13 +198,13 @@ export default function LoginDialog({
             </div>
 
             {/* Lien vers inscription */}
-            <div className="mt-6 text-center">
-              <span className="text-sm text-gray-600">
+            <div className="mt-4 md:mt-6 text-center">
+              <span className="text-xs md:text-sm text-gray-600">
                 Pas encore de compte ?{" "}
               </span>
               <button
                 onClick={onSwitchToRegister}
-                className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+                className="text-xs md:text-sm text-blue-600 hover:text-blue-500 font-medium"
               >
                 S'inscrire
               </button>
@@ -212,7 +212,7 @@ export default function LoginDialog({
           </div>
 
           {/* Côté droit - Image */}
-          <div className="w-1/2 bg-gradient-to-br from-blue-500 to-purple-600 relative">
+          <div className="hidden md:block md:w-1/2 bg-gradient-to-br from-blue-500 to-purple-600 relative min-h-[300px]">
             <img
               src="/images/login.jpg"
               alt="Login"

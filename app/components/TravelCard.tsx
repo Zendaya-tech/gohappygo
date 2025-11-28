@@ -16,7 +16,7 @@ interface FavoriteCardProps {
   onRemove: () => void;
 }
 
-export default function FavoriteCard({
+export default function TravelCard({
   id,
   name,
   location,

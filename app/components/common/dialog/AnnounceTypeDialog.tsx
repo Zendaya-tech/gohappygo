@@ -55,7 +55,7 @@ export default function AnnounceTypeDialog({ open, onClose, onSelectType }: Anno
         {
             id: 'package',
             title: 'Annonce de colis',
-            description: 'J\'ai un colis à transporter',
+            description: 'J\'ai un colis à faire voyager',
             icon: TruckIcon,
             color: 'text-green-600'
         }

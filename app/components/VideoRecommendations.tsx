@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import RecommendationCard from "./RecommendationCard";
+import VideoCard from "./VideoCard";
 
-export default function Recommendations() {
+export default function VideoRecommendations() {
   const { t } = useTranslation();
   const recommendations = [
     {
@@ -47,7 +47,7 @@ export default function Recommendations() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {recommendations.map((recommendation, index) => (
-          <RecommendationCard key={index} {...recommendation} />
+          <VideoCard key={index} {...recommendation} />
         ))}
       </div>
     </section>

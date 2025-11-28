@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   XMarkIcon,
   PhotoIcon,
@@ -16,14 +16,21 @@ interface ProfileDialogProps {
 }
 
 export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
+  const { updateProfile, changePassword, deleteAccount, user } = useAuth();
+  
+  // Parse firstName and lastName from user.name
+  const nameParts = user?.name?.split(" ") || [];
+  const firstName = nameParts[0] || "";
+  const lastName = nameParts.slice(1).join(" ") || "";
+  
   const [activeTab, setActiveTab] = useState<
     "profile" | "password" | "account"
   >("profile");
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    firstName: firstName,
+    lastName: lastName,
     phoneNumber: "",
-    aboutMe: "",
+    aboutMe: user?.bio || "",
   });
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -35,7 +42,9 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
     new: false,
     confirm: false,
   });
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(
+    user?.profilePictureUrl || null
+  );
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [hasActiveTransactions] = useState(false); // Simulate active transactions
@@ -43,7 +52,23 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { updateProfile, changePassword, deleteAccount, user } = useAuth();
+
+  // Update form data when user data changes or dialog opens
+  useEffect(() => {
+    if (open && user) {
+      const nameParts = user.name?.split(" ") || [];
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
+      
+      setFormData({
+        firstName: firstName,
+        lastName: lastName,
+        phoneNumber: "",
+        aboutMe: user.bio || "",
+      });
+      setProfileImage(user.profilePictureUrl || null);
+    }
+  }, [open, user]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({

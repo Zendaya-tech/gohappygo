@@ -279,21 +279,21 @@ export default function CreateAnnounceDialog({
       <div className="fixed inset-0 bg-black/35" onClick={onClose} />
 
       {/* Dialog container */}
-      <div className="relative z-10 mt-10 w-full max-w-6xl overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10 dark:ring-white/10 max-h-[85vh] flex flex-col">
+      <div className="relative z-10 mt-4 md:mt-10 w-full max-w-6xl overflow-hidden rounded-2xl md:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10 dark:ring-white/10 h-[95vh] md:max-h-[85vh] flex flex-col">
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-0 flex-1">
           {/* Sidebar steps */}
-          <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800 p-6 overflow-y-auto">
+          <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800 p-4 md:p-6 overflow-y-auto">
             <StepsNav step={step} />
           </aside>
 
           {/* Content */}
-          <section className="p-6 overflow-y-auto min-h-0">
-            <header className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                <span className="uppercase">
+          <section className="p-4 md:p-6 overflow-y-auto min-h-0">
+            <header className="mb-4 md:mb-6">
+              <h2 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white">
+                <span className="uppercase text-sm md:text-base">
                   {t("dialogs.createAnnounce.title")}
                 </span>{" "}
-                - Step {step} of 4
+                <span className="text-sm md:text-base">- Step {step} of 4</span>
               </h2>
             </header>
 
@@ -710,16 +710,16 @@ function StepsNav({ step }: { step: StepKey }) {
     title: string;
     subtitle: string;
   }) => (
-    <div className="flex items-start gap-3 py-4">
+    <div className="flex items-start gap-2 md:gap-3 py-2 md:py-4">
       <div
-        className={`mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full border ${
+        className={`mt-0.5 md:mt-1 inline-flex h-4 w-4 md:h-5 md:w-5 items-center justify-center rounded-full border ${
           index <= step
             ? "border-green-500 text-green-600"
             : "border-gray-300 text-gray-400"
         }`}
       >
         {index <= step ? (
-          <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+          <svg className="h-2.5 w-2.5 md:h-3 md:w-3" viewBox="0 0 20 20" fill="currentColor">
             <path
               fillRule="evenodd"
               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -727,18 +727,18 @@ function StepsNav({ step }: { step: StepKey }) {
             />
           </svg>
         ) : (
-          <span className="h-2 w-2 rounded-full bg-gray-300"></span>
+          <span className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-gray-300"></span>
         )}
       </div>
-      <div>
+      <div className="flex-1 min-w-0">
         <div
-          className={`text-base font-semibold ${
+          className={`text-sm md:text-base font-semibold truncate ${
             index <= step ? "text-gray-900 dark:text-white" : "text-gray-400"
           }`}
         >
           {title}
         </div>
-        <div className="text-sm text-gray-400">{subtitle}</div>
+        <div className="text-xs md:text-sm text-gray-400 truncate">{subtitle}</div>
       </div>
     </div>
   );
@@ -746,15 +746,15 @@ function StepsNav({ step }: { step: StepKey }) {
   return (
     <div>
       <Item index={1} title="General" subtitle="Select basic settings" />
-      <div className="ml-2 h-6 w-px bg-gray-200 dark:bg-gray-800" />
+      <div className="ml-1.5 md:ml-2 h-4 md:h-6 w-px bg-gray-200 dark:bg-gray-800" />
       <Item index={2} title="Pictures" subtitle="Add 2 photos" />
-      <div className="ml-2 h-6 w-px bg-gray-200 dark:bg-gray-800" />
+      <div className="ml-1.5 md:ml-2 h-4 md:h-6 w-px bg-gray-200 dark:bg-gray-800" />
       <Item
         index={3}
         title="Price & Booking"
         subtitle="Specify your preferences"
       />
-      <div className="ml-2 h-6 w-px bg-gray-200 dark:bg-gray-800" />
+      <div className="ml-1.5 md:ml-2 h-4 md:h-6 w-px bg-gray-200 dark:bg-gray-800" />
       <Item index={4} title="Payments" subtitle="Setting up payments" />
     </div>
   );

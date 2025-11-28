@@ -5,6 +5,7 @@ import {
   removeBookmark,
   checkIfBookmarked,
 } from "~/services/bookmarkService";
+import { useAuthStore, type AuthState } from "~/store/auth";
 
 interface PropertyCardProps {
   id: string;
@@ -21,9 +22,10 @@ interface PropertyCardProps {
   avatar?: string;
   type?: "traveler" | "transporter";
   isBookmarked?: boolean;
+  userId?: number; // ID de l'utilisateur qui a créé l'annonce
 }
 
-export default function PropertyCard({
+export default function AnnounceCard({
   id,
   name,
   location,
@@ -38,9 +40,15 @@ export default function PropertyCard({
   isRequest = false,
   avatar,
   isBookmarked = false,
+  userId,
 }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const isLoggedIn = useAuthStore((s: AuthState) => s.isLoggedIn);
+  const currentUser = useAuthStore((s: AuthState) => s.user);
+  
+  // Vérifier si l'annonce appartient à l'utilisateur connecté
+  const isOwnAnnounce = currentUser && userId && currentUser.id === Number(userId);
 
   // Use the isBookmarked prop from API response or check bookmark status
   useEffect(() => {
@@ -65,6 +73,12 @@ export default function PropertyCard({
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.preventDefault(); // Empêche la navigation vers le lien
+
+    // Si l'utilisateur n'est pas connecté, ouvrir la modal de connexion
+    if (!isLoggedIn) {
+      window.dispatchEvent(new Event('open-login-dialog'));
+      return;
+    }
 
     if (isLoading) return;
 
@@ -107,14 +121,14 @@ export default function PropertyCard({
       to={`/announces?id=${id}&type=${announceType}`}
       className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800"
     >
-      <div className="relative flex overflow-hidden rounded-2xl bg-gray-100  dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">
+      <div className="relative items-center  justify-center flex overflow-hidden rounded-2xl bg-gray-100  dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">
         <img
           src={image}
           alt={name}
           className={`${
             type === "transporter"
               ? "max-h-full h-52 p-5 object-contain max-w-full "
-              : "object-cover  w-full"
+              : "object-cover min-w-100 min-h-100 "
           } m-auto  `}
         />
         {featured && (
@@ -133,15 +147,16 @@ export default function PropertyCard({
             {type === "transporter" ? "Voyage" : "Demande"}
           </div>
         )}
-        <button
-          onClick={handleFavoriteClick}
-          disabled={isLoading}
-          className={`absolute top-4 right-4 backdrop-blur-sm p-2 rounded-full transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
-            isFavorite
-              ? "bg-red-500/90 text-white"
-              : "bg-white/80 dark:bg-gray-900/70 hover:bg-white dark:hover:bg-gray-800"
-          }`}
-        >
+        {!isOwnAnnounce && (
+          <button
+            onClick={handleFavoriteClick}
+            disabled={isLoading}
+            className={`absolute top-4 right-4 backdrop-blur-sm p-2 rounded-full transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed ${
+              isFavorite
+                ? "bg-red-500/90 text-white"
+                : "bg-white/80 dark:bg-gray-900/70 hover:bg-white dark:hover:bg-gray-800"
+            }`}
+          >
           {isLoading ? (
             <svg
               className="w-5 h-5 animate-spin text-gray-600 dark:text-gray-300"
@@ -179,7 +194,14 @@ export default function PropertyCard({
               />
             </svg>
           )}
-        </button>
+          </button>
+        )}
+        
+        {isOwnAnnounce && (
+          <div className="absolute top-4 right-4 backdrop-blur-sm px-3 py-1 rounded-full bg-gray-500/90 text-white text-xs font-medium">
+            Votre annonce
+          </div>
+        )}
         {airline && <></>}
       </div>
       <div className="p-6">

@@ -9,7 +9,7 @@ export default function FooterMinimal() {
                 </div>
                 <nav className="flex items-center gap-4">
                     <a href="/annonces" className="hover:text-gray-900 dark:hover:text-gray-100">Annonces</a>
-                    <a href="/transporters" className="hover:text-gray-900 dark:hover:text-gray-100">HappyVoyageurs</a>
+                    <a href="/voyageurs" className="hover:text-gray-900 dark:hover:text-gray-100">HappyVoyageurs</a>
                     <a href="/help-center" className="hover:text-gray-900 dark:hover:text-gray-100">Aide</a>
                 </nav>
                 <p className="text-xs">© {year} GoHappyGo</p>

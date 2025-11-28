@@ -155,7 +155,7 @@ export default function CreatePackageDialog({
       const result = await createDemand(demandData);
 
       if (result) {
-        setSuccess("Demande de transport créée avec succès!");
+        setSuccess("Demande de voyage créée avec succès!");
         setTimeout(() => {
           onClose();
         }, 2000);
@@ -168,7 +168,7 @@ export default function CreatePackageDialog({
       // Check if it's a 401 error (user not authenticated)
       if (err?.response?.status === 401 || err?.status === 401) {
         setError(
-          "Vous devez être connecté pour créer une demande de transport. Veuillez vous connecter."
+          "Vous devez être connecté pour créer une demande de voyage. Veuillez vous connecter."
         );
       } else {
         // Handle validation errors from backend
@@ -197,22 +197,22 @@ export default function CreatePackageDialog({
       <div className="fixed inset-0 bg-black/35" onClick={onClose} />
 
       {/* Dialog container */}
-      <div className="relative z-10 mt-10 w-full max-w-6xl overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10 dark:ring-white/10 max-h-[85vh] flex flex-col">
+      <div className="relative z-10 mt-4 md:mt-10 w-full max-w-6xl overflow-hidden rounded-2xl md:rounded-2xl bg-white dark:bg-gray-900 shadow-2xl ring-1 ring-black/10 dark:ring-white/10 h-[95vh] md:max-h-[85vh] flex flex-col">
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-0 flex-1">
           {/* Sidebar steps */}
-          <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800 p-6 overflow-y-auto">
+          <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800 p-4 md:p-6 overflow-y-auto">
             <StepsNavPackage step={currentStep as 1 | 2 | 3} />
           </aside>
 
           {/* Content */}
-          <section className="p-6 overflow-y-auto min-h-0">
-            <header className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <section className="p-4 md:p-6 overflow-y-auto min-h-0">
+            <header className="mb-4 md:mb-6">
+              <h2 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white">
                 {" "}
-                <span className="uppercase">
+                <span className="uppercase text-sm md:text-base">
                   {t("dialogs.createPackage.title")}
                 </span>
-                - {t("common.step")} {currentStep} {t("common.of")} 3
+                <span className="text-sm md:text-base"> - {t("common.step")} {currentStep} {t("common.of")} 3</span>
               </h2>
             </header>
 

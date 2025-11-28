@@ -2,12 +2,12 @@ import type { Route } from "./+types/home";
 import Header from "../components/Header";
 import HeroSection from "../components/features/home/HeroSection";
 import FeaturesSection from "../components/features/home/FeaturesSection";
-import PlacesByCategory from "../components/PlacesByCategory";
-import FeaturedProperties from "../components/FeaturedProperties";
-import Recommendations from "../components/Recommendations";
-import PopularPlaces from "../components/PopularPlaces";
-import HostSection from "../components/HostSection";
-import SelectedPlaces from "../components/SelectedPlaces";
+import PackageCategories from "../components/PackageCategories";
+import VerifiedTravelers from "../components/VerifiedTravelers";
+import VideoRecommendations from "../components/VideoRecommendations";
+import PopularRoutes from "../components/PopularRoutes";
+import BecomeTransporterSection from "../components/BecomeTransporterSection";
+import LatestDemands from "../components/LatestDemands";
 import Reviews from "../components/features/home/Reviews";
 import SupportSection from "../components/SupportSection";
 import Footer from "../components/Footer";
@@ -34,12 +34,12 @@ export default function Home() {
       <div className="min-h-screen max-w-7xl mx-auto relative bg-white dark:bg-gray-950">
         <HeroSection />
         <FeaturesSection />
-        {/* <PlacesByCategory /> */}
-        <FeaturedProperties />
-        <Recommendations />
-        <PopularPlaces />
-        <HostSection />
-        <SelectedPlaces />
+        {/* <PackageCategories /> */}
+        <VerifiedTravelers />
+        <VideoRecommendations />
+        <PopularRoutes />
+        <BecomeTransporterSection />
+        <LatestDemands />
         <Reviews />
         <SupportSection />
       </div>

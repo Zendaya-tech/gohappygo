@@ -65,7 +65,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
               <li>
                 <a
-                  href="/transporters"
+                  href="/voyageurs"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
                   {t("footer.discover.transporters")}
@@ -121,9 +121,9 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Transporter */}
+          {/* Voyageur */}
           <div>
-            <h4 className="font-semibold mb-4">Transporter</h4>
+            <h4 className="font-semibold mb-4">Voyageur</h4>
             <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
               <li>
                 <a

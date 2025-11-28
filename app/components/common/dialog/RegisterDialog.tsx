@@ -113,38 +113,38 @@ export default function RegisterDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div
         ref={ref}
-        className="relative w-full max-w-4xl max-h-[90vh] mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
       >
-        <div className="flex">
+        <div className="flex flex-col md:flex-row">
           {/* Côté gauche - Formulaire */}
-          <div className="w-1/2 p-8">
+          <div className="w-full md:w-1/2 p-4 sm:p-6 md:p-8 overflow-y-auto max-h-[90vh]">
             <div className="mb-4">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                 {step === 1 ? "Inscription" : "Vérification"}
               </h1>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 {step === 1
                   ? "et profitez de toutes les possibilités"
                   : "Saisissez le code de vérification"}
               </p>
             </div>
 
-            <form className="space-y-6" onSubmit={onSubmit}>
+            <form className="space-y-4 sm:space-y-6" onSubmit={onSubmit}>
               {message && (
-                <div className="text-sm text-green-600">{message}</div>
+                <div className="text-xs sm:text-sm text-green-600">{message}</div>
               )}
-              {error && <div className="text-sm text-red-600">{error}</div>}
+              {error && <div className="text-xs sm:text-sm text-red-600">{error}</div>}
 
               {step === 1 ? (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <input
                       type="text"
                       id="firstName"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                       placeholder="Prénom"
                       required
                       value={form.firstName}
@@ -155,7 +155,7 @@ export default function RegisterDialog({
                     <input
                       type="text"
                       id="lastName"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                       placeholder="Nom"
                       required
                       value={form.lastName}
@@ -186,7 +186,7 @@ export default function RegisterDialog({
                     <input
                       type="email"
                       id="email"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                       placeholder="Votre email"
                       required
                       value={form.email}
@@ -200,7 +200,7 @@ export default function RegisterDialog({
                     <input
                       type="password"
                       id="password"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                       placeholder="Votre mot de passe"
                       required
                       value={form.password}
@@ -214,7 +214,7 @@ export default function RegisterDialog({
                     <input
                       type="password"
                       id="confirmPassword"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                       placeholder="Confirmez votre mot de passe"
                       required
                       value={form.confirmPassword}
@@ -231,24 +231,24 @@ export default function RegisterDialog({
                     <input
                       type="checkbox"
                       id="terms"
-                      className="mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                      className="mt-0.5 sm:mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500"
                       required
                     />
                     <label
                       htmlFor="terms"
-                      className="ml-2 text-sm text-gray-600"
+                      className="ml-2 text-xs sm:text-sm text-gray-600"
                     >
                       En vous inscrivant, vous acceptez la{" "}
                       <a
                         href="/privacy"
-                        className="text-green-600 hover:text-green-500"
+                        className="text-green-600 hover:text-green-500 underline"
                       >
                         Politique de confidentialité
                       </a>{" "}
                       et les{" "}
                       <a
                         href="/terms"
-                        className="text-green-600 hover:text-green-500"
+                        className="text-green-600 hover:text-green-500 underline"
                       >
                         Conditions d'utilisation
                       </a>
@@ -258,12 +258,12 @@ export default function RegisterDialog({
                 </>
               ) : (
                 <>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs sm:text-sm text-gray-600">
                     Un code de vérification à 6 chiffres a été envoyé à{" "}
-                    {form.email}.
+                    <span className="font-medium break-all">{form.email}</span>.
                   </p>
                   <div
-                    className="flex justify-between gap-2"
+                    className="flex justify-between gap-1.5 sm:gap-2"
                     onPaste={(e) => {
                       const text = e.clipboardData
                         .getData("text")
@@ -300,13 +300,13 @@ export default function RegisterDialog({
                             inputsRef.current[idx - 1]?.focus();
                           }
                         }}
-                        className="w-12 h-12 text-center text-lg rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-10 h-10 sm:w-12 sm:h-12 text-center text-base sm:text-lg rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     ))}
                   </div>
                   <button
                     type="button"
-                    className="text-sm text-green-600 hover:text-green-700"
+                    className="text-xs sm:text-sm text-green-600 hover:text-green-700"
                   >
                     Renvoyer le code
                   </button>
@@ -316,7 +316,7 @@ export default function RegisterDialog({
               <button
                 type="submit"
                 disabled={submitting}
-                className={`w-full text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 ${
+                className={`w-full text-white py-2.5 sm:py-3 px-4 rounded-lg text-sm sm:text-base font-medium transition-colors duration-200 ${
                   submitting
                     ? "bg-gray-300 cursor-not-allowed"
                     : "bg-green-600 hover:bg-green-700"
@@ -329,7 +329,7 @@ export default function RegisterDialog({
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="w-full inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  className="w-full inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Retour
                 </button>
@@ -339,18 +339,18 @@ export default function RegisterDialog({
             {step === 1 && (
               <>
                 {/* Séparateur */}
-                <div className="my-6 flex items-center">
+                <div className="my-4 sm:my-6 flex items-center">
                   <div className="flex-1 border-t border-gray-300"></div>
-                  <span className="px-4 text-sm text-gray-500">
+                  <span className="px-2 sm:px-4 text-xs sm:text-sm text-gray-500">
                     Ou continuer avec
                   </span>
                   <div className="flex-1 border-t border-gray-300"></div>
                 </div>
 
                 {/* Boutons sociaux */}
-                <div className="flex justify-center gap-4">
-                  <button className="flex text-sm w-32 items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                    <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                <div className="flex justify-center gap-2 sm:gap-4">
+                  <button className="flex text-xs sm:text-sm w-28 sm:w-32 items-center justify-center px-2 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" viewBox="0 0 24 24">
                       <path
                         fill="#4285F4"
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -370,9 +370,9 @@ export default function RegisterDialog({
                     </svg>
                     Google
                   </button>
-                  <button className="text-sm w-32 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                  <button className="text-xs sm:text-sm w-28 sm:w-32 flex items-center justify-center px-2 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                     <svg
-                      className="w-5 h-5 mr-2"
+                      className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
                       fill="#1877F2"
                       viewBox="0 0 24 24"
                     >
@@ -383,13 +383,13 @@ export default function RegisterDialog({
                 </div>
 
                 {/* Lien vers connexion */}
-                <div className="mt-6 text-center">
-                  <span className="text-sm text-gray-600">
+                <div className="mt-4 sm:mt-6 text-center">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     Vous avez déjà un compte ?{" "}
                   </span>
                   <button
                     onClick={onSwitchToLogin}
-                    className="text-sm text-green-600 hover:text-green-500 font-medium"
+                    className="text-xs sm:text-sm text-green-600 hover:text-green-500 font-medium"
                   >
                     Se connecter
                   </button>
@@ -398,8 +398,8 @@ export default function RegisterDialog({
             )}
           </div>
 
-          {/* Côté droit - Image */}
-          <div className="w-1/2 bg-gradient-to-br from-green-500 to-blue-600 relative">
+          {/* Côté droit - Image (caché sur mobile) */}
+          <div className="hidden md:block md:w-1/2 bg-gradient-to-br from-green-500 to-blue-600 relative">
             <img
               src="/images/login.jpg"
               alt="Register"

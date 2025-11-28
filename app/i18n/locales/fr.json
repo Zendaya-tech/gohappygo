@@ -1,6 +1,6 @@
 {
   "demande":{
-    "Colis":"Demande de transport",
+    "Colis":"Demande de voyage",
     "Voyage":"Annonce de voyage"
   },
   "common": {
@@ -75,7 +75,7 @@
       "title": "Nos",
       "exploreDestinations": "Explorez de nouvelles destinations",
       "popularRoutes": "Trajets populaires",
-      "secureTransport": "Transportez en toute sécurité",
+      "secureTransport": "Voyagez en toute sécurité",
       "fragilePackages": "Colis fragiles",
       "saveOnShipping": "Économisez sur vos envois",
       "advantageousRates": "Tarifs avantageux",
@@ -91,11 +91,11 @@
         "name": "Marie D."
       },
       "southAmerica": {
-        "review": "Excellent service ! J'ai pu rentabiliser mon voyage en transportant des colis. Interface simple et paiement rapide.",
+        "review": "Excellent service ! J'ai pu rentabiliser mon voyage en faisant voyager des colis. Interface simple et paiement rapide.",
         "name": "Thomas L."
       },
       "northAmerica": {
-        "review": "Excellent service ! J'ai pu rentabiliser mon voyage en transportant des colis. Interface simple et paiement rapide.",
+        "review": "Excellent service ! J'ai pu rentabiliser mon voyage en faisant voyager des colis. Interface simple et paiement rapide.",
         "name": "Thomas L."
       },
       "asia": {
@@ -103,7 +103,7 @@
         "name": "Thomas L."
       },
       "africa": {
-        "review": "J'ai transporté des colis en Afrique. Le service était très rapide et le prix était très abordable.",
+        "review": "J'ai fait voyager des colis en Afrique. Le service était très rapide et le prix était très abordable.",
         "name": "Thierry M."
       },
       "oceania": {
@@ -146,7 +146,7 @@
       "airline": "Compagnie aérienne",
       "travelDate": "Date du voyage",
       "travelAd": "Annonce de voyage",
-      "transportRequest": "Demande de Transport"
+      "transportRequest": "Demande de Voyage"
     },
     "card": {
       "availableSpace": "Espace disponible",
@@ -173,7 +173,7 @@
       "success": "Réussite",
       "response": "Réponse",
       "earnings": "Gains",
-      "packagesCarried": "Colis transportés",
+      "packagesCarried": "Colis en voyage",
       "distance": "Distance",
       "packagesSent": "Colis envoyés"
     },
@@ -216,7 +216,7 @@
       "create": "Créer"
     },
     "createPackage": {
-      "title": "Demande de transport ",
+      "title": "Demande de voyage",
       "description": "Description",
       "weight": "Poids (kg)",
       "maxDeliveryDate": "Date max de livraison",
@@ -244,7 +244,7 @@
     }
   },
   "requests": {
-    "title": "Demandes de transport",
+    "title": "Demandes de voyage",
     "urgentDocuments": "Colis urgent - Documents",
     "birthdayGift": "Cadeau d'anniversaire",
     "medications": "Médicaments",
@@ -268,7 +268,7 @@
       "packageInsurance": "Assurance colis"
     },
     "transport": {
-      "title": "Transporter",
+      "title": "Voyager",
       "becomeTransporter": "Devenir HappyVoyageur",
       "securityRules": "Règles de sécurité",
       "identityVerification": "Vérification d'identité"

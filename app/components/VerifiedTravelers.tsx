@@ -1,8 +1,8 @@
-import PropertyCard from './PropertyCard';
+import AnnounceCard from './AnnounceCard';
 import { useEffect, useState } from "react";
 import { getLatestTravels, type DemandTravelItem } from "~/services/announceService";
 
-export default function FeaturedProperties() {
+export default function VerifiedTravelers() {
     const [travels, setTravels] = useState<DemandTravelItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -67,15 +67,15 @@ export default function FeaturedProperties() {
                     const pricePerKg = travel.pricePerKg?.toString() || "0";
                     const rating = "4.8"; // Rating par défaut
                     
-                    // Pour les transporteurs, utiliser le logo de la compagnie
+                    // Pour les voyageurs, utiliser le logo de la compagnie
                     const image = travel.airline?.logoUrl || avatar;
                     const featured = Boolean(travel.user?.isVerified);
                     const availableWeight = travel.weightAvailable ? `${travel.weightAvailable}kg` : undefined;
                     const departure = travel.deliveryDate ? formatDate(travel.deliveryDate) : undefined;
-                    const type = "transporter"; // Puisqu'on récupère que les travels
+                    const type = "transporter"; // Type pour les voyages
 
                     return (
-                        <PropertyCard 
+                        <AnnounceCard 
                             key={id} 
                             id={id} 
                             name={name}

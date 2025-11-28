@@ -10,7 +10,7 @@ interface RecommendationCardProps {
     videoId?: string;
 }
 
-export default function RecommendationCard({ title, subtitle, image, videoUrl, videoId }: RecommendationCardProps) {
+export default function VideoCard({ title, subtitle, image, videoUrl, videoId }: RecommendationCardProps) {
     const { t } = useTranslation();
     const [videoModalOpen, setVideoModalOpen] = useState(false);
 

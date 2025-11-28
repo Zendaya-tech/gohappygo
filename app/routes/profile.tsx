@@ -5,7 +5,7 @@ import ProfileDialog from "../components/common/dialogs/ProfileDialog";
 import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
 import CreatePackageDialog from "~/components/common/dialog/CreatePackageDialog";
 import { useAuth } from "~/hooks/useAuth";
-import FavoriteCard from "~/components/FavoriteCard";
+import TravelCard from "~/components/TravelCard";
 import {
   StarIcon,
   QuestionMarkCircleIcon,
@@ -19,7 +19,7 @@ import ReservationCard, {
 import ProfileTravelCard, {
   type ProfileTravel,
 } from "~/components/common/ProfileTravelCard";
-import PropertyCard from "~/components/PropertyCard";
+import AnnounceCard from "~/components/AnnounceCard";
 import { getBookmarks, type BookmarkItem } from "~/services/announceService";
 import { removeBookmark } from "~/services/bookmarkService";
 
@@ -220,52 +220,54 @@ const FavoritesSection = () => {
               
               if (!isTravel && !isDemand) return null;
 
-              const id = bookmark.id.toString();
-              let name, avatar, location, price, rating, image, weight, departure, type, featured;
+              // Get the actual item (travel or demand)
+              const item: any = isTravel ? bookmark.travel : bookmark.demand;
+              if (!item) return null;
 
-              if (isTravel && bookmark.travel) {
-                // For travel bookmarks
-                name = "Transporteur"; // We don't have user info in travel object
-                avatar = "/favicon.ico";
-                location = `Vol ${bookmark.travel.flightNumber}`;
-                price = bookmark.travel.pricePerKg.toString();
-                rating = "4.8";
-                image = "/favicon.ico"; // Could use airline logo if available
-                weight = `${bookmark.travel.totalWeightAllowance}kg`;
-                departure = formatDate(bookmark.travel.departureDatetime);
-                type = "transporter" as const;
-                featured = true;
-              } else if (isDemand && bookmark.demand) {
-                // For demand bookmarks
-                console.log("errod",bookmark.demandId)
-                name = (bookmark.demand.user)? bookmark.demand.user.name || "inconnu" : "inconnu";
-                avatar = (bookmark.demand.user)? bookmark.demand.user.profilePictureUrl || "/favicon.ico":"/favicon.ico";
-                const originName = bookmark.demand.originAirport?.name || "";
-                const destName = bookmark.demand.destinationAirport?.name || "";
-                location = `${originName} → ${destName}`;
-                price = bookmark.demand.pricePerKg.toString();
-                rating = "4.7";
-                image = avatar; // Use user avatar for demands
-                weight = `${bookmark.demand.weight}kg`;
-                departure = formatDate(bookmark.demand.deliveryDate);
-                type = "traveler" as const;
-                featured = bookmark.demand.user? bookmark.demand.user.isVerified :false;
-              }
+              const id = (isTravel ? bookmark.travelId : bookmark.demandId)?.toString() || bookmark.id.toString();
+              const name = item.user?.name || "Voyageur";
+              const avatar = item.user?.profilePictureUrl|| item.images?.[0]?.fileUrl || "/favicon.ico";
+              const originName = item.departureAirport?.name || "";
+              const destName = item.arrivalAirport?.name || "";
+              const location = `${originName} → ${destName}`;
+              const pricePerKg = item.pricePerKg ?? 0;
+              const rating = "4.7";
+              
+              // Pour les voyages (travel), utiliser le logo de la compagnie
+              // Pour les demandes (demand), utiliser l'avatar de l'utilisateur
+              const image = isTravel 
+                ? item.airline?.logoUrl || avatar
+                : avatar;
+              
+              const featured = Boolean(item.user?.isVerified);
+              
+              // Use weightAvailable for travel type, weight for demand type
+              const availableWeight = isTravel 
+                ? item.weightAvailable ?? 0
+                : item.weight ?? 0;
+              
+              const departure = item.deliveryDate 
+                ? formatDate(item.deliveryDate)
+                : undefined;
+              
+              const airline = item.airline?.name;
+              const type = isTravel ? "transporter" : "traveler";
 
               return (
                 <div key={id} className="relative">
-                  <FavoriteCard
+                  <TravelCard
                     id={id}
-                    name={name!}
-                    avatar={avatar!}
-                    location={location!}
-                    price={price!}
-                    rating={rating!}
-                    image={image!}
-                    featured={featured!}
-                    weight={weight}
+                    name={name}
+                    avatar={avatar}
+                    location={location}
+                    price={`${pricePerKg}`}
+                    rating={rating}
+                    image={image}
+                    featured={featured}
+                    weight={availableWeight ? `${availableWeight}kg` : undefined}
                     departure={departure}
-                    type={type!}
+                    airline={airline}
+                    type={type as any}
                     onRemove={() => handleRemoveBookmark(
                       bookmark.bookmarkType, 
                       isTravel ? bookmark.travelId! : bookmark.demandId!
@@ -396,9 +398,9 @@ export default function Profile() {
       case "messages":
         return (
           <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-            <div className="flex h-[600px]">
+            <div className="flex flex-col md:flex-row h-auto md:h-[600px]">
               {/* Messages List */}
-              <div className="w-1/3 border-r border-gray-200">
+              <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-gray-200 max-h-[300px] md:max-h-none">
                 <div className="p-4 border-b border-gray-200">
                   <h3 className="font-semibold text-gray-900">Mes Messages</h3>
                 </div>
@@ -787,14 +789,14 @@ export default function Profile() {
     <div className=" bg-white">
       <Header />
 
-      <main className="min-h-screen mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
+      <main className="min-h-screen mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr] gap-4 md:gap-6 lg:gap-8">
           {/* Sidebar */}
-          <aside className="space-y-6">
+          <aside className="space-y-4 md:space-y-6">
             {/* Profile Card */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center">
+            <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 text-center">
               {/* Profile Picture */}
-              <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden">
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-3 md:mb-4 overflow-hidden">
                 {isAuthenticated && user?.profilePictureUrl ? (
                   <img
                     src={user.profilePictureUrl}
@@ -818,7 +820,7 @@ export default function Profile() {
 
               {/* User Name */}
               {isAuthenticated && user?.name ? (
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
                   {user.name}
                 </h3>
               ) : (
@@ -850,21 +852,21 @@ export default function Profile() {
             </div>
 
             {/* Navigation */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-4">
-              <nav className="space-y-2">
+            <div className="bg-white rounded-2xl border border-gray-200 p-3 md:p-4">
+              <nav className="space-y-1 md:space-y-2">
                 {profileSections.map((section) => (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center justify-between p-3 rounded-lg text-left transition-colors ${
+                    className={`w-full flex items-center justify-between p-2 md:p-3 rounded-lg text-left transition-colors ${
                       activeSection === section.id
                         ? "bg-blue-50 text-blue-600"
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      {section.icon}
-                      <span className="text-sm font-medium">
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <span className="flex-shrink-0">{section.icon}</span>
+                      <span className="text-xs md:text-sm font-medium truncate">
                         {section.label}
                       </span>
                     </div>
@@ -888,7 +890,7 @@ export default function Profile() {
                 onClick={() => setCreatePackageDialogOpen(true)}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl"
               >
-                Publier une demande de transport
+                Publier une demande de voyage
               </button>
             </div>
           </aside>
@@ -896,8 +898,8 @@ export default function Profile() {
           {/* Main Content */}
           <section>
             {/* Section Title */}
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">
+            <div className="mb-4 md:mb-6">
+              <h1 className="text-xl md:text-2xl font-bold text-gray-900">
                 | {profileSections.find((s) => s.id === activeSection)?.label}
               </h1>
             </div>

@@ -11,40 +11,9 @@ import ShareDialog from "~/components/common/dialog/ShareDialog";
 import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
 import { getAnnounceByIdAndType, type DemandTravelItem } from "~/services/announceService";
 import { getRandomQuotes, type Quote } from "~/services/quotesService";
+import { useAuthStore, type AuthState } from "~/store/auth";
 
-const mockReviews = [
-  {
-    id: 1,
-    rating: 5,
-    name: "Jack Black",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    comment: "Super annonce !",
-    fontFamily: "cinzel",
-  },
-  {
-    id: 2,
-    rating: 4,
-    name: "John Doe",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-    comment:
-      "le voyage c'est déroulé sans problème, la livraison a été rapide et le colis a été bien reçu.",
-    fontFamily: "sacramento",
-  },
-  {
-    id: 3,
-    rating: 5,
-    name: "Marie Dubois",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-    comment:
-      "Excellent service, très professionnel et ponctuel. Je recommande vivement !",
-    fontFamily: "playfair",
-  },
-];
-
-// quotes are fetched dynamically below
+// Reviews are now fetched from the API
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
@@ -72,12 +41,30 @@ export default function AnnounceDetail() {
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [newRating, setNewRating] = useState<number>(0);
-  const averageRating =
-    mockReviews.reduce((sum, review) => sum + review.rating, 0) /
-    mockReviews.length;
-  const totalReviews = mockReviews.length;
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [quotesError, setQuotesError] = useState<string | null>(null);
+  
+  // Import auth store to check if user owns this announce
+  const currentUser = useAuthStore((s: AuthState) => s.user);
+  const isOwnAnnounce = currentUser && listing && listing.user?.id === Number(currentUser.id);
+  
+  // Use real reviews from listing
+  const reviews = useMemo(() => {
+    if (!(listing as any)?.reviews) return [];
+    return (listing as any).reviews.map((review: any) => ({
+      id: review.id,
+      rating: parseFloat(review.rating) || 0,
+      name: `${review.reviewer?.firstName || ""} ${review.reviewer?.lastName || ""}`.trim() || "Anonyme",
+      avatar: review.reviewer?.profilePictureUrl || "/favicon.ico",
+      comment: review.comment || "",
+      createdAt: review.createdAt,
+    }));
+  }, [(listing as any)?.reviews]);
+  
+  const averageRating = reviews.length > 0
+    ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
+    : 0;
+  const totalReviews = reviews.length;
 
   useEffect(() => {
     const fetchAnnounce = async () => {
@@ -115,11 +102,18 @@ export default function AnnounceDetail() {
   const galleryImages = useMemo(() => {
     if (!listing) return [];
     const images = listing.images?.map(img => img.fileUrl) || [];
-    if (listing.airline?.logoUrl) {
-      return [listing.airline.logoUrl, ...images];
+    
+    if (type === "travel") {
+      // Pour les voyages: logo de la compagnie + images
+      if (listing.airline?.logoUrl) {
+        return [listing.airline.logoUrl, ...images];
+      }
+      return images;
+    } else {
+      // Pour les demandes: les 3 premières images
+      return images.slice(0, 3);
     }
-    return images;
-  }, [listing]);
+  }, [listing, type]);
 
   if (loading) {
     return (
@@ -220,11 +214,11 @@ export default function AnnounceDetail() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <Header />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
         {/* Left: media + traveller + route + description */}
         <div>
           {/* top right small action */}
-          <div className="flex items-center justify-end text-sm text-gray-500 mb-3 gap-3">
+          <div className="flex items-center justify-end text-xs sm:text-sm text-gray-500 mb-3 gap-2 sm:gap-3">
             <button
               className="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-600"
               onClick={() => setShareOpen(true)}
@@ -232,14 +226,15 @@ export default function AnnounceDetail() {
               <ShareIcon className="h-4 w-4" />
               Partager
             </button>
-            <button
-              onClick={() => setIsFavorite(!isFavorite)}
-              className={`inline-flex items-center gap-2 transition-all duration-200 hover:scale-105 ${
-                isFavorite
-                  ? "text-red-500"
-                  : "text-gray-500 hover:text-rose-600"
-              }`}
-            >
+            {!isOwnAnnounce && (
+              <button
+                onClick={() => setIsFavorite(!isFavorite)}
+                className={`inline-flex items-center gap-2 transition-all duration-200 hover:scale-105 ${
+                  isFavorite
+                    ? "text-red-500"
+                    : "text-gray-500 hover:text-rose-600"
+                }`}
+              >
               <svg
                 className="h-4 w-4 transition-colors duration-200"
                 fill={isFavorite ? "currentColor" : "none"}
@@ -253,16 +248,23 @@ export default function AnnounceDetail() {
                   d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
                 />
               </svg>
-              {isFavorite ? "Retirer des favoris" : "Add to favourite"}
-            </button>
+                {isFavorite ? "Retirer des favoris" : "Add to favourite"}
+              </button>
+            )}
+            
+            {isOwnAnnounce && (
+              <div className="inline-flex items-center gap-2 text-gray-500">
+                <span className="text-sm font-medium">Votre annonce</span>
+              </div>
+            )}
           </div>
 
           {/* Gallery with hover effects */}
-          <div className="rounded-2xl  overflow-hidden bg-white dark:bg-gray-900">
-            <div className="flex h-[400px] gap-4">
-              <div className="flex-1">
+          <div className="rounded-2xl overflow-hidden bg-white dark:bg-gray-900">
+            <div className="flex flex-col md:flex-row h-auto md:h-[400px] gap-3 md:gap-4">
+              <div className="flex-1 h-[300px] md:h-full">
                 <div
-                  className="relative w-full h-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300  hover:shadow-lg"
+                  className="relative w-full h-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:shadow-lg"
                   onClick={() => {
                     setCurrentImageIndex(0);
                     setSliderOpen(true);
@@ -275,52 +277,93 @@ export default function AnnounceDetail() {
                         : listing.images?.[0]?.fileUrl || "/favicon.ico"
                     }
                     alt="main"
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    className={`h-full w-full transition-transform duration-300 group-hover:scale-110 ${
+                      type === "travel" ? "object-contain p-8" : "object-cover"
+                    }`}
                   />
                   <div className="absolute inset-0  bg-black  opacity-0  group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
                 </div>
               </div>
-              <div className="w-80  flex flex-col gap-3">
-                {listing.images?.[0] && (
-                  <div
-                    className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                    onClick={() => {
-                      setCurrentImageIndex(1);
-                      setSliderOpen(true);
-                    }}
-                  >
-                    <img
-                      src={listing.images[0].fileUrl}
-                      alt="thumb-1"
-                      className="h-full w-full object-cover transition-transform duration-300 "
-                    />
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
-                  </div>
-                )}
-                {listing.images?.[1] && (
-                  <div
-                    className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                    onClick={() => {
-                      setCurrentImageIndex(2);
-                      setSliderOpen(true);
-                    }}
-                  >
-                    <img
-                      src={listing.images[1].fileUrl}
-                      alt="thumb-2"
-                      className="h-full w-full object-cover transition-transform duration-300 "
-                    />
-                    <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
-                  </div>
+              <div className="w-full md:w-80 flex flex-row md:flex-col gap-3 h-[120px] md:h-full">
+                {type === "travel" ? (
+                  <>
+                    {listing.images?.[0] && (
+                      <div
+                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                        onClick={() => {
+                          setCurrentImageIndex(1);
+                          setSliderOpen(true);
+                        }}
+                      >
+                        <img
+                          src={listing.images[0].fileUrl}
+                          alt="thumb-1"
+                          className="h-full w-full object-cover transition-transform duration-300 "
+                        />
+                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                      </div>
+                    )}
+                    {listing.images?.[1] && (
+                      <div
+                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                        onClick={() => {
+                          setCurrentImageIndex(2);
+                          setSliderOpen(true);
+                        }}
+                      >
+                        <img
+                          src={listing.images[1].fileUrl}
+                          alt="thumb-2"
+                          className="h-full w-full object-cover transition-transform duration-300 "
+                        />
+                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {listing.images?.[1] && (
+                      <div
+                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                        onClick={() => {
+                          setCurrentImageIndex(1);
+                          setSliderOpen(true);
+                        }}
+                      >
+                        <img
+                          src={listing.images[1].fileUrl}
+                          alt="thumb-1"
+                          className="h-full w-full object-cover transition-transform duration-300 "
+                        />
+                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                      </div>
+                    )}
+                    {listing.images?.[2] && (
+                      <div
+                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                        onClick={() => {
+                          setCurrentImageIndex(2);
+                          setSliderOpen(true);
+                        }}
+                      >
+                        <img
+                          src={listing.images[2].fileUrl}
+                          alt="thumb-2"
+                          className="h-full w-full object-cover transition-transform duration-300 "
+                        />
+                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-6">
-            <div className=" lg:col-span-2 ">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-10 mt-6">
+            <div className="lg:col-span-2">
               {/* Traveller bar */}
-              <div className="mt-6 flex items-center justify-between">
+              <div className="mt-4 md:mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <img
                     src={listing.user?.profilePictureUrl || "/favicon.ico"}
@@ -337,16 +380,26 @@ export default function AnnounceDetail() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   <button
                     onClick={() => navigate("/profile")}
-                    className="rounded-lg bg-blue-600 px-5 py-2  font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors duration-200"
+                    disabled={isOwnAnnounce}
+                    className={`rounded-lg px-4 sm:px-5 py-2 text-sm font-semibold shadow-sm transition-colors duration-200 flex-1 sm:flex-none ${
+                      isOwnAnnounce
+                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
                   >
                     Profile
                   </button>
                   <button
                     onClick={() => setMessageOpen(true)}
-                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-5 py-2  font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                    disabled={isOwnAnnounce}
+                    className={`rounded-lg border px-4 sm:px-5 py-2 text-sm font-medium transition-colors duration-200 flex-1 sm:flex-none ${
+                      isOwnAnnounce
+                        ? "border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
+                        : "border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    }`}
                   >
                     Message
                   </button>
@@ -354,9 +407,9 @@ export default function AnnounceDetail() {
               </div>
 
               {/* Route line */}
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-12 gap-4 text-sm">
+              <div className="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-12 gap-4 text-xs sm:text-sm">
                 <div className="md:col-span-9">
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-gray-700 dark:text-gray-300">
+                  <div className="flex flex-wrap items-center gap-x-3 sm:gap-x-5 gap-y-2 text-gray-700 dark:text-gray-300">
                     <span className="font-medium">
                       {listing.departureAirport?.name || "Départ"} → {listing.arrivalAirport?.name || "Arrivée"}
                     </span>
@@ -372,8 +425,8 @@ export default function AnnounceDetail() {
                     </span>
                   </div>
                 </div>
-                <div className="md:col-span-3 text-left md:text-right">
-                  <div className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="md:col-span-3 text-left md:text-right mt-2 md:mt-0">
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                     ${listing.pricePerKg}
                     <span className="text-base font-semibold">/Kilo</span>
                   </div>
@@ -443,7 +496,7 @@ export default function AnnounceDetail() {
                 <div className="mt-8">
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
-                      {mockReviews.length} Comments
+                      {reviews.length} Commentaire{reviews.length > 1 ? 's' : ''}
                     </h4>
                     <div className="flex items-center gap-2 text-sm">
                       <div className="flex items-center">
@@ -471,63 +524,66 @@ export default function AnnounceDetail() {
                     </div>
                   </div>
                   <div className="flex flex-col mt-10 gap-5">
-                    {mockReviews.map((review, index) => {
-                      return (
-                        <div
-                          key={review.id}
-                          className={`flex items-start gap-3 `}
-                        >
-                          <img
-                            src={review.avatar}
-                            alt="avatar"
-                            className="h-10 w-10 rounded-full"
-                          />
-                          <div className="flex-1">
-                            <div
-                              className={`text-sm text-gray-600 dark:text-gray-400 `}
-                            >
-                              {review.name} •{" "}
-                              {new Date()
-                                .toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })
-                                .toUpperCase()}
+                    {reviews.length === 0 ? (
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        Aucun commentaire pour le moment
+                      </div>
+                    ) : (
+                      reviews.map((review: any) => {
+                        const reviewDate = review.createdAt 
+                          ? new Date(review.createdAt).toLocaleDateString("fr-FR", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "";
+                        
+                        return (
+                          <div
+                            key={review.id}
+                            className="flex items-start gap-3"
+                          >
+                            <img
+                              src={review.avatar}
+                              alt="avatar"
+                              className="h-10 w-10 rounded-full object-cover"
+                            />
+                            <div className="flex-1">
+                              <div className="text-sm text-gray-600 dark:text-gray-400">
+                                {review.name} • {reviewDate}
+                              </div>
+                              <p className="mt-1 text-gray-800 dark:text-gray-200">
+                                {review.comment}
+                              </p>
                             </div>
-                            <p
-                              className={`mt-1 text-gray-800 dark:text-gray-200 `}
-                            >
-                              {review.comment}
-                            </p>
+                            <div className="flex items-center">
+                              {[1, 2, 3, 4, 5].map((i) => (
+                                <svg
+                                  key={i}
+                                  className={`h-4 w-4 ${
+                                    i <= review.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.176 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81H7.03a1 1 0 00.95-.69l1.07-3.293z" />
+                                </svg>
+                              ))}
+                            </div>
                           </div>
-                          <div className="flex items-center">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                              <svg
-                                key={i}
-                                className={`h-4 w-4 ${
-                                  i <= review.rating
-                                    ? "text-yellow-400"
-                                    : "text-gray-300"
-                                }`}
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 00-1.176 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81H7.03a1 1 0 00.95-.69l1.07-3.293z" />
-                              </svg>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Right: booking summary */}
-            <aside className="lg:col-span-1">
-              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+            <aside className="lg:col-span-1 order-first lg:order-last">
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sticky top-20">
                 {type === "travel" ? (
                   <>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -628,17 +684,24 @@ export default function AnnounceDetail() {
                 {type === "travel" ? (
                   <button
                     onClick={() => setBookOpen(true)}
-                    className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700"
+                    disabled={isOwnAnnounce}
+                    className={`mt-6 w-full rounded-lg px-4 py-4 text-sm font-semibold transition-colors duration-200 ${
+                      isOwnAnnounce
+                        ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
                   >
-                    Book now
+                    {isOwnAnnounce ? "Votre voyage" : "Book now"}
                   </button>
                 ) : (
-                  <button
-                    onClick={() => setCreateOpen(true)}
-                    className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700"
-                  >
-                    Créer ce voyage
-                  </button>
+                  !isOwnAnnounce && (
+                    <button
+                      onClick={() => setCreateOpen(true)}
+                      className="mt-6 w-full rounded-lg bg-blue-600 px-4 py-4 text-sm font-semibold text-white hover:bg-blue-700"
+                    >
+                      Créer ce voyage
+                    </button>
+                  )
                 )}
               </div>
             </aside>
@@ -650,7 +713,7 @@ export default function AnnounceDetail() {
         open={shareOpen}
         onClose={() => setShareOpen(false)}
         listing={{
-          title: `Transport ${listing.departureAirport?.name} → ${listing.arrivalAirport?.name}`,
+          title: `Voyage ${listing.departureAirport?.name} → ${listing.arrivalAirport?.name}`,
           location: `${listing.departureAirport?.name}, ${listing.arrivalAirport?.name}`,
           rating: 4.7,
           bedrooms: 1,
@@ -833,6 +896,6 @@ export const meta: Route.MetaFunction = ({ location }) => {
   const id = searchParams.get("id") || "unknown";
   return [
     { title: `Annonce #${id} - GoHappyGo` },
-    { name: "description", content: "Détails de l'annonce de transport." },
+    { name: "description", content: "Détails de l'annonce de voyage." },
   ];
 };

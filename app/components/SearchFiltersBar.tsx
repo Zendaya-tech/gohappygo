@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import AirportComboBox from "./common/AirportComboBox";
+import AirlineComboBox from "./common/AirlineComboBox";
 import type { Airport } from "~/services/airportService";
+import type { Airline } from "~/services/airlineService";
 
 type Props = {
   initialFrom?: string;
   initialTo?: string;
   initialDate?: string; // ISO string yyyy-mm-dd
   initialFlight?: string;
+  initialAirline?: string;
   initialWeight?: number;
   onChange?: (filters: {
     from: string;
     to: string;
     date: string;
     flight: string;
+    airline: string;
     weight: number;
   }) => void;
 };
@@ -25,15 +29,15 @@ export default function SearchFiltersBar({
   initialTo,
   initialDate,
   initialFlight = "",
+  initialAirline = "",
   initialWeight = 0,
   onChange,
 }: Props) {
   const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState(initialTo);
-  const [date, setDate] = useState<Date | undefined>(
-    initialDate ? new Date(initialDate) : undefined
-  );
+  const [date, setDate] = useState<string>(initialDate || "");
   const [flight, setFlight] = useState(initialFlight);
+  const [airline, setAirline] = useState(initialAirline);
   const [weight, setWeight] = useState<number>(initialWeight);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -71,14 +75,15 @@ export default function SearchFiltersBar({
   };
 
   return (
-    <div className="bg-white max-w-7xl mx-auto   border border-gray-200  rounded-2xl rounded-r-full px-4 py-4  shadow-lg">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+    <div className="bg-white max-w-7xl mx-auto border border-gray-200 rounded-2xl md:rounded-r-full px-3 md:px-4 py-3 md:py-4 shadow-lg">
+      {/* Mobile: 2x2 Grid + Button | Desktop: 5 columns */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-2">
         {/* From */}
-        <div className="border-r border-gray-200  pr-4">
+        <div className="md:border-r md:border-gray-200 md:pr-4">
           <AirportComboBox
             label="Départ"
             value={from}
-            placeholder="Saisir le nom de l'aéroport"
+            placeholder="Aéroport de départ"
             onChange={(airport: Airport | null) => {
               const code = airport?.id || "";
               setFrom(code);
@@ -88,11 +93,11 @@ export default function SearchFiltersBar({
         </div>
 
         {/* To */}
-        <div className="border-r border-gray-200  pr-4">
+        <div className="md:border-r md:border-gray-200 md:pr-4">
           <AirportComboBox
             label="Arrivée"
             value={to}
-            placeholder="Saisir le nom de l'aéroport"
+            placeholder="Aéroport d'arrivée"
             onChange={(airport: Airport | null) => {
               const code = airport?.id || "";
               setTo(code);
@@ -102,8 +107,8 @@ export default function SearchFiltersBar({
         </div>
 
         {/* Date */}
-        <div className="border-r border-gray-200  pr-4">
-          <label className="block text-sm font-medium text-gray-700  mb-1">
+        <div className="md:border-r md:border-gray-200 md:pr-4">
+          <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
             Date
           </label>
           <input
@@ -114,13 +119,13 @@ export default function SearchFiltersBar({
               console.log(e.target.value);
               emit({ date: e.target.value });
             }}
-            className="w-full text-sm text-gray-700  bg-transparent border-none outline-none truncate"
+            className="w-full text-xs md:text-sm text-gray-700 bg-transparent border border-gray-300 md:border-none rounded-lg md:rounded-none px-3 py-2 md:px-0 md:py-0 outline-none truncate focus:border-blue-500 md:focus:border-none transition-colors"
           />
         </div>
 
         {/* Flight */}
-        <div className="border-r border-gray-200  pr-4">
-          <label className="block text-sm font-medium text-gray-700  mb-1">
+        <div className="md:border-r md:border-gray-200 md:pr-4">
+          <label className="block text-xs md:text-sm font-medium text-gray-700 mb-1">
             Vol
           </label>
           <input
@@ -130,18 +135,18 @@ export default function SearchFiltersBar({
               setFlight(e.target.value);
               emit({ flight: e.target.value });
             }}
-            placeholder="Numéro de vol"
-            className="w-full uppercase text-sm text-gray-700  bg-transparent border-none outline-none truncate"
+            placeholder="N° de vol"
+            className="w-full uppercase text-xs md:text-sm text-gray-700 bg-transparent border border-gray-300 md:border-none rounded-lg md:rounded-none px-3 py-2 md:px-0 md:py-0 outline-none truncate focus:border-blue-500 md:focus:border-none transition-colors"
           />
         </div>
 
-        {/* Search Button */}
-        <div className="flex items-center justify-center bg-[url('/images/gribouille.jpg')] rounded-r-full overflow-hidden bg-no-repeat bg-cover bg-center">
+        {/* Search Button - Full width on mobile, single column on desktop */}
+        <div className="col-span-2 md:col-span-1 flex items-center justify-center bg-[url('/images/gribouille.jpg')] md:rounded-r-full rounded-2xl overflow-hidden bg-no-repeat bg-cover bg-center py-4 md:py-0">
           <button
             onClick={handleSearch}
             disabled={isLoading}
             className={`
-              relative bg-blue-600 border-8 border-white text-white p-3 rounded-full 
+              relative bg-blue-600 border-4 md:border-8 border-white text-white p-3 md:p-3 rounded-full 
               transition-all duration-300 ease-in-out transform
               ${
                 isLoading
@@ -149,6 +154,7 @@ export default function SearchFiltersBar({
                   : "hover:bg-blue-700 hover:scale-110 active:scale-95"
               }
               ${isLoading ? "animate-pulse" : "hover:shadow-lg"}
+              shadow-xl
             `}
           >
             {isLoading ? (
@@ -176,7 +182,7 @@ export default function SearchFiltersBar({
                 </svg>
               </div>
             ) : (
-              <span className="text-2xl font-bold transition-transform duration-200">
+              <span className="text-xl md:text-2xl font-bold transition-transform duration-200">
                 GO
               </span>
             )}

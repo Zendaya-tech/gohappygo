@@ -3,10 +3,12 @@ import Footer from "../components/Footer";
 import { Link, useLocation } from "react-router";
 import { useEffect, useMemo, useState } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
-import PropertyCard from "~/components/PropertyCard";
+import AnnounceCard from "~/components/AnnounceCard";
 import SearchFiltersBar from "~/components/SearchFiltersBar";
 import { getRandomQuotes, type Quote } from "../services/quotesService";
 import { getDemandAndTravel } from "~/services/announceService";
+import AirlineComboBox from "~/components/common/AirlineComboBox";
+import type { Airline } from "~/services/airlineService";
 
 export default function Annonces() {
   const location = useLocation();
@@ -28,6 +30,7 @@ export default function Annonces() {
   const [quotesError, setQuotesError] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [weightRange, setWeightRange] = useState({ min: "", max: "" });
+  const [selectedAirline, setSelectedAirline] = useState<string | null>(null);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -43,7 +46,7 @@ export default function Annonces() {
     { id: "airline", label: "Compagnie aérienne" },
     { id: "travel-date", label: "Date du voyage" },
     { id: "travel-ad", label: "Annonce de voyage" },
-    { id: "transport-request", label: "Demande de Transport" },
+    { id: "transport-request", label: "Demande de Voyage" },
   ];
   // Fetch from API when URL changes or filters change
   useEffect(() => {
@@ -86,6 +89,11 @@ export default function Annonces() {
           filters.maxWeight = parseFloat(weightRange.max);
         }
 
+        // Apply airline filter
+        if (selectedAirline) {
+          filters.airlineId = parseInt(selectedAirline);
+        }
+
         const apiRes = await getDemandAndTravel(filters);
         let items = Array.isArray(apiRes) ? apiRes : apiRes?.items ?? [];
 
@@ -110,7 +118,7 @@ export default function Annonces() {
     };
     fetchResults();
     return () => controller.abort();
-  }, [location.search, urlParams, selectedFilters, priceRange, weightRange]);
+  }, [location.search, urlParams, selectedFilters, priceRange, weightRange, selectedAirline]);
 
   const handleFilterChange = (filterId: string) => {
     setSelectedFilters((prev) =>
@@ -124,20 +132,19 @@ export default function Annonces() {
     setSelectedFilters([]);
     setPriceRange({ min: "", max: "" });
     setWeightRange({ min: "", max: "" });
+    setSelectedAirline(null);
   };
 
   return (
     <div className="min-h-screen dark:bg-gray-950 relative">
       <Header />
 
-      <main className=" mx-auto relative max-w-7xl py-8 px-4">
+      <main className="mx-auto relative max-w-7xl py-4 md:py-8 px-4">
         {/* Search Bar */}
-
-        <div className="sticky bg-white  z-14 top-15 pt-10  left-0 w-full">
+        <div className="sticky bg-white dark:bg-gray-950 z-10 top-16 md:top-20 pt-4 md:pt-10 left-0 w-full">
           <SearchFiltersBar
             initialFrom={searchParams.from}
             initialTo={searchParams.to}
-            // initialDate={new Date().toISOString().slice(0, 10)}
             initialFlight={searchParams.flight}
             initialWeight={0}
             onChange={(f) =>
@@ -152,51 +159,69 @@ export default function Annonces() {
         </div>
 
         {/* Main Content with Filters and Results */}
-        <div className="flex relative  gap-8 mt-10 ">
+        <div className="flex flex-col lg:flex-row relative gap-4 md:gap-8 mt-6 md:mt-10">
           {/* Left Sidebar - Filters */}
-          <div className="w-64 flex-shrink-0">
-            <div className="sticky top-24 bg-gray-100 dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 max-h-[calc(100vh-7rem)] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <button className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-4 py-2 rounded-lg text-sm font-medium">
+          <div className="w-full lg:w-64 flex-shrink-0">
+            <div className="lg:sticky lg:top-24 bg-gray-100 dark:bg-gray-900 rounded-2xl p-4 md:p-6 border border-gray-200 dark:border-gray-800 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
+              <div className="flex items-center justify-between mb-4 md:mb-6">
+                <button className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium">
                   Filtrer par
                 </button>
                 <button
                   onClick={clearAllFilters}
-                  className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                  className="text-xs md:text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                 >
                   tout effacer
                 </button>
               </div>
 
               {/* Filtrer non disponible button */}
-              <div className="mb-4">
-                <button className="w-full text-left px-4 py-2 text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+              <div className="mb-3 md:mb-4">
+                <button className="w-full text-left px-3 md:px-4 py-2 text-xs md:text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
                   Filtrer non disponible
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {filters.map((filter) => (
-                  <label
-                    key={filter.id}
-                    className="flex items-center space-x-3 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedFilters.includes(filter.id)}
-                      onChange={() => handleFilterChange(filter.id)}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 rounded"
-                    />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {filter.label}
-                    </span>
-                  </label>
-                ))}
+              <div className="space-y-2 md:space-y-3">
+                {filters.map((filter) => {
+                  // Si c'est le filtre "airline", afficher le combobox au lieu du checkbox
+                  if (filter.id === "airline") {
+                    return (
+                      <div key={filter.id} className="mt-3 md:mt-4">
+                        <AirlineComboBox
+                          label={filter.label}
+                          value={selectedAirline || ""}
+                          onChange={(airline: Airline | null) => {
+                            setSelectedAirline(airline ? String(airline.id) : null);
+                          }}
+                          placeholder="Rechercher une compagnie"
+                        />
+                      </div>
+                    );
+                  }
+                  
+                  return (
+                    <label
+                      key={filter.id}
+                      className="flex items-center space-x-2 md:space-x-3 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedFilters.includes(filter.id)}
+                        onChange={() => handleFilterChange(filter.id)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 rounded"
+                      />
+                      <span className="text-xs md:text-sm text-gray-700 dark:text-gray-300">
+                        {filter.label}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
 
               {/* Price Range Filter */}
-              <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+              <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h4 className="text-xs md:text-sm font-medium text-gray-900 dark:text-white mb-2 md:mb-3">
                   Prix par kg (€)
                 </h4>
                 <div className="flex gap-2">
@@ -207,7 +232,7 @@ export default function Annonces() {
                     onChange={(e) =>
                       setPriceRange((prev) => ({ ...prev, min: e.target.value }))
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="number"
@@ -216,14 +241,14 @@ export default function Annonces() {
                     onChange={(e) =>
                       setPriceRange((prev) => ({ ...prev, max: e.target.value }))
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               {/* Weight Range Filter */}
-              <div className="mt-4">
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">
+              <div className="mt-3 md:mt-4">
+                <h4 className="text-xs md:text-sm font-medium text-gray-900 dark:text-white mb-2 md:mb-3">
                   Poids (kg)
                 </h4>
                 <div className="flex gap-2">
@@ -234,7 +259,7 @@ export default function Annonces() {
                     onChange={(e) =>
                       setWeightRange((prev) => ({ ...prev, min: e.target.value }))
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
                   <input
                     type="number"
@@ -243,7 +268,7 @@ export default function Annonces() {
                     onChange={(e) =>
                       setWeightRange((prev) => ({ ...prev, max: e.target.value }))
                     }
-                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -251,11 +276,11 @@ export default function Annonces() {
           </div>
 
           {/* Right Section - Results Grid */}
-          <div className=" ">
+          <div className="flex-1 w-full">
             {loading && (
-              <div className="text-sm text-gray-500">Chargement…</div>
+              <div className="text-sm text-gray-500 text-center py-8">Chargement…</div>
             )}
-            {error && <div className="text-sm text-red-600">{error}</div>}
+            {error && <div className="text-sm text-red-600 text-center py-8">{error}</div>}
             {!loading && !error && results.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-4">
                 {/* Empty state illustration */}
@@ -308,21 +333,21 @@ export default function Annonces() {
                 </div>
 
                 {/* Empty state text */}
-                <div className="text-center max-w-md">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                <div className="text-center max-w-md px-4">
+                  <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white mb-2">
                     Nous n'avons trouvé aucun bagage disponible
                   </h3>
-                  <p className="text-lg text-gray-600 dark:text-gray-400 mb-1">
+                  <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 mb-1">
                     pour ce vol... encore !
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
+                  <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-6 md:mb-8">
                     Activez une alerte, nous vous préviendrons
                     <br />
                     dès qu'une offre correspond.
                   </p>
 
                   {/* Alert button */}
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-colors">
                     Activer une alerte
                   </button>
                 </div>
@@ -330,7 +355,7 @@ export default function Annonces() {
             )}
 
             {!loading && !error && results.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                 {results.map((item: any) => {
                   const id = item.id?.toString() || Math.random().toString(36).slice(2);
                   const name = item.user?.name || item.title || "Voyageur";
@@ -362,7 +387,7 @@ export default function Annonces() {
                   const type = item.type === "travel" ? "transporter" : "traveler";
 
                   return (
-                    <PropertyCard
+                    <AnnounceCard
                       key={id}
                       id={id}
                       name={name}
@@ -379,6 +404,7 @@ export default function Annonces() {
                       airline={airline}
                       type={type as any}
                       isBookmarked={item.isBookmarked}
+                      userId={item.user?.id}
                     />
                   );
                 })}
