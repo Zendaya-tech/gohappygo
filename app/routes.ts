@@ -5,8 +5,6 @@ export default [
   //
   route("/annonces", "routes/annonces.tsx"),
   route("/announces", "routes/announces.$id.tsx"),
-  route("/login", "routes/login.tsx"),
-  route("/register", "routes/register.tsx"),
   route("/profile", "routes/profile.tsx"),
   route("/terms-privacy","routes/terms.tsx"),
   route("/logout","routes/logout.tsx"), // the logout route 
