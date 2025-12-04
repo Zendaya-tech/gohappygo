@@ -3,6 +3,7 @@
     "Colis":"Demande de voyage",
     "Voyage":"Annonce de voyage"
   },
+
   "common": {
     "loading": "Chargement...",
     "save": "Sauvegarder",

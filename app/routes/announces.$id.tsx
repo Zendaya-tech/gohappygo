@@ -12,6 +12,8 @@ import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialo
 import { getAnnounceByIdAndType, type DemandTravelItem } from "~/services/announceService";
 import { getRandomQuotes, type Quote } from "~/services/quotesService";
 import { useAuthStore, type AuthState } from "~/store/auth";
+import { createRequestToTravel, type CreateRequestToTravelPayload } from "~/services/requestService";
+import type { BookingCardData } from "~/components/common/dialog/BookingDialog";
 
 // Reviews are now fetched from the API
 
@@ -43,15 +45,17 @@ export default function AnnounceDetail() {
   const [newRating, setNewRating] = useState<number>(0);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [quotesError, setQuotesError] = useState<string | null>(null);
+  const [bookingError, setBookingError] = useState<string | null>(null);
+  const [bookingSuccess, setBookingSuccess] = useState<boolean>(false);
   
   // Import auth store to check if user owns this announce
   const currentUser = useAuthStore((s: AuthState) => s.user);
-  const isOwnAnnounce = currentUser && listing && listing.user?.id === Number(currentUser.id);
+  const isOwnAnnounce = Boolean(currentUser && listing && listing.user?.id === Number(currentUser.id));
   
   // Use real reviews from listing
   const reviews = useMemo(() => {
-    if (!(listing as any)?.reviews) return [];
-    return (listing as any).reviews.map((review: any) => ({
+    if (!listing?.reviews) return [];
+    return listing.reviews.map((review) => ({
       id: review.id,
       rating: parseFloat(review.rating) || 0,
       name: `${review.reviewer?.firstName || ""} ${review.reviewer?.lastName || ""}`.trim() || "Anonyme",
@@ -59,7 +63,14 @@ export default function AnnounceDetail() {
       comment: review.comment || "",
       createdAt: review.createdAt,
     }));
-  }, [(listing as any)?.reviews]);
+  }, [listing?.reviews]);
+  
+  // Format user name from firstName and lastName
+  const userName = useMemo(() => {
+    if (!listing?.user) return "Voyageur";
+    const { firstName, lastName } = listing.user;
+    return `${firstName || ""} ${lastName || ""}`.trim() || "Voyageur";
+  }, [listing?.user]);
   
   const averageRating = reviews.length > 0
     ? reviews.reduce((sum: number, review: any) => sum + review.rating, 0) / reviews.length
@@ -211,10 +222,100 @@ export default function AnnounceDetail() {
 
   const availableWeight = type === "travel" ? listing.weightAvailable : listing.weight;
 
+  const handleBookingConfirm = async (cardData: BookingCardData) => {
+    setBookingError(null);
+    setBookingSuccess(false);
+
+    if (!currentUser) {
+      setBookingError("Vous devez être connecté pour réserver");
+      setBookOpen(false);
+      navigate("/login");
+      return;
+    }
+
+    if (type !== "travel") {
+      setBookingError("Vous ne pouvez réserver que des voyages");
+      setBookOpen(false);
+      return;
+    }
+
+    if (kilos <= 0) {
+      setBookingError("Veuillez entrer un poids valide");
+      setBookOpen(false);
+      return;
+    }
+
+    if (kilos > availableWeight) {
+      setBookingError(`Le poids demandé dépasse la capacité disponible (${availableWeight}kg)`);
+      setBookOpen(false);
+      return;
+    }
+
+    try {
+      const payload: CreateRequestToTravelPayload = {
+        travelId: Number(id),
+        requestType: 'GoAndGo',
+        weight: kilos,
+        cardNumber: cardData.cardNumber,
+        expiryDate: cardData.expiryDate,
+        cvc: cardData.cvc,
+      };
+
+      const response = await createRequestToTravel(payload);
+      setBookingSuccess(true);
+      setBookOpen(false);
+      
+      // Show success message
+      alert(`Réservation réussie! Votre demande #${response.id} a été créée.`);
+      
+      // Reset kilos
+      setKilos(0);
+      
+      // Optionally refresh the listing to update available weight
+      const updatedListing = await getAnnounceByIdAndType(id, type);
+      if (updatedListing) {
+        setListing(updatedListing);
+      }
+    } catch (error: any) {
+      console.error("Booking error:", error);
+      const errorMessage = error?.message || "Une erreur est survenue lors de la réservation";
+      setBookingError(errorMessage);
+      setBookOpen(false);
+      alert(`Erreur: ${errorMessage}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <Header />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
+        {/* Success/Error Messages */}
+        {bookingSuccess && (
+          <div className="mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
+            <div className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                Réservation effectuée avec succès!
+              </p>
+            </div>
+          </div>
+        )}
+        
+        {bookingError && (
+          <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
+            <div className="flex items-center gap-2">
+              <svg className="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                {bookingError}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Left: media + traveller + route + description */}
         <div>
           {/* top right small action */}
@@ -367,15 +468,15 @@ export default function AnnounceDetail() {
                 <div className="flex items-center gap-4">
                   <img
                     src={listing.user?.profilePictureUrl || "/favicon.ico"}
-                    alt={listing.user?.name || "User"}
+                    alt={userName}
                     className="h-12 w-12 rounded-full object-cover ring-2 ring-white dark:ring-gray-900 shadow"
                   />
                   <div>
                     <div className="font-semibold text-gray-900 dark:text-white">
-                      {listing.user?.name || "Voyageur"}
+                      {userName}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      Note 4.7 •{" "}
+                      {averageRating > 0 ? `Note ${averageRating.toFixed(1)}` : "Pas encore noté"} •{" "}
                       {listing.user?.isVerified ? "Vérifié" : "Non vérifié"}
                     </div>
                   </div>
@@ -413,10 +514,15 @@ export default function AnnounceDetail() {
                     <span className="font-medium">
                       {listing.departureAirport?.name || "Départ"} → {listing.arrivalAirport?.name || "Arrivée"}
                     </span>
-                    <span>Départ: {formatDate(listing.departudeDatetime)}</span>
+                    <span>Départ: {formatDate(listing.departureDatetime || listing.travelDate || listing.deliveryDate || new Date().toISOString())}</span>
                     <span className="font-medium">
                       Vol N° {listing.flightNumber}
                     </span>
+                    {listing.airline?.name && (
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {listing.airline.name}
+                      </span>
+                    )}
                     <span className="text-blue-600">
                       {type === "travel"
                         ? "Espace disponible"
@@ -427,7 +533,7 @@ export default function AnnounceDetail() {
                 </div>
                 <div className="md:col-span-3 text-left md:text-right mt-2 md:mt-0">
                   <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                    ${listing.pricePerKg}
+                    €{listing.pricePerKg}
                     <span className="text-base font-semibold">/Kilo</span>
                   </div>
                 </div>
@@ -435,12 +541,8 @@ export default function AnnounceDetail() {
 
               {/* Description */}
               <div className="mt-6">
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
                   {listing.description || "Description non disponible"}
-                </p>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
-                  Je retourne sur {listing.arrivalAirport?.name} prochainement. Vous
-                  pouvez retrouver mes voyages sur la plateforme.
                 </p>
               </div>
 
@@ -587,7 +689,7 @@ export default function AnnounceDetail() {
                 {type === "travel" ? (
                   <>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      ${listing.pricePerKg}
+                      €{listing.pricePerKg}
                       <span className="text-base font-semibold">/Kilo</span>
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-6">
@@ -609,19 +711,19 @@ export default function AnnounceDetail() {
                     <div className="space-y-3 text-sm">
                       <div className="flex items-center justify-between text-gray-500">
                         <span>commission plateforme</span>
-                        <span>{platformCommission.toFixed(0)}</span>
+                        <span>€{platformCommission.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center justify-between text-gray-500">
                         <span>TVA 24 %</span>
-                        <span>{vat.toFixed(0)}</span>
+                        <span>€{vat.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center justify-between text-gray-500">
                         <span>Assurance</span>
-                        <span>{insurance.toFixed(0)}</span>
+                        <span>€{insurance.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center justify-between text-gray-500">
                         <span>Platform Tax</span>
-                        <span>{platformTax.toFixed(0)}</span>
+                        <span>€{platformTax.toFixed(2)}</span>
                       </div>
                     </div>
 
@@ -631,7 +733,7 @@ export default function AnnounceDetail() {
                           Total with taxes
                         </span>
                         <span className="font-semibold text-gray-900 dark:text-white">
-                          ${total.toFixed(0)}
+                          €{total.toFixed(2)}
                         </span>
                       </div>
                     </div>
@@ -715,7 +817,7 @@ export default function AnnounceDetail() {
         listing={{
           title: `Voyage ${listing.departureAirport?.name} → ${listing.arrivalAirport?.name}`,
           location: `${listing.departureAirport?.name}, ${listing.arrivalAirport?.name}`,
-          rating: 4.7,
+          rating: averageRating,
           bedrooms: 1,
           beds: 1,
           bathrooms: 1,
@@ -725,12 +827,13 @@ export default function AnnounceDetail() {
       {/* Booking Dialog */}
       <BookingDialog
         open={bookOpen}
-        onClose={() => setBookOpen(false)}
-        amount={total}
-        email={"test1@demo.com"}
-        onConfirm={() => {
-          // Keep existing behavior: confirm sets kilos implicitly by existing input
+        onClose={() => {
+          setBookOpen(false);
+          setBookingError(null);
         }}
+        amount={total}
+        email={currentUser?.email || ""}
+        onConfirm={handleBookingConfirm}
       />
 
       {/* Message Dialog */}
@@ -738,7 +841,7 @@ export default function AnnounceDetail() {
         open={messageOpen}
         onClose={() => setMessageOpen(false)}
         title={`${listing.departureAirport?.name} → ${listing.arrivalAirport?.name}`}
-        hostName={listing.user?.name || "Voyageur"}
+        hostName={userName}
         hostAvatar={listing.user?.profilePictureUrl || "/favicon.ico"}
         onSend={(msg) => {
           console.log("Message sent:", msg);
@@ -769,17 +872,20 @@ export default function AnnounceDetail() {
           pricePerKg: listing.pricePerKg,
           travelDate: (() => {
             try {
-              const d = new Date(listing.deliveryDate);
+              const dateStr = listing.departureDatetime || listing.travelDate || listing.deliveryDate;
+              if (!dateStr) return "";
+              const d = new Date(dateStr);
               if (Number.isNaN(d.getTime())) return "";
               return d.toISOString().slice(0, 10);
             } catch {
               return "";
             }
           })(),
+          airlineId: listing.airline?.airlineId || listing.airline?.id,
           flightNumber: listing.flightNumber,
           reservationType: listing.isSharedWeight ? "shared" : "single",
           bookingType: listing.isInstant ? "instant" : "non-instant",
-          allowExtraGrams: listing.isAllowExtraWeight || false,
+          allowExtraGrams: Boolean(listing.isAllowExtraWeight),
         }}
       />
 

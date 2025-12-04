@@ -70,24 +70,47 @@ export interface Airline {
 
 export interface User {
     id: number;
-    name: string;
-    selfieImage: string;
-    createdAt: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    username?: string;
+    profilePictureUrl: string;
+    bio?: string;
     isVerified: boolean;
-    profilePictureUrl:string;
+    createdAt: string;
 }
 
 export interface Image {
     id: number;
     fileUrl: string;
-    originalName: string;
+    originalName?: string;
     purpose: string;
+}
+
+export interface Review {
+    id: number;
+    createdAt: string;
+    updatedAt: string;
+    reviewerId: number;
+    revieweeId: number;
+    requestId: number;
+    rating: string;
+    comment: string;
+    reviewer: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        email: string;
+        profilePictureUrl: string;
+    };
 }
 
 export interface DemandTravelItem {
     id: number;
-    type: "demand" | "travel";
-    title: string;
+    type?: "demand" | "travel";
+    title?: string;
+    description: string;
     flightNumber: string;
     departureAirportId: number;
     arrivalAirportId: number;
@@ -96,22 +119,26 @@ export interface DemandTravelItem {
     airline: Airline;
     userId: number;
     status: "active" | string;
-    deliveryDate: string;
+    deliveryDate?: string; // For unified API
+    departureDatetime?: string; // For travel detail
+    travelDate?: string; // For demand detail
     createdAt: string;
     updatedAt: string;
-    weight: number;
+    weight?: number; // For demands
     pricePerKg: number;
-    weightAvailable: number;
+    weightAvailable?: number; // For travels
+    totalWeightAllowance?: number; // For travels
     isDeactivated: boolean;
-    packageKind: string;
-    isSharedWeight: boolean;
-    isInstant: boolean;
-    isAllowExtraWeight: boolean;
-    feeForLateComer: number;
-    feeForGloomy: number;
+    packageKind?: string;
+    isSharedWeight?: boolean;
+    isInstant?: boolean;
+    isAllowExtraWeight?: boolean;
+    feeForLateComer?: number;
+    feeForGloomy?: number;
     user: User;
     images: Image[];
-    isBookmarked: boolean;
+    isBookmarked?: boolean;
+    reviews?: Review[];
 }
 
 export async function getDemandAndTravel(filters: DemandAndTravelFilters & { page?: number; limit?: number }) {
@@ -236,5 +263,38 @@ export const getBookmarks = async () => {
     } catch (error) {
         console.error("Error fetching bookmarks:", error);
         return { items: [], meta: {} };
+    }
+};
+
+export const getUserDemandsAndTravels = async (userId: number, type?: "demand" | "travel") => {
+    try {
+        const params: Record<string, any> = { userId };
+        if (type) params.type = type;
+        
+        const response = await api.get('/demand-and-travel', { params });
+        return response.data; // { items: DemandTravelItem[], meta: {} }
+    } catch (error) {
+        console.error("Error fetching user demands and travels:", error);
+        return { items: [], meta: {} };
+    }
+};
+
+export const deleteTravel = async (travelId: number) => {
+    try {
+        const response = await api.delete(`/travel/${travelId}`);
+        return response.data;
+    } catch (error: any) {
+        console.error("Error deleting travel:", error);
+        throw error?.response?.data || error;
+    }
+};
+
+export const deleteDemand = async (demandId: number) => {
+    try {
+        const response = await api.delete(`/demand/${demandId}`);
+        return response.data;
+    } catch (error: any) {
+        console.error("Error deleting demand:", error);
+        throw error?.response?.data || error;
     }
 };

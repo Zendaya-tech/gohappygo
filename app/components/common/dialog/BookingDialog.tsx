@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
 
+export interface BookingCardData {
+    cardNumber: string;
+    expiryDate: string;
+    cvc: string;
+}
+
 export default function BookingDialog({
     open,
     onClose,
@@ -11,11 +17,12 @@ export default function BookingDialog({
     onClose: () => void;
     amount: number;
     email?: string;
-    onConfirm: () => void;
+    onConfirm: (cardData: BookingCardData) => void;
 }) {
     const [cardNumber, setCardNumber] = useState("");
     const [exp, setExp] = useState("");
     const [cvc, setCvc] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!open) return;
@@ -31,6 +38,7 @@ export default function BookingDialog({
         setCardNumber("");
         setExp("");
         setCvc("");
+        setIsSubmitting(false);
     }, [open]);
 
     if (!open) return null;
@@ -93,10 +101,22 @@ export default function BookingDialog({
                 {/* Pay button */}
                 <div className="px-6 pb-6">
                     <button
-                        onClick={() => { onConfirm(); onClose(); }}
-                        className="w-full rounded-md bg-blue-600 py-3 text-base font-semibold text-white shadow hover:bg-blue-700"
+                        onClick={() => {
+                            if (!cardNumber || !exp || !cvc) {
+                                alert("Veuillez remplir tous les champs de la carte");
+                                return;
+                            }
+                            setIsSubmitting(true);
+                            onConfirm({ cardNumber, expiryDate: exp, cvc });
+                        }}
+                        disabled={isSubmitting}
+                        className={`w-full rounded-md py-3 text-base font-semibold text-white shadow ${
+                            isSubmitting 
+                                ? "bg-gray-400 cursor-not-allowed" 
+                                : "bg-blue-600 hover:bg-blue-700"
+                        }`}
                     >
-                        Pay ${amount.toFixed(2)}
+                        {isSubmitting ? "Traitement..." : `Pay $${amount.toFixed(2)}`}
                     </button>
                 </div>
             </div>

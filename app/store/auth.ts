@@ -5,6 +5,7 @@ export type AuthState = {
   user?: {
     id: string;
     name: string;
+    email?: string;
     profilePictureUrl?: string;
     bio?: string;
   } | null;

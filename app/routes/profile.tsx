@@ -20,8 +20,10 @@ import ProfileTravelCard, {
   type ProfileTravel,
 } from "~/components/common/ProfileTravelCard";
 import AnnounceCard from "~/components/AnnounceCard";
-import { getBookmarks, type BookmarkItem } from "~/services/announceService";
+import { getBookmarks, type BookmarkItem, getDemandAndTravel, getUserDemandsAndTravels, deleteTravel, deleteDemand, type DemandTravelItem } from "~/services/announceService";
 import { removeBookmark } from "~/services/bookmarkService";
+import { getReviews, type Review } from "~/services/reviewService";
+import { getRequests, acceptRequest, completeRequest, type RequestResponse } from "~/services/requestService";
 
 interface ProfileSection {
   id: string;
@@ -86,51 +88,595 @@ const sampleReservations: Reservation[] = [
 ];
 
 const ReservationsSection = () => {
-  const [tab, setTab] = useState<
-    "waiting_proposal" | "waiting_payment" | "archived"
-  >("waiting_proposal");
-  const filtered = sampleReservations.filter((r) =>
-    tab === "archived" ? r.status === "archived" : r.status === tab
-  );
+  const [tab, setTab] = useState<"pending" | "accepted" | "completed">("pending");
+  const [requests, setRequests] = useState<RequestResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const response = await getRequests();
+        setRequests(response.items || []);
+      } catch (error) {
+        console.error("Error fetching requests:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequests();
+  }, []);
+
+  const handleAcceptRequest = async (requestId: number) => {
+    try {
+      await acceptRequest(requestId);
+      // Refresh requests
+      const response = await getRequests();
+      setRequests(response.items || []);
+    } catch (error) {
+      console.error("Error accepting request:", error);
+      alert("Erreur lors de l'acceptation de la demande");
+    }
+  };
+
+  const handleCompleteRequest = async (requestId: number) => {
+    try {
+      await completeRequest(requestId);
+      // Refresh requests
+      const response = await getRequests();
+      setRequests(response.items || []);
+    } catch (error) {
+      console.error("Error completing request:", error);
+      alert("Erreur lors de la finalisation de la demande");
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const filtered = requests.filter((r) => {
+    const status = r.currentStatus?.status?.toUpperCase();
+    if (tab === "pending") return status === "NEGOTIATING" || status === "PENDING";
+    if (tab === "accepted") return status === "ACCEPTED";
+    if (tab === "completed") return status === "COMPLETED";
+    return false;
+  });
+
+  if (loading) {
+    return (
+      <div className="text-center text-gray-500 py-8">
+        Chargement de vos réservations...
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex items-center gap-6 mb-6">
         <button
-          onClick={() => setTab("waiting_proposal")}
+          onClick={() => setTab("pending")}
           className={`text-sm font-semibold ${
-            tab === "waiting_proposal"
+            tab === "pending"
               ? "text-gray-900 dark:text-white"
               : "text-gray-500"
           }`}
         >
-          | Waiting for proposal
+          | En attente
         </button>
         <button
-          onClick={() => setTab("waiting_payment")}
+          onClick={() => setTab("accepted")}
           className={`text-sm font-semibold ${
-            tab === "waiting_payment"
+            tab === "accepted"
               ? "text-gray-900 dark:text-white"
               : "text-gray-500"
           }`}
         >
-          | Waiting for payment
+          | Acceptées
         </button>
         <button
-          onClick={() => setTab("archived")}
+          onClick={() => setTab("completed")}
           className={`text-sm font-semibold ${
-            tab === "archived"
+            tab === "completed"
               ? "text-gray-900 dark:text-white"
               : "text-gray-500"
           }`}
         >
-          | Archived reservations
+          | Terminées
         </button>
       </div>
-      <div className="space-y-4">
-        {filtered.map((r) => (
-          <ReservationCard key={r.id} reservation={r} />
-        ))}
+      
+      {filtered.length === 0 ? (
+        <div className="text-center text-gray-500 py-8">
+          Aucune réservation dans cette catégorie
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filtered.map((request) => (
+            <div
+              key={request.id}
+              className="border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow"
+            >
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h4 className="text-sm font-semibold text-gray-900">
+                      Demande #{request.id}
+                    </h4>
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      request.currentStatus?.status === "COMPLETED"
+                        ? "bg-green-100 text-green-700"
+                        : request.currentStatus?.status === "ACCEPTED"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}>
+                      {request.currentStatus?.status || "En attente"}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-1 text-sm text-gray-600">
+                    <p>
+                      <span className="font-medium">Type:</span> {request.requestType}
+                    </p>
+                    <p>
+                      <span className="font-medium">Poids:</span> {request.weight} kg
+                    </p>
+                    <p>
+                      <span className="font-medium">Demandeur:</span>{" "}
+                      {request.requester?.firstName} {request.requester?.lastName}
+                    </p>
+                    {request.travel && (
+                      <p>
+                        <span className="font-medium">Vol:</span> {request.travel.flightNumber}
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500">
+                      Créée le {formatDate(request.createdAt)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 ml-4">
+                  {request.currentStatus?.status === "NEGOTIATING" && (
+                    <button
+                      onClick={() => handleAcceptRequest(request.id)}
+                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Accepter
+                    </button>
+                  )}
+                  {request.currentStatus?.status === "ACCEPTED" && (
+                    <button
+                      onClick={() => handleCompleteRequest(request.id)}
+                      className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Terminer
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ReviewsSection = () => {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await getReviews();
+        setReviews(response.items || []);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const calculateAverageRating = () => {
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + parseFloat(review.rating || "0"), 0);
+    return (sum / reviews.length).toFixed(1);
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="text-center text-gray-500">
+          Chargement de vos avis...
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      {reviews.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <StarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">Aucun avis reçu</p>
+            <p className="text-gray-400 text-sm mt-2">
+              Les avis de vos voyageurs apparaîtront ici
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Mes Avis ({reviews.length})
+            </h3>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <StarIcon
+                    key={star}
+                    className={`h-4 w-4 ${
+                      star <= Math.round(parseFloat(calculateAverageRating()))
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className="text-sm text-gray-600 ml-1">
+                {calculateAverageRating()} ({reviews.length} avis)
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {reviews.map((review) => {
+              const reviewer = review.reviewer;
+              const reviewerName = reviewer 
+                ? `${reviewer.firstName} ${reviewer.lastName.charAt(0)}.`
+                : "Utilisateur";
+              const reviewerAvatar = reviewer?.profilePictureUrl || "/favicon.ico";
+              const rating = parseFloat(review.rating || "0");
+
+              return (
+                <div
+                  key={review.id}
+                  className="border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow"
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Avatar */}
+                    <div className="flex-shrink-0">
+                      <img
+                        src={reviewerAvatar}
+                        alt={reviewerName}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-900">
+                            {reviewerName}
+                          </h4>
+                          {review.request?.travel && (
+                            <p className="text-xs text-gray-500">
+                              Vol {review.request.travel.flightNumber}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {/* Rating stars */}
+                          <div className="flex items-center">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <StarIcon
+                                key={star}
+                                className={`h-4 w-4 ${
+                                  star <= rating
+                                    ? "text-yellow-400 fill-current"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            {formatDate(review.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Comment */}
+                      {review.comment && (
+                        <p className="text-sm text-gray-700 mb-3">
+                          {review.comment}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const TravelRequestsSection = () => {
+  const [demands, setDemands] = useState<DemandTravelItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  const fetchDemands = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const response = await getUserDemandsAndTravels(user.id, "demand");
+      const items = Array.isArray(response) ? response : response?.items ?? [];
+      setDemands(items);
+    } catch (error) {
+      console.error("Error fetching demands:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDemands();
+  }, [user?.id]);
+
+  const handleDeleteDemand = async (demandId: number) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cette demande ?")) {
+      return;
+    }
+
+    try {
+      await deleteDemand(demandId);
+      // Refresh the list
+      await fetchDemands();
+    } catch (error) {
+      console.error("Error deleting demand:", error);
+      alert("Erreur lors de la suppression de la demande");
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="text-center text-gray-500">
+          Chargement de vos demandes...
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      {demands.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <QuestionMarkCircleIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">Aucune demande de voyage</p>
+            <p className="text-gray-400 text-sm mt-2">
+              Créez une demande pour trouver un transporteur
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {demands.map((demand) => (
+            <div
+              key={demand.id}
+              className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-start gap-4">
+                {/* Image */}
+                <div className="flex-shrink-0">
+                  <img
+                    src={demand.images?.[0]?.fileUrl || demand.user?.profilePictureUrl || "/favicon.ico"}
+                    alt="Demande"
+                    className="w-32 h-32 object-cover rounded-xl"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    {demand.departureAirport?.name} → {demand.arrivalAirport?.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-1">
+                    {demand.deliveryDate && formatDate(demand.deliveryDate)}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Numéro de vol {demand.flightNumber}
+                  </p>
+
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold">
+                      {demand.weight} Kg
+                    </div>
+                    <div className="text-gray-700 font-semibold">
+                      € {demand.pricePerKg} / Kg
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteDemand(demand.id)}
+                      className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const TravelsSection = () => {
+  const [travels, setTravels] = useState<DemandTravelItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  const fetchTravels = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const response = await getUserDemandsAndTravels(user.id, "travel");
+      const items = Array.isArray(response) ? response : response?.items ?? [];
+      setTravels(items);
+    } catch (error) {
+      console.error("Error fetching travels:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTravels();
+  }, [user?.id]);
+
+  const handleDeleteTravel = async (travelId: number) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce voyage ?")) {
+      return;
+    }
+
+    try {
+      await deleteTravel(travelId);
+      // Refresh the list
+      await fetchTravels();
+    } catch (error) {
+      console.error("Error deleting travel:", error);
+      alert("Erreur lors de la suppression du voyage");
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="text-center text-gray-500">
+          Chargement de vos voyages...
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+      {travels.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <PaperAirplaneIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">Aucun voyage</p>
+            <p className="text-gray-400 text-sm mt-2">
+              Publiez une annonce de voyage pour transporter des colis
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {travels.map((travel) => (
+            <div
+              key={travel.id}
+              className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-start gap-4">
+                {/* Image */}
+                <div className="flex-shrink-0">
+                  <img
+                    src={travel.images?.[0]?.fileUrl || travel.user?.profilePictureUrl || "/favicon.ico"}
+                    alt="Voyage"
+                    className="w-32 h-32 object-cover rounded-xl"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    {travel.departureAirport?.name} → {travel.arrivalAirport?.name}
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-1">
+                    {travel.departureDatetime && formatDate(travel.departureDatetime)}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Numéro de vol {travel.flightNumber}
+                  </p>
+
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold">
+                      {travel.weightAvailable} Kg
+                    </div>
+                    <div className="text-gray-700 font-semibold">
+                      € {travel.pricePerKg} / Kg
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteTravel(travel.id)}
+                      className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -594,179 +1140,11 @@ export default function Profile() {
           </div>
         );
       case "reviews":
-        // Sample reviews data
-        const reviews = [
-          {
-            id: "rev1",
-            travelerName: "Harry",
-            travelerAvatar:
-              "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face",
-            route: "Paris ➜ Sydney",
-            comment: "A great moment with Harry. Thank you!",
-            rating: 5,
-            date: "7 Feb 24, 2025",
-            verified: true,
-          },
-          {
-            id: "rev2",
-            travelerName: "Yaoundé",
-            travelerAvatar:
-              "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
-            route: "Yaoundé ➜ Marrakech",
-            comment: "GoHappyGo is a great plateforme and Harry is so kind!",
-            rating: 5,
-            date: "5 Jul 25, 2025",
-            verified: false,
-          },
-        ];
-
-        return (
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
-            {reviews.length === 0 ? (
-              <div className="flex items-center justify-center h-64">
-                <div className="text-center">
-                  <StarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">Aucun avis reçu</p>
-                  <p className="text-gray-400 text-sm mt-2">
-                    Les avis de vos voyageurs apparaîtront ici
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Mes Avis ({reviews.length})
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <StarIcon
-                          key={star}
-                          className="h-4 w-4 text-yellow-400 fill-current"
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600 ml-1">
-                      5.0 ({reviews.length} avis)
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {reviews.map((review) => (
-                    <div
-                      key={review.id}
-                      className="border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow"
-                    >
-                      <div className="flex items-start gap-4">
-                        {/* Avatar */}
-                        <div className="flex-shrink-0">
-                          <img
-                            src={review.travelerAvatar}
-                            alt={review.travelerName}
-                            className="w-12 h-12 rounded-full object-cover"
-                          />
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          {/* Header */}
-                          <div className="flex items-center justify-between mb-2">
-                            <div>
-                              <h4 className="text-sm font-semibold text-gray-900">
-                                {review.route}
-                              </h4>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {/* Rating stars */}
-                              <div className="flex items-center">
-                                {[1, 2, 3, 4, 5].map((star) => (
-                                  <StarIcon
-                                    key={star}
-                                    className={`h-4 w-4 ${
-                                      star <= review.rating
-                                        ? "text-yellow-400 fill-current"
-                                        : "text-gray-300"
-                                    }`}
-                                  />
-                                ))}
-                              </div>
-                              <span className="text-xs text-gray-500">
-                                {review.date}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Comment */}
-                          <p className="text-sm text-gray-700 mb-3">
-                            {review.comment}
-                          </p>
-
-                          {/* Footer */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Load more button */}
-                <div className="mt-6 text-center">
-                  <button className="px-4 py-2 text-sm text-blue-600 hover:text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
-                    Voir plus d'avis
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        );
+        return <ReviewsSection />;
       case "travel-requests":
-        return (
-          <div className="bg-white rounded-2xl border border-gray-200 p-8">
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <QuestionMarkCircleIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">
-                  Aucune demande de voyage
-                </p>
-              </div>
-            </div>
-          </div>
-        );
+        return <TravelRequestsSection />;
       case "travels":
-        const travels: ProfileTravel[] = [
-          {
-            id: "t1",
-            originCity: "Paris",
-            destinationCity: "New-York",
-            travelDate: "2024-06-24",
-            flightNumber: "XC456Y",
-            availableWeightKg: 12,
-            pricePerKg: 15,
-            verified: true,
-            imageUrl: "/images/paris.jpg",
-          },
-          {
-            id: "t2",
-            originCity: "Lyon",
-            destinationCity: "Tokyo",
-            travelDate: "2024-07-02",
-            flightNumber: "AF1234",
-            availableWeightKg: 6,
-            pricePerKg: 18,
-            imageUrl: "/images/rencontre2-converted.webp",
-          },
-        ];
-        return (
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
-            {travels.map((t) => (
-              <ProfileTravelCard key={t.id} travel={t} />
-            ))}
-          </div>
-        );
+        return <TravelsSection />;
       case "favorites":
         return <FavoritesSection />;
       case "payments":
