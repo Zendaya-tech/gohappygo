@@ -778,7 +778,10 @@ const FavoritesSection = () => {
               const originName = item.departureAirport?.name || "";
               const destName = item.arrivalAirport?.name || "";
               const location = `${originName} → ${destName}`;
-              const pricePerKg = item.pricePerKg ?? 0;
+              // Parse pricePerKg as it's returned as string from API
+              const pricePerKg = typeof item.pricePerKg === 'string' 
+                ? parseFloat(item.pricePerKg) 
+                : (item.pricePerKg ?? 0);
               const rating = "4.7";
               
               // Pour les voyages (travel), utiliser le logo de la compagnie
@@ -794,9 +797,9 @@ const FavoritesSection = () => {
                 ? item.weightAvailable ?? 0
                 : item.weight ?? 0;
               
-              const departure = item.deliveryDate 
-                ? formatDate(item.deliveryDate)
-                : undefined;
+              // Get the date from the correct field
+              const dateString = item.departureDatetime || item.deliveryDate || item.travelDate;
+              const departure = dateString ? formatDate(dateString) : undefined;
               
               const airline = item.airline?.name;
               const type = isTravel ? "transporter" : "traveler";
