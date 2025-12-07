@@ -771,8 +771,10 @@ const FavoritesSection = () => {
               if (!item) return null;
 
               const id = (isTravel ? bookmark.travelId : bookmark.demandId)?.toString() || bookmark.id.toString();
-              const name = item.user?.name || "Voyageur";
-              const avatar = item.user?.profilePictureUrl|| item.images?.[0]?.fileUrl || "/favicon.ico";
+              const name = item.user 
+                ? `${item.user.firstName || ""} ${item.user.lastName || ""}`.trim() || "Voyageur"
+                : "Voyageur";
+              const avatar = item.user?.profilePictureUrl || item.images?.[0]?.fileUrl || "/favicon.ico";
               const originName = item.departureAirport?.name || "";
               const destName = item.arrivalAirport?.name || "";
               const location = `${originName} → ${destName}`;

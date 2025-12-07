@@ -31,20 +31,22 @@ export default function TravelCard({
   avatar,
   onRemove,
 }: FavoriteCardProps) {
+  const announceType = type === "transporter" ? "travel" : "demand";
+  
   return (
     <Link
-      to={`/announces/${id}`}
-     target="_blank"
-      className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800 relative block"
+      to={`/announces?id=${id}&type=${announceType}`}
+      target="_blank"
+      className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800"
     >
-      <div className="relative flex overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">
+      <div className="relative items-center justify-center flex overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">
         <img
           src={image}
           alt={name}
           className={`${
             type === "transporter"
-              ? "max-h-full max-w-full"
-              : "object-cover w-full"
+              ? "max-h-full h-52 p-5 object-contain max-w-full"
+              : "object-cover min-w-100 min-h-100"
           } m-auto`}
         />
         {featured && (
@@ -93,20 +95,18 @@ export default function TravelCard({
       </div>
       <div className="p-6">
         <div className="flex items-center gap-2 mb-2">
-          <img src={avatar} alt={name} className="w-10 h-10 rounded-full" />
+          <img src={avatar} alt={name} className="w-10 h-10 rounded-full object-cover" />
           <h3 className="font-semibold text-gray-900 dark:text-white">
             {name}
           </h3>
         </div>
-        <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
+        <p className="text-gray-600 h-12 dark:text-gray-300 text-sm mb-2">
           {location}
         </p>
-        {weight && (
-          <p className="text-blue-600 text-sm font-medium mb-2">
-            {type === "transporter" ? "Espace disponible" : "Espace demandé"}:{" "}
-            {weight}
-          </p>
-        )}
+        <p className="text-blue-600 text-sm font-medium mb-2">
+          {type === "transporter" ? "Espace disponible" : "Espace demandé"}:{" "}
+          {weight ?? "0 kg"}
+        </p>
         {departure && (
           <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">
             Date : {departure}

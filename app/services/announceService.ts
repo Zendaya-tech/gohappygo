@@ -222,37 +222,41 @@ export const getLatestDemands = async (limit: number = 6) => {
 export interface BookmarkItem {
     id: number;
     createdAt: string;
-    updatedAt: string;
     userId: number;
     bookmarkType: "TRAVEL" | "DEMAND";
     travelId?: number;
     demandId?: number;
     notes?: string;
     travel?: {
-        title: string;
-        flightNumber: string;
-        airline: string;
-        departureAirportId: number;
-        arrivalAirportId: number;
-        departureDatetime: string;
-        arrivalDatetime: string;
-        pricePerKg: number;
-        totalWeightAllowance: number;
-    };
-    demand?: {
-        title: string;
+        id: number;
         flightNumber: string;
         description: string;
         departureAirportId: number;
         arrivalAirportId: number;
-        deliveryDate: string;
-        weight: number;
-        pricePerKg: number;
-        packageKind: string;
+        departureDatetime: string;
+        pricePerKg: string;
+        weightAvailable: string;
         status: string;
-        originAirport: Airport;
-        destinationAirport: Airport;
+        departureAirport: Airport;
+        arrivalAirport: Airport;
         user: User;
+        airline?: Airline;
+        images?: Image[];
+    };
+    demand?: {
+        id: number;
+        flightNumber: string;
+        description: string;
+        departureAirportId: number;
+        arrivalAirportId: number;
+        departureDatetime: string;
+        weight: string;
+        pricePerKg: string;
+        status: string;
+        departureAirport: Airport;
+        arrivalAirport: Airport;
+        user: User;
+        images?: Image[];
     };
 }
 
