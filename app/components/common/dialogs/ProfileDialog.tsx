@@ -60,12 +60,30 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
       
-      setFormData({
-        firstName: firstName,
-        lastName: lastName,
-        phoneNumber: "",
-        aboutMe: user.bio || "",
-      });
+      // Fetch full user data to get phone number
+      const fetchUserData = async () => {
+        try {
+          const { getMe } = await import("~/services/authService");
+          const userData = await getMe();
+          
+          setFormData({
+            firstName: userData?.firstName || firstName,
+            lastName: userData?.lastName || lastName,
+            phoneNumber: userData?.phone || "",
+            aboutMe: userData?.bio || user.bio || "",
+          });
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          setFormData({
+            firstName: firstName,
+            lastName: lastName,
+            phoneNumber: "",
+            aboutMe: user.bio || "",
+          });
+        }
+      };
+      
+      fetchUserData();
       setProfileImage(user.profilePictureUrl || null);
     }
   }, [open, user]);

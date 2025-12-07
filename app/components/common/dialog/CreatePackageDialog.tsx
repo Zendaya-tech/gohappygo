@@ -272,7 +272,7 @@ export default function CreatePackageDialog({
 
                 <div>
                   <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
-                    Nature du colis
+                    Nature du baggage
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <label className="inline-flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 px-4 py-3 text-sm text-gray-700 dark:text-gray-300">

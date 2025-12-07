@@ -34,6 +34,7 @@ export default function TravelCard({
   return (
     <Link
       to={`/announces/${id}`}
+     target="_blank"
       className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800 relative block"
     >
       <div className="relative flex overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">

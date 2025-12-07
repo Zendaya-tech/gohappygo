@@ -618,7 +618,7 @@ const TravelsSection = () => {
             <PaperAirplaneIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">Aucun voyage</p>
             <p className="text-gray-400 text-sm mt-2">
-              Publiez une annonce de voyage pour transporter des colis
+              Publiez une annonce de voyage pour transporter des baggage
             </p>
           </div>
         </div>

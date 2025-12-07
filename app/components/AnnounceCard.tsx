@@ -118,6 +118,7 @@ export default function AnnounceCard({
 
   return (
     <Link
+      target="_blank"
       to={`/announces?id=${id}&type=${announceType}`}
       className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-800"
     >
