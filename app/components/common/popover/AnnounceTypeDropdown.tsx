@@ -55,7 +55,7 @@ export default function AnnounceTypeDropdown({
         },
         {
             id: 'package',
-            title: 'Baggage',
+            title: 'Colis',
             description: 'Demander le voyage d\'un baggage',
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

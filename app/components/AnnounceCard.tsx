@@ -48,7 +48,7 @@ export default function AnnounceCard({
   const currentUser = useAuthStore((s: AuthState) => s.user);
   
   // Vérifier si l'annonce appartient à l'utilisateur connecté
-  const isOwnAnnounce = currentUser && userId && currentUser.id === Number(userId);
+  const isOwnAnnounce = currentUser && userId && Number(currentUser.id) === Number(userId);
 
   // Use the isBookmarked prop from API response or check bookmark status
   useEffect(() => {
@@ -212,8 +212,8 @@ export default function AnnounceCard({
             {name}
           </h3>
         </div>
-        <p className="text-gray-600 h-12 dark:text-gray-300 text-sm mb-2">
-          {location}
+        <p className="text-gray-600 h-12 dark:text-gray-300 text-sm mb-2 line-clamp-2">
+          {location && location.length > 30 ? `${location.slice(0, 30)}...` : location}
         </p>
         {
           <p className="text-blue-600 text-sm font-medium mb-2">

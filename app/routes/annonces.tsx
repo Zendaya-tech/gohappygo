@@ -1,7 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Link, useLocation } from "react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
 import AnnounceCard from "~/components/AnnounceCard";
 import SearchFiltersBar from "~/components/SearchFiltersBar";
@@ -9,6 +9,7 @@ import { getRandomQuotes, type Quote } from "../services/quotesService";
 import { getDemandAndTravel } from "~/services/announceService";
 import AirlineComboBox from "~/components/common/AirlineComboBox";
 import type { Airline } from "~/services/airlineService";
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 
 export default function Annonces() {
   const location = useLocation();
@@ -19,7 +20,11 @@ export default function Annonces() {
   );
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [meta, setMeta] = useState<any>(null);
   const [searchParams, setSearchParams] = useState({
     from: urlParams.get("from") || "",
     to: urlParams.get("to") || "",
@@ -44,58 +49,69 @@ export default function Annonces() {
     { id: "verified", label: "Profil vérifié" },
     { id: "lowest-price", label: "Prix le plus bas" },
     { id: "airline", label: "Compagnie aérienne" },
-    { id: "travel-date", label: "Date du voyage" },
+    { id: "travel-date", label: "Plus ancien" },
     { id: "travel-ad", label: "Annonce de voyage" },
     { id: "transport-request", label: "Demande de Voyage" },
   ];
-  // Fetch from API when URL changes or filters change
+  // Build filters object
+  const buildFilters = useCallback(() => {
+    const filters: any = {
+      originAirportId: urlParams.get("from") || undefined,
+      destinationAirportId: urlParams.get("to") || undefined,
+      travelDate: urlParams.get("date") || undefined,
+      flightNumber: urlParams.get("flight") || undefined,
+      limit: 12, // Items per page
+    };
+
+    // Apply selected filters
+    if (selectedFilters.includes("verified")) {
+      filters.isVerified = true;
+    }
+    if (selectedFilters.includes("travel-ad")) {
+      filters.type = "travel";
+    }
+    if (selectedFilters.includes("transport-request")) {
+      filters.type = "demand";
+    }
+
+    // Apply price range filters
+    if (priceRange.min) {
+      filters.minPricePerKg = parseFloat(priceRange.min);
+    }
+    if (priceRange.max) {
+      filters.maxPricePerKg = parseFloat(priceRange.max);
+    }
+
+    // Apply weight range filters
+    if (weightRange.min) {
+      filters.minWeight = parseFloat(weightRange.min);
+    }
+    if (weightRange.max) {
+      filters.maxWeight = parseFloat(weightRange.max);
+    }
+
+    // Apply airline filter
+    if (selectedAirline) {
+      filters.airlineId = parseInt(selectedAirline);
+    }
+
+    return filters;
+  }, [urlParams, selectedFilters, priceRange, weightRange, selectedAirline]);
+
+  // Fetch initial results when filters change
   useEffect(() => {
     const controller = new AbortController();
     const fetchResults = async () => {
       setLoading(true);
       setError(null);
+      setCurrentPage(1);
       try {
-        const filters: any = {
-          originAirportId: urlParams.get("from") || undefined,
-          destinationAirportId: urlParams.get("to") || undefined,
-          travelDate: urlParams.get("date") || undefined,
-          flightNumber: urlParams.get("flight") || undefined,
-        };
-
-        // Apply selected filters
-        if (selectedFilters.includes("verified")) {
-          filters.isVerified = true;
-        }
-        if (selectedFilters.includes("travel-ad")) {
-          filters.type = "travel";
-        }
-        if (selectedFilters.includes("transport-request")) {
-          filters.type = "demand";
-        }
-
-        // Apply price range filters
-        if (priceRange.min) {
-          filters.minPricePerKg = parseFloat(priceRange.min);
-        }
-        if (priceRange.max) {
-          filters.maxPricePerKg = parseFloat(priceRange.max);
-        }
-
-        // Apply weight range filters
-        if (weightRange.min) {
-          filters.minWeight = parseFloat(weightRange.min);
-        }
-        if (weightRange.max) {
-          filters.maxWeight = parseFloat(weightRange.max);
-        }
-
-        // Apply airline filter
-        if (selectedAirline) {
-          filters.airlineId = parseInt(selectedAirline);
-        }
+        const filters = buildFilters();
+        filters.page = 1;
 
         const apiRes = await getDemandAndTravel(filters);
         let items = Array.isArray(apiRes) ? apiRes : apiRes?.items ?? [];
+        const responseMeta = apiRes?.meta;
 
         // Apply client-side sorting for "lowest-price"
         if (selectedFilters.includes("lowest-price")) {
@@ -110,6 +126,8 @@ export default function Annonces() {
         }
 
         setResults(items);
+        setMeta(responseMeta);
+        setHasMore(responseMeta?.hasNextPage ?? false);
       } catch (e: any) {
         setError(e?.message || "Failed to load results");
       } finally {
@@ -118,7 +136,51 @@ export default function Annonces() {
     };
     fetchResults();
     return () => controller.abort();
-  }, [location.search, urlParams, selectedFilters, priceRange, weightRange, selectedAirline]);
+  }, [location.search, urlParams, selectedFilters, priceRange, weightRange, selectedAirline, buildFilters]);
+
+  // Load more results for infinite scroll
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+
+    setLoadingMore(true);
+    try {
+      const filters = buildFilters();
+      filters.page = currentPage + 1;
+
+      const apiRes = await getDemandAndTravel(filters);
+      let items = Array.isArray(apiRes) ? apiRes : apiRes?.items ?? [];
+      const responseMeta = apiRes?.meta;
+
+      // Apply client-side sorting for "lowest-price"
+      if (selectedFilters.includes("lowest-price")) {
+        items = [...items].sort((a, b) => (a.pricePerKg || 0) - (b.pricePerKg || 0));
+      }
+
+      // Apply client-side sorting for "travel-date"
+      if (selectedFilters.includes("travel-date")) {
+        items = [...items].sort((a, b) => 
+          new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime()
+        );
+      }
+
+      setResults((prev) => [...prev, ...items]);
+      setMeta(responseMeta);
+      setCurrentPage((prev) => prev + 1);
+      setHasMore(responseMeta?.hasNextPage ?? false);
+    } catch (e: any) {
+      console.error("Failed to load more results:", e);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, currentPage, buildFilters, selectedFilters]);
+
+  // Infinite scroll hook
+  const sentinelRef = useInfiniteScroll({
+    onLoadMore: loadMore,
+    hasMore,
+    loading: loadingMore,
+    threshold: 300,
+  });
 
   const handleFilterChange = (filterId: string) => {
     setSelectedFilters((prev) =>
@@ -355,60 +417,78 @@ export default function Annonces() {
             )}
 
             {!loading && !error && results.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-                {results.map((item: any) => {
-                  const id = item.id?.toString() || Math.random().toString(36).slice(2);
-                  const name = item.user?.name || item.title || "Voyageur";
-                  const avatar = item.user?.selfieImage || item.images?.[0]?.fileUrl || "/favicon.ico";
-                  const originName = item.departureAirport?.name || "";
-                  const destName = item.arrivalAirport?.name || "";
-                  const route = `${originName} - ${destName}`;
-                  const pricePerKg = item.pricePerKg ?? 0;
-                  const rating = "4.7"; // Default rating since it's not in the new structure
-                  
-                  // Pour les transporteurs (travel), utiliser le logo de la compagnie
-                  // Pour les voyageurs (demand), utiliser l'avatar de l'utilisateur
-                  const image = item.type === "travel" 
-                    ? item.airline?.logoUrl || avatar
-                    : avatar;
-                  
-                  const featured = Boolean(item.user?.isVerified);
-                  
-                  // Use weightAvailable for travel type, weight for demand type
-                  const availableWeight = item.type === "travel" 
-                    ? item.weightAvailable ?? 0
-                    : item.weight ?? 0;
-                  
-                  const departure = item.deliveryDate 
-                    ? formatDate(item.deliveryDate)
-                    : undefined;
-                  
-                  const airline = item.airline?.name;
-                  const type = item.type === "travel" ? "transporter" : "traveler";
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
+                  {results.map((item: any) => {
+                    const id = item.id?.toString() || Math.random().toString(36).slice(2);
+                    const name = item.user?.name || item.title || "Voyageur";
+                    const avatar = item.user?.selfieImage || item.images?.[0]?.fileUrl || "/favicon.ico";
+                    const originName = item.departureAirport?.name || "";
+                    const destName = item.arrivalAirport?.name || "";
+                    const route = `${originName} - ${destName}`;
+                    const pricePerKg = item.pricePerKg ?? 0;
+                    const rating = "4.7"; // Default rating since it's not in the new structure
+                    
+                    // Pour les transporteurs (travel), utiliser le logo de la compagnie
+                    // Pour les voyageurs (demand), utiliser l'avatar de l'utilisateur
+                    const image = item.type === "travel" 
+                      ? item.airline?.logoUrl || avatar
+                      : avatar;
+                    
+                    const featured = Boolean(item.user?.isVerified);
+                    
+                    // Use weightAvailable for travel type, weight for demand type
+                    const availableWeight = item.type === "travel" 
+                      ? item.weightAvailable ?? 0
+                      : item.weight ?? 0;
+                    
+                    const departure = item.deliveryDate 
+                      ? formatDate(item.deliveryDate)
+                      : undefined;
+                    
+                    const airline = item.airline?.name;
+                    const type = item.type === "travel" ? "transporter" : "traveler";
 
-                  return (
-                    <AnnounceCard
-                      key={id}
-                      id={id}
-                      name={name}
-                      avatar={avatar}
-                      location={route}
-                      price={`${pricePerKg}`}
-                      rating={rating}
-                      image={image}
-                      featured={featured}
-                      weight={
-                        availableWeight ? `${availableWeight}kg` : undefined
-                      }
-                      departure={departure}
-                      airline={airline}
-                      type={type as any}
-                      isBookmarked={item.isBookmarked}
-                      userId={item.user?.id}
-                    />
-                  );
-                })}
-              </div>
+                    return (
+                      <AnnounceCard
+                        key={id}
+                        id={id}
+                        name={name}
+                        avatar={avatar}
+                        location={route}
+                        price={`${pricePerKg}`}
+                        rating={rating}
+                        image={image}
+                        featured={featured}
+                        weight={
+                          availableWeight ? `${availableWeight}kg` : undefined
+                        }
+                        departure={departure}
+                        airline={airline}
+                        type={type as any}
+                        isBookmarked={item.isBookmarked}
+                        userId={item.user?.id}
+                      />
+                    );
+                  })}
+                </div>
+
+                {/* Infinite scroll sentinel */}
+                <div ref={sentinelRef} className="w-full py-8">
+                  {loadingMore && (
+                    <div className="flex justify-center items-center gap-2">
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                    </div>
+                  )}
+                  {!hasMore && results.length > 0 && (
+                    <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                      Vous avez vu toutes les annonces disponibles
+                    </p>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>

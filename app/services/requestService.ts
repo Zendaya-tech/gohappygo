@@ -4,9 +4,7 @@ export interface CreateRequestToTravelPayload {
   travelId: number;
   requestType: 'GoAndGive' | 'GoAndGo';
   weight: number;
-  cardNumber: string;
-  expiryDate: string;
-  cvc: string;
+  paymentMethodId: string; // Stripe Payment Method ID
 }
 
 export interface UserResponse {

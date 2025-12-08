@@ -256,9 +256,7 @@ export default function AnnounceDetail() {
         travelId: Number(id),
         requestType: 'GoAndGo',
         weight: kilos,
-        cardNumber: cardData.cardNumber,
-        expiryDate: cardData.expiryDate,
-        cvc: cardData.cvc,
+        paymentMethodId: cardData.paymentMethodId,
       };
 
       const response = await createRequestToTravel(payload);

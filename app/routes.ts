@@ -15,6 +15,7 @@ export default [
   route("/security-rules","routes/security-rules.tsx"),
   route("/assurance-colis","routes/assurance-colis.tsx"),
   route("/download-app","routes/download-app.tsx"),
+  route("/notifications", "routes/notifications.tsx"),
 
   route("/how-it-work","routes/how-it-works.tsx"),
 

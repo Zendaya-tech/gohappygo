@@ -13,6 +13,7 @@ import RegisterDialog from "./common/dialog/RegisterDialog";
 import { Link } from "react-router";
 import { useAuthStore, type AuthState } from "../store/auth";
 import LanguageDropdown from "./common/popover/LanguageDropdown";
+import { notificationService } from "../services/notificationService";
 
 
 export default function Header() {
@@ -39,6 +40,7 @@ export default function Header() {
   const [showRegister, setShowRegister] = useState(false);
   const [showMobilePublishOptions, setShowMobilePublishOptions] =
     useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const handleAnnounceTypeSelect = (type: "travel" | "package") => {
     if (type === "travel") {
       setShowCreateAnnounce(true);
@@ -66,6 +68,22 @@ export default function Header() {
       );
     };
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const loadUnreadCount = async () => {
+        try {
+          const counts = await notificationService.getNotificationCounts();
+          setUnreadCount(counts.unread);
+        } catch (error) {
+          console.error("Failed to load notification counts:", error);
+        }
+      };
+      loadUnreadCount();
+      const interval = setInterval(loadUnreadCount, 30000); // Refresh every 30 seconds
+      return () => clearInterval(interval);
+    }
+  }, [isLoggedIn]);
 
   return (
     <>
@@ -145,11 +163,16 @@ export default function Header() {
                       d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                     />
                   </svg>
-                  <span className="absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs font-medium">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
                 </button>
                 <NotificationPopover
                   open={showNotif}
                   onClose={() => setShowNotif(false)}
+                  onCountChange={setUnreadCount}
                 />
               </div>
             )}
@@ -241,11 +264,16 @@ export default function Header() {
                       d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                     />
                   </svg>
-                  <span className="absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs font-medium">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
                 </button>
                 <NotificationPopover
                   open={showNotif}
                   onClose={() => setShowNotif(false)}
+                  onCountChange={setUnreadCount}
                 />
               </div>
             )}

@@ -1,9 +1,132 @@
 import { useEffect, useState } from "react";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+
+// Remplace par ta clé publique Stripe
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || "pk_test_your_key_here");
 
 export interface BookingCardData {
-    cardNumber: string;
-    expiryDate: string;
-    cvc: string;
+    paymentMethodId: string;
+}
+
+function CheckoutForm({
+    amount,
+    onConfirm,
+    onClose,
+    isSubmitting,
+    setIsSubmitting
+}: {
+    amount: number;
+    onConfirm: (data: BookingCardData) => Promise<void>;
+    onClose: () => void;
+    isSubmitting: boolean;
+    setIsSubmitting: (value: boolean) => void;
+}) {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!stripe || !elements) {
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError(null);
+
+        const cardElement = elements.getElement(CardElement);
+        if (!cardElement) {
+            setError("Erreur lors du chargement du formulaire de paiement");
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            // Créer un PaymentMethod avec Stripe
+            const { error: stripeError, paymentMethod } = await stripe.createPaymentMethod({
+                type: "card",
+                card: cardElement,
+            });
+
+            if (stripeError) {
+                setError(stripeError.message || "Erreur lors du traitement du paiement");
+                setIsSubmitting(false);
+                return;
+            }
+
+            if (!paymentMethod) {
+                setError("Impossible de créer la méthode de paiement");
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Appeler la fonction de confirmation avec le paymentMethodId
+            await onConfirm({ paymentMethodId: paymentMethod.id });
+        } catch (err: any) {
+            setError(err.message || "Une erreur est survenue");
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <div className="px-6 py-5">
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Informations de carte
+                    </label>
+                    <div className="rounded-lg border border-gray-300 px-3 py-3 focus-within:ring-2 focus-within:ring-indigo-500">
+                        <CardElement
+                            options={{
+                                style: {
+                                    base: {
+                                        fontSize: "16px",
+                                        color: "#1f2937",
+                                        "::placeholder": {
+                                            color: "#9ca3af",
+                                        },
+                                    },
+                                    invalid: {
+                                        color: "#ef4444",
+                                    },
+                                },
+                                hidePostalCode: true,
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="mb-4 rounded-lg bg-red-50 border border-red-200 p-3">
+                        <p className="text-sm text-red-800">{error}</p>
+                    </div>
+                )}
+
+                <div className="text-xs text-gray-500 mb-4">
+                    <svg className="inline h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    Paiement sécurisé par Stripe
+                </div>
+            </div>
+
+            <div className="px-6 pb-6">
+                <button
+                    type="submit"
+                    disabled={!stripe || isSubmitting}
+                    className={`w-full rounded-md py-3 text-base font-semibold text-white shadow ${
+                        !stripe || isSubmitting
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                >
+                    {isSubmitting ? "Traitement..." : `Payer €${amount.toFixed(2)}`}
+                </button>
+            </div>
+        </form>
+    );
 }
 
 export default function BookingDialog({
@@ -17,42 +140,49 @@ export default function BookingDialog({
     onClose: () => void;
     amount: number;
     email?: string;
-    onConfirm: (cardData: BookingCardData) => void;
+    onConfirm: (cardData: BookingCardData) => Promise<void>;
 }) {
-    const [cardNumber, setCardNumber] = useState("");
-    const [exp, setExp] = useState("");
-    const [cvc, setCvc] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!open) return;
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
+            if (e.key === "Escape" && !isSubmitting) onClose();
         };
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
-    }, [open, onClose]);
+    }, [open, onClose, isSubmitting]);
 
     useEffect(() => {
-        if (!open) return;
-        setCardNumber("");
-        setExp("");
-        setCvc("");
-        setIsSubmitting(false);
+        if (!open) {
+            setIsSubmitting(false);
+        }
     }, [open]);
 
     if (!open) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+            <div className="fixed inset-0 bg-black/40" onClick={isSubmitting ? undefined : onClose} />
             <div className="relative z-10 w-full max-w-md rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
                 {/* Logo badge */}
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2">
-                    <div className=" rounded-full border-4 border-white shadow-md  bg-white flex items-center justify-center">
+                    <div className="rounded-full border-4 border-white shadow-md bg-white flex items-center justify-center">
                         <img src="/logo.png" alt="GoHappyGo" className="h-16" />
                     </div>
                 </div>
+
+                {/* Close button */}
+                {!isSubmitting && (
+                    <button
+                        onClick={onClose}
+                        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                )}
 
                 {/* Header */}
                 <div className="pt-20 text-center px-6">
@@ -60,65 +190,16 @@ export default function BookingDialog({
                     <p className="mt-1 text-sm text-gray-500">Réserver vos kilos pour votre prochain voyage</p>
                 </div>
 
-                {/* Email row */}
-                {/* <div className="mt-4 border-y bg-gray-50 text-center text-gray-700 text-sm font-medium py-3">{email || "test1@demo.com"}</div> */}
-
-                {/* Card form */}
-                <div className="px-6 py-5">
-                    <div className="mb-3">
-                        <div className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-3 focus-within:ring-2 focus-within:ring-indigo-500">
-                            <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M2 10h20" /></svg>
-                            <input
-                                value={cardNumber}
-                                onChange={(e) => setCardNumber(e.target.value)}
-                                placeholder="Card number"
-                                className="flex-1 outline-none text-gray-900 placeholder-gray-400"
-                            />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-3 focus-within:ring-2 focus-within:ring-indigo-500">
-                            <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 7h8M7 11h10M6 15h12" /></svg>
-                            <input
-                                value={exp}
-                                onChange={(e) => setExp(e.target.value)}
-                                placeholder="MM / YY"
-                                className="flex-1 outline-none text-gray-900 placeholder-gray-400"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-3 focus-within:ring-2 focus-within:ring-indigo-500">
-                            <svg className="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 17a2 2 0 100-4 2 2 0 000 4z" /><path d="M19 7H5a2 2 0 00-2 2v6a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2z" /></svg>
-                            <input
-                                value={cvc}
-                                onChange={(e) => setCvc(e.target.value)}
-                                placeholder="CVC"
-                                className="flex-1 outline-none text-gray-900 placeholder-gray-400"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Pay button */}
-                <div className="px-6 pb-6">
-                    <button
-                        onClick={() => {
-                            if (!cardNumber || !exp || !cvc) {
-                                alert("Veuillez remplir tous les champs de la carte");
-                                return;
-                            }
-                            setIsSubmitting(true);
-                            onConfirm({ cardNumber, expiryDate: exp, cvc });
-                        }}
-                        disabled={isSubmitting}
-                        className={`w-full rounded-md py-3 text-base font-semibold text-white shadow ${
-                            isSubmitting 
-                                ? "bg-gray-400 cursor-not-allowed" 
-                                : "bg-blue-600 hover:bg-blue-700"
-                        }`}
-                    >
-                        {isSubmitting ? "Traitement..." : `Pay $${amount.toFixed(2)}`}
-                    </button>
-                </div>
+                {/* Stripe Elements Provider */}
+                <Elements stripe={stripePromise}>
+                    <CheckoutForm
+                        amount={amount}
+                        onConfirm={onConfirm}
+                        onClose={onClose}
+                        isSubmitting={isSubmitting}
+                        setIsSubmitting={setIsSubmitting}
+                    />
+                </Elements>
             </div>
         </div>
     );
