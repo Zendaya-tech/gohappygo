@@ -4,19 +4,19 @@ export default function Footer() {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
   return (
-    <footer className="bg-gray-100 text-gray-900 px-6 py-12 dark:bg-gray-900 dark:text-gray-100">
+    <footer className="bg-gray-100 text-gray-600 px-6 py-12 dark:bg-gray-900 dark:text-gray-400">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8">
           {/* Brand */}
-          <div className="col-span-2 sm:col-span-3 md:col-span-2">
+          <div className="col-span-1 sm:col-span-2 md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <img src="/logo.png" alt="GoHappyGo logo" className="h-10" />
-              <span className="font-bold text-lg">GoHappyGo</span>
+              <span className="font-bold text-lg text-gray-900 dark:text-gray-100">GoHappyGo</span>
             </div>
-            <p className="text-gray-900 dark:text-gray-100 text-sm">
+            <p className="text-sm mb-4">
               {t("footer.description")}
             </p>
-            <div className="mt-4 flex items-center gap-3 text-gray-900 dark:text-gray-100">
+            <div className="flex items-center gap-3">
               <a
                 href="https://x.com/GoHappyGo1"
                 aria-label="Twitter"
@@ -59,78 +59,78 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Découvrir */}
+          {/* Pour mieux nous connaître */}
           <div>
-            <h4 className="font-semibold mb-4">{t("footer.discover.title")}</h4>
-            <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-              <li>
-                <a
-                  href="/voyageurs"
-                  className="hover:text-gray-900 dark:hover:text-gray-100"
-                >
-                  {t("footer.discover.transporters")}
-                </a>
-              </li>
+            <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">{t("footer.knowUs.title")}</h4>
+            <ul className="space-y-2 text-sm">
               <li>
                 <a
                   href="/how-it-work"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  {t("footer.discover.howItWorks")}
+                  {t("footer.knowUs.howItWorks")}
                 </a>
               </li>
               <li>
                 <a
-                  href="/logos"
+                  href="/impact-ecologique"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  {t("footer.discover.logos")}
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Expédier */}
-          <div>
-            <h4 className="font-semibold mb-4">Expédier</h4>
-            <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-gray-900 dark:hover:text-gray-100"
-                >
-                  Poster une demande
+                  {t("footer.knowUs.ecologicalImpact")}
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/what-is-happiness"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  Tarifs
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/assurance-colis"
-                  className="hover:text-gray-900 dark:hover:text-gray-100"
-                >
-                  Assurance colis
+                  {t("footer.knowUs.whatIsHappiness")}
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Voyageur */}
+          {/* Mentions Légales */}
           <div>
-            <h4 className="font-semibold mb-4">Voyageur</h4>
-            <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+            <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">{t("footer.legal.title")}</h4>
+            <ul className="space-y-2 text-sm">
               <li>
                 <a
-                  href="#"
+                  href="/terms-of-use"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  Devenir HappyVoyageur
+                  {t("footer.legal.termsOfUse")}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/privacy-policy"
+                  className="hover:text-gray-900 dark:hover:text-gray-100"
+                >
+                  {t("footer.legal.privacyPolicy")}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/pricing-policy"
+                  className="hover:text-gray-900 dark:hover:text-gray-100"
+                >
+                  {t("footer.legal.pricingPolicy")}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Donnez du Bonheur */}
+          <div>
+            <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">{t("footer.giveHappiness.title")}</h4>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a
+                  href="/become-transporter"
+                  className="hover:text-gray-900 dark:hover:text-gray-100"
+                >
+                  {t("footer.giveHappiness.becomeTransporter")}
                 </a>
               </li>
               <li>
@@ -138,54 +138,54 @@ export default function Footer() {
                   href="/security-rules"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  Règles de sécurité
+                  {t("footer.giveHappiness.securityRules")}
                 </a>
               </li>
               <li>
                 <a
-                  href="/security-rules#id-check"
+                  href="/insurance-protection"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  Vérification d'identité
+                  {t("footer.giveHappiness.insuranceProtection")}
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Support */}
+          {/* Assistance */}
           <div>
-            <h4 className="font-semibold mb-4">Support</h4>
-            <ul className="space-y-2 text-sm text-gray-900 dark:text-gray-100">
+            <h4 className="font-semibold mb-4 text-gray-900 dark:text-gray-100">{t("footer.support.title")}</h4>
+            <ul className="space-y-2 text-sm">
               <li>
                 <a
-                  href="/help-center"
+                  href="/faq"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  Centre d'aide
+                  {t("footer.support.faq")}
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
+                  href="/contact"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  Contact
+                  support@gohappygo.fr
                 </a>
               </li>
               <li>
                 <a
-                  href="/terms-privacy"
+                  href="/download-app"
                   className="hover:text-gray-900 dark:hover:text-gray-100"
                 >
-                  Conditions & Confidentialité
+                  {t("footer.support.downloadApp")}
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t dark:border-gray-700 border-gray-300 mt-10 pt-8 text-center text-sm text-gray-900 dark:text-gray-100">
-          <p>&copy; {year} GoHappyGo. Tous droits réservés.</p>
+        <div className="border-t dark:border-gray-700 border-gray-300 mt-10 pt-8 text-center text-sm">
+          <p>&copy; {year} GoHappyGo. {t("footer.copyright")}</p>
         </div>
       </div>
     </footer>

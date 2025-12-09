@@ -255,6 +255,30 @@
   },
   "footer": {
     "description": "Soyez un porteur de bonheur",
+    "copyright": "Tous droits réservés.",
+    "knowUs": {
+      "title": "Pour mieux nous connaître",
+      "howItWorks": "Comment ça marche ?",
+      "ecologicalImpact": "Impact écologique",
+      "whatIsHappiness": "C'est quoi le Bonheur ?"
+    },
+    "legal": {
+      "title": "Mentions Légales",
+      "termsOfUse": "Conditions Générales d'Utilisation",
+      "privacyPolicy": "Politique de Confidentialité",
+      "pricingPolicy": "Politique Tarifaire"
+    },
+    "giveHappiness": {
+      "title": "Donnez du Bonheur",
+      "becomeTransporter": "Devenir HappyVoyageur",
+      "securityRules": "Règles de sécurité",
+      "insuranceProtection": "Assurance et Protection"
+    },
+    "support": {
+      "title": "Assistance",
+      "faq": "Faire Aux Questions",
+      "downloadApp": "Télécharger l'application"
+    },
     "discover": {
       "title": "Découvrir",
       "announcements": "Annonces",
@@ -274,20 +298,10 @@
       "securityRules": "Règles de sécurité",
       "identityVerification": "Vérification d'identité"
     },
-    "support": {
-      "title": "Support",
-      "helpCenter": "Centre d'aide",
-      "forgotPassword": "Mot de passe oublié",
-      "contact": "Contact"
-    },
     "account": {
       "title": "Compte",
       "login": "Se connecter",
       "register": "S'inscrire"
-    },
-    "legal": {
-      "title": "Légal",
-      "termsPrivacy": "Conditions & Confidentialité"
     }
   },
   "languages": {

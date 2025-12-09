@@ -26,12 +26,28 @@ export default function SupportSection() {
                 <div className="bg-gray-100 col-span-1 md:col-span-2 flex flex-col justify-between text-gray-900 p-6 md:p-8 rounded-2xl">
                     <h3 className="text-xl font-bold mb-4 uppercase">{t('home.supportSection.online.title')}</h3>
                     <p className="text-gray-800 mb-6 text-xl md:text-2xl">{t('home.supportSection.online.description')}</p>
-                    <form className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        <label htmlFor="support-email" className="sr-only">{t('home.supportSection.online.placeholder')}</label>
-                        <input id="support-email" type="email" placeholder={t('home.supportSection.online.placeholder')} className="flex-1 px-4 py-3 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        <button type="submit" className="bg-slate-800 text-white px-5 py-3 rounded-lg font-semibold hover:bg-blue-700">
-                            {t('home.supportSection.online.send')}
-                        </button>
+                    <form className="flex flex-col gap-3">
+                        <div>
+                            <label htmlFor="support-email" className="sr-only">Email</label>
+                            <input 
+                                id="support-email" 
+                                type="email" 
+                                placeholder="Votre email" 
+                                className="w-full px-4 py-3 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            />
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <label htmlFor="support-message" className="sr-only">{t('home.supportSection.online.placeholder')}</label>
+                            <input 
+                                id="support-message" 
+                                type="text" 
+                                placeholder={t('home.supportSection.online.placeholder')} 
+                                className="flex-1 px-4 py-3 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                            />
+                            <button type="submit" className="bg-slate-800 text-white px-5 py-3 rounded-lg font-semibold hover:bg-blue-700">
+                                {t('home.supportSection.online.send')}
+                            </button>
+                        </div>
                     </form>
 
                 </div>

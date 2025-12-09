@@ -213,7 +213,7 @@ export default function AnnounceCard({
           </h3>
         </div>
         <p className="text-gray-600 h-12 dark:text-gray-300 text-sm mb-2 line-clamp-2">
-          {location && location.length > 30 ? `${location.slice(0, 30)}...` : location}
+          {location && location.length > 60 ? `${location.slice(0, 60)}...` : location}
         </p>
         {
           <p className="text-blue-600 text-sm font-medium mb-2">

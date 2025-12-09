@@ -253,7 +253,31 @@
     "books": "Books"
   },
   "footer": {
-    "description": "Platform that connects travelers and shippers for economical and ecological shipments.",
+    "description": "Be a happiness carrier",
+    "copyright": "All rights reserved.",
+    "knowUs": {
+      "title": "To know us better",
+      "howItWorks": "How does it work?",
+      "ecologicalImpact": "Ecological impact",
+      "whatIsHappiness": "What is Happiness?"
+    },
+    "legal": {
+      "title": "Legal Mentions",
+      "termsOfUse": "Terms of Use",
+      "privacyPolicy": "Privacy Policy",
+      "pricingPolicy": "Pricing Policy"
+    },
+    "giveHappiness": {
+      "title": "Give Happiness",
+      "becomeTransporter": "Become HappyTransporter",
+      "securityRules": "Security rules",
+      "insuranceProtection": "Insurance and Protection"
+    },
+    "support": {
+      "title": "Support",
+      "faq": "Frequently Asked Questions",
+      "downloadApp": "Download the app"
+    },
     "discover": {
       "title": "Discover",
       "announcements": "Announcements",
@@ -273,20 +297,10 @@
       "securityRules": "Security rules",
       "identityVerification": "Identity verification"
     },
-    "support": {
-      "title": "Support",
-      "helpCenter": "Help center",
-      "forgotPassword": "Forgot password",
-      "contact": "Contact"
-    },
     "account": {
       "title": "Account",
       "login": "Login",
       "register": "Register"
-    },
-    "legal": {
-      "title": "Legal",
-      "termsPrivacy": "Terms & Privacy"
     }
   },
   "languages": {
