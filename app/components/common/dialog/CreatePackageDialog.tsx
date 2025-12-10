@@ -98,7 +98,8 @@ export default function CreatePackageDialog({
         return (
           departureAirport !== null &&
           arrivalAirport !== null &&
-          Boolean(baggageDescription)
+          Boolean(baggageDescription) &&
+          baggageDescription.length <= 500
         );
       case 2:
         return photos.length >= 3;
@@ -263,11 +264,30 @@ export default function CreatePackageDialog({
                 <Field label={t("dialogs.createAnnounce.story")}>
                   <textarea
                     value={baggageDescription}
-                    onChange={(e) => setBaggageDescription(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 500) {
+                        setBaggageDescription(e.target.value);
+                      }
+                    }}
                     rows={5}
                     placeholder={t("dialogs.createAnnounce.story")}
-                    className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full resize-none rounded-xl border ${
+                      baggageDescription.length > 500
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                    } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
+                  <div
+                    className={`mt-1 text-xs ${
+                      baggageDescription.length > 500
+                        ? "text-red-500 font-semibold"
+                        : baggageDescription.length > 450
+                        ? "text-orange-500"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {baggageDescription.length}/500 caractères
+                  </div>
                 </Field>
 
                 <div>
@@ -372,28 +392,35 @@ export default function CreatePackageDialog({
                     className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </Field>
-                <Field label={t("dialogs.createAnnounce.pricePerKilo")}>
-                  <div className="flex">
-                    <input
-                      type="number"
-                      min={0}
-                      step={0.01}
-                      value={pricePerKilo}
-                      onChange={(e) => setPricePerKilo(e.target.value)}
-                      placeholder={t("dialogs.createAnnounce.pricePerKilo")}
-                      className="flex-1 rounded-l-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-r-0"
-                    />
-                    <CurrencyComboBox
-                      value={currency?.code}
-                      onChange={setCurrency}
-                      placeholder="EUR"
-                      compact
-                    />
+                <div>
+                  <div className="flex gap-4">
+                    <Field label={t("dialogs.createAnnounce.pricePerKilo")}>
+                      <input
+                        type="number"
+                        min={0}
+                        step={0.01}
+                        value={pricePerKilo}
+                        onChange={(e) => setPricePerKilo(e.target.value)}
+                        placeholder={t("dialogs.createAnnounce.pricePerKilo")}
+                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </Field>
+                    <div className="w-32">
+                      <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-white">
+                        Currency
+                      </label>
+                      <CurrencyComboBox
+                        value={currency?.code}
+                        onChange={setCurrency}
+                        placeholder="EUR"
+                        compact
+                      />
+                    </div>
                   </div>
                   <p className="mt-1 text-xs text-gray-500">
                     Cette devise sera utilisée pour tous les montants
                   </p>
-                </Field>
+                </div>
               </div>
             )}
 

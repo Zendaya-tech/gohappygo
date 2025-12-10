@@ -197,71 +197,113 @@ const ReservationsSection = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filtered.map((request) => (
-            <div
-              key={request.id}
-              className="border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h4 className="text-sm font-semibold text-gray-900">
-                      Demande #{request.id}
-                    </h4>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      request.currentStatus?.status === "COMPLETED"
-                        ? "bg-green-100 text-green-700"
-                        : request.currentStatus?.status === "ACCEPTED"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}>
-                      {request.currentStatus?.status || "En attente"}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-1 text-sm text-gray-600">
-                    <p>
-                      <span className="font-medium">Type:</span> {request.requestType}
-                    </p>
-                    <p>
-                      <span className="font-medium">Poids:</span> {request.weight} kg
-                    </p>
-                    <p>
-                      <span className="font-medium">Demandeur:</span>{" "}
-                      {request.requester?.firstName} {request.requester?.lastName}
-                    </p>
-                    {request.travel && (
-                      <p>
-                        <span className="font-medium">Vol:</span> {request.travel.flightNumber}
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-500">
-                      Créée le {formatDate(request.createdAt)}
-                    </p>
-                  </div>
-                </div>
+          {filtered.map((request) => {
+            const travel = request.travel;
+            const requester = request.requester;
+            const departureCity = travel?.departureAirport?.city || "Paris";
+            const arrivalCity = travel?.arrivalAirport?.city || "New-York";
+            const travelDate = travel?.departureDatetime ? formatDate(travel.departureDatetime) : "";
+            const flightNumber = travel?.flightNumber || "N/A";
+            const weight = request.weight || 0;
+            const pricePerKg = typeof travel?.pricePerKg === 'string' ? parseFloat(travel.pricePerKg) : (travel?.pricePerKg || 0);
+            const price = (pricePerKg * weight).toFixed(0);
+            const requesterName = requester ? `${requester.firstName} ${requester.lastName.charAt(0)}.` : "Utilisateur";
+            const requesterAvatar = (requester as any)?.profilePictureUrl || "/favicon.ico";
 
-                <div className="flex flex-col gap-2 ml-4">
-                  {request.currentStatus?.status === "NEGOTIATING" && (
-                    <button
-                      onClick={() => handleAcceptRequest(request.id)}
-                      className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Accepter
+            return (
+              <div
+                key={request.id}
+                className="bg-gray-50 border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6">
+                  {/* Left Section - Trip Details */}
+                  <div className="flex gap-6">
+                    {/* Plane Icon */}
+                    <div className="flex-shrink-0">
+                      <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Trip Info */}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1">
+                        {departureCity} → {arrivalCity}
+                      </h3>
+                      <p className="text-sm text-gray-500 mb-1">
+                        {travelDate}
+                      </p>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Numéro de vol {flightNumber}
+                      </p>
+
+                      {/* Weight and Price */}
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">
+                          {weight} Kg
+                        </div>
+                        <div className="text-gray-900 font-bold text-lg">
+                          € {price}
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-3">
+                        {request.currentStatus?.status === "NEGOTIATING" && (
+                          <>
+                            <button
+                              onClick={() => handleAcceptRequest(request.id)}
+                              className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                            >
+                              Approve
+                            </button>
+                            <button className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors">
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {request.currentStatus?.status === "ACCEPTED" && (
+                          <button
+                            onClick={() => handleCompleteRequest(request.id)}
+                            className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                          >
+                            Terminer
+                          </button>
+                        )}
+                        {request.currentStatus?.status === "COMPLETED" && (
+                          <span className="px-6 py-2 bg-green-100 text-green-700 rounded-lg font-medium">
+                            Terminé
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Section - Customer Details */}
+                  <div className="border-l border-gray-300 pl-6">
+                    <h4 className="text-sm font-semibold text-gray-600 mb-4">
+                      Customer Details
+                    </h4>
+                    <div className="flex items-center gap-3 mb-4">
+                      <img
+                        src={requesterAvatar}
+                        alt={requesterName}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <span className="font-semibold text-gray-900">
+                        {requesterName}
+                      </span>
+                    </div>
+                    <button className="w-full px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                      Contact
                     </button>
-                  )}
-                  {request.currentStatus?.status === "ACCEPTED" && (
-                    <button
-                      onClick={() => handleCompleteRequest(request.id)}
-                      className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      Terminer
-                    </button>
-                  )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -336,7 +378,7 @@ const ReviewsSection = () => {
                   <StarIcon
                     key={star}
                     className={`h-4 w-4 ${
-                      star <= Math.round(parseFloat(calculateAverageRating()))
+                      star <= Math.round(parseFloat(calculateAverageRating() || "0"))
                         ? "text-yellow-400 fill-current"
                         : "text-gray-300"
                     }`}
@@ -434,7 +476,7 @@ const TravelRequestsSection = () => {
     if (!user?.id) return;
     
     try {
-      const response = await getUserDemandsAndTravels(user.id, "demand");
+      const response = await getUserDemandsAndTravels(Number(user.id), "demand");
       const items = Array.isArray(response) ? response : response?.items ?? [];
       setDemands(items);
     } catch (error) {
@@ -562,7 +604,7 @@ const TravelsSection = () => {
     if (!user?.id) return;
     
     try {
-      const response = await getUserDemandsAndTravels(user.id, "travel");
+      const response = await getUserDemandsAndTravels(Number(user.id), "travel");
       const items = Array.isArray(response) ? response : response?.items ?? [];
       setTravels(items);
     } catch (error) {
@@ -805,7 +847,7 @@ const FavoritesSection = () => {
               const type = isTravel ? "transporter" : "traveler";
 
               return (
-                <div key={id} className="relative">
+                <>
                   <TravelCard
                     id={id}
                     name={name}
@@ -846,8 +888,7 @@ const FavoritesSection = () => {
                       />
                     </svg>
                   </button> */}
-                </div>
-              );
+              </>);
             })}
           </div>
         </div>
@@ -1180,10 +1221,10 @@ export default function Profile() {
             <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 text-center">
               {/* Profile Picture */}
               <div className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-3 md:mb-4 overflow-hidden">
-                {isAuthenticated && user?.profilePictureUrl ? (
+                {isAuthenticated && (user as any)?.profilePictureUrl ? (
                   <img
-                    src={user.profilePictureUrl}
-                    alt={user.name || "Profile"}
+                    src={(user as any).profilePictureUrl}
+                    alt={user?.name || "Profile"}
                     className="w-full h-full object-cover"
                   />
                 ) : (

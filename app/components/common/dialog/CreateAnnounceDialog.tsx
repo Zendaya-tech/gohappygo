@@ -53,7 +53,7 @@ export default function CreateAnnounceDialog({
   const [allowExtraGrams, setAllowExtraGrams] = useState<boolean>(false);
   // Supplementary info for Step 1
   const [flightNumber, setFlightNumber] = useState("");
-  const [airline, setAirline] = useState({});
+  const [airline, setAirline] = useState<{ name?: string }>({});
   const [travelDate, setTravelDate] = useState("");
   const [fetchingAirline, setFetchingAirline] = useState(false);
   // API integration state
@@ -80,7 +80,7 @@ export default function CreateAnnounceDialog({
   useEffect(() => {
     const fetchAirline = async () => {
       if (!flightNumber || flightNumber.length < 2) {
-        setAirline("");
+        setAirline({});
         return;
       }
 
@@ -88,13 +88,13 @@ export default function CreateAnnounceDialog({
       try {
         const airlineName = await getAirlineFromFlightNumber(flightNumber);
         if (airlineName) {
-          setAirline(airlineName);
+          setAirline({ name: airlineName });
         } else {
-          setAirline("");
+          setAirline({});
         }
       } catch (error) {
         console.error("Error fetching airline:", error);
-        setAirline("");
+        setAirline({});
       } finally {
         setFetchingAirline(false);
       }
@@ -143,7 +143,7 @@ export default function CreateAnnounceDialog({
       setNoSmileTax(0);
       setAllowExtraGrams(false);
       setFlightNumber("");
-      setAirline("");
+      setAirline({});
       setTravelDate("");
       setReservationType("single");
       setBookingType("instant");
@@ -154,11 +154,14 @@ export default function CreateAnnounceDialog({
   }, [open, initialData]);
 
   const canNext = useMemo(() => {
-    if (step === 1) return departure !== null && arrival !== null;
+    if (step === 1)
+      return (
+        departure !== null && arrival !== null && story.length <= 500
+      );
     if (step === 2) return files.length >= 2;
     if (step === 3) return Boolean(kilos) && Boolean(pricePerKg);
     return true;
-  }, [step, departure, arrival, files.length, kilos, pricePerKg]);
+  }, [step, departure, arrival, files.length, kilos, pricePerKg, story.length]);
 
   const onFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files ? Array.from(e.target.files) : [];
@@ -344,7 +347,7 @@ export default function CreateAnnounceDialog({
                 <Field label="Compagnie aérienne">
                   <div className="relative">
                     <input
-                      value={airline.name}
+                      value={airline.name || ""}
                       disabled
                       placeholder={
                         fetchingAirline
@@ -389,13 +392,29 @@ export default function CreateAnnounceDialog({
                 <Field label="Tell a bit more  about your travel">
                   <textarea
                     value={story}
-                    onChange={(e) => setStory(e.target.value)}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 500) {
+                        setStory(e.target.value);
+                      }
+                    }}
                     rows={5}
                     placeholder="Type here..."
-                    className="w-full resize-none rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full resize-none rounded-xl border ${
+                      story.length > 500
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                    } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
-                  <div className="mt-1 text-xs text-gray-400">
-                    Max 500 characters
+                  <div
+                    className={`mt-1 text-xs ${
+                      story.length > 500
+                        ? "text-red-500 font-semibold"
+                        : story.length > 450
+                        ? "text-orange-500"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {story.length}/500 caractères
                   </div>
                 </Field>
                 <div>
@@ -510,28 +529,35 @@ export default function CreateAnnounceDialog({
                     className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </Field>
-                <Field label="What is your price per kilos?">
-                  <div className="flex">
-                    <input
-                      type="number"
-                      min={0}
-                      value={pricePerKg}
-                      onChange={(e) =>
-                        setPricePerKg(
-                          e.target.value === "" ? "" : Number(e.target.value)
-                        )
-                      }
-                      placeholder="enter  your price per kilos"
-                      className="flex-1 rounded-l-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 border-r-0"
-                    />
-                    <CurrencyComboBox
-                      value={currency?.code}
-                      onChange={setCurrency}
-                      placeholder="EUR"
-                      compact
-                    />
+                <div>
+                  <div className="flex gap-4">
+                    <Field label="What is your price per kilos?">
+                      <input
+                        type="number"
+                        min={0}
+                        value={pricePerKg}
+                        onChange={(e) =>
+                          setPricePerKg(
+                            e.target.value === "" ? "" : Number(e.target.value)
+                          )
+                        }
+                        placeholder="enter  your price per kilos"
+                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                    </Field>
+                    <div className="w-32">
+                      <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-white">
+                        Currency
+                      </label>
+                      <CurrencyComboBox
+                        value={currency?.code}
+                        onChange={setCurrency}
+                        placeholder="EUR"
+                        compact
+                      />
+                    </div>
                   </div>
-                </Field>
+                </div>
                 <Field
                   label={
                     <span>

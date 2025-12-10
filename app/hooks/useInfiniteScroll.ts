@@ -1,7 +1,7 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef } from "react";
 
 interface UseInfiniteScrollOptions {
-  onLoadMore: () => void;
+  onLoadMore: () => void | Promise<void>;
   hasMore: boolean;
   loading: boolean;
   threshold?: number; // Distance from bottom in pixels to trigger load
@@ -13,38 +13,31 @@ export function useInfiniteScroll({
   loading,
   threshold = 300,
 }: UseInfiniteScrollOptions) {
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [target] = entries;
-      if (target.isIntersecting && hasMore && !loading) {
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sentinelRef.current || loading || !hasMore) return;
+
+      const rect = sentinelRef.current.getBoundingClientRect();
+      const isVisible = rect.top <= window.innerHeight + threshold;
+
+      if (isVisible) {
+        console.log("Infinite scroll triggered - loading more");
         onLoadMore();
       }
-    },
-    [hasMore, loading, onLoadMore]
-  );
-
-  useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: `${threshold}px`,
-      threshold: 0.1,
     };
 
-    observerRef.current = new IntersectionObserver(handleObserver, options);
-
-    if (sentinelRef.current) {
-      observerRef.current.observe(sentinelRef.current);
-    }
+    // Check on mount and scroll
+    handleScroll();
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleScroll);
 
     return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
-  }, [handleObserver, threshold]);
+  }, [onLoadMore, hasMore, loading, threshold]);
 
   return sentinelRef;
 }

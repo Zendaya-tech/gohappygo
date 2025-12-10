@@ -141,7 +141,7 @@ export default function CurrencyComboBox({
             }
           }}
           placeholder={placeholder}
-          className="w-20 text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-r-xl pl-3 pr-2 py-3 outline-none border-l-0 focus:ring-2 focus:ring-indigo-500"
+          className="w-full text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl pl-3 pr-2 py-3 outline-none focus:ring-2 focus:ring-indigo-500"
         />
         {open && (
           <div

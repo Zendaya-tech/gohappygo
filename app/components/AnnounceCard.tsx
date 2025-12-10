@@ -198,11 +198,7 @@ export default function AnnounceCard({
           </button>
         )}
         
-        {isOwnAnnounce && (
-          <div className="absolute top-4 right-4 backdrop-blur-sm px-3 py-1 rounded-full bg-gray-500/90 text-white text-xs font-medium">
-            Votre annonce
-          </div>
-        )}
+
         {airline && <></>}
       </div>
       <div className="p-6">

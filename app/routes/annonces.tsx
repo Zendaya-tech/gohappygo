@@ -60,7 +60,7 @@ export default function Annonces() {
       destinationAirportId: urlParams.get("to") || undefined,
       travelDate: urlParams.get("date") || undefined,
       flightNumber: urlParams.get("flight") || undefined,
-      limit: 12, // Items per page
+      limit: 4, // Items per page
     };
 
     // Apply selected filters
@@ -177,9 +177,9 @@ export default function Annonces() {
   // Infinite scroll hook
   const sentinelRef = useInfiniteScroll({
     onLoadMore: loadMore,
-    hasMore,
+    hasMore: hasMore && !loading,
     loading: loadingMore,
-    threshold: 300,
+    threshold: 200,
   });
 
   const handleFilterChange = (filterId: string) => {
@@ -474,20 +474,24 @@ export default function Annonces() {
                 </div>
 
                 {/* Infinite scroll sentinel */}
-                <div ref={sentinelRef} className="w-full py-8">
-                  {loadingMore && (
-                    <div className="flex justify-center items-center gap-2">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                    </div>
-                  )}
-                  {!hasMore && results.length > 0 && (
+                {hasMore && (
+                  <div ref={sentinelRef} className="w-full py-8 min-h-[100px]">
+                    {loadingMore && (
+                      <div className="flex justify-center items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {!hasMore && results.length > 0 && (
+                  <div className="w-full py-8">
                     <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                       Vous avez vu toutes les annonces disponibles
                     </p>
-                  )}
-                </div>
+                  </div>
+                )}
               </>
             )}
           </div>
