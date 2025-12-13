@@ -38,12 +38,24 @@ export const useAuth = () => {
                   res.user.lastName ?? ""
                 }`.trim() ||
                 (res.user.email ?? "Utilisateur"),
+              email: res.user.email,
+              firstName: res.user.firstName,
+              lastName: res.user.lastName,
+              phone: res.user.phone,
               profilePictureUrl: res.user.profilePictureUrl,
               bio: res.user.bio,
+              role: res.user.role,
+              isPhoneVerified: res.user.isPhoneVerified,
+              isVerified: res.user.isVerified,
+              isAwaitingVerification: res.user.isAwaitingVerification,
+              recentCurrency: res.user.recentCurrency,
+              createdAt: res.user.createdAt,
+              profileStats: res.user.profileStats,
             }
           : {
               id: "me",
               name: email.split("@")[0] || "Utilisateur",
+              email: email,
             };
 
         // Store token in localStorage
@@ -113,8 +125,19 @@ export const useAuth = () => {
             name:
               `${res.user.firstName ?? ""} ${res.user.lastName ?? ""}`.trim() ||
               (res.user.email ?? "Utilisateur"),
+            email: res.user.email,
+            firstName: res.user.firstName,
+            lastName: res.user.lastName,
+            phone: res.user.phone,
             profilePictureUrl: res.user.profilePictureUrl,
             bio: res.user.bio,
+            role: res.user.role,
+            isPhoneVerified: res.user.isPhoneVerified,
+            isVerified: res.user.isVerified,
+            isAwaitingVerification: res.user.isAwaitingVerification,
+            recentCurrency: res.user.recentCurrency,
+            createdAt: res.user.createdAt,
+            profileStats: res.user.profileStats,
           };
 
           // Stocker le token dans localStorage
@@ -170,8 +193,19 @@ export const useAuth = () => {
           name:
             `${userData.firstName ?? ""} ${userData.lastName ?? ""}`.trim() ||
             (userData.email ?? "Utilisateur"),
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          phone: userData.phone,
           profilePictureUrl: userData.profilePictureUrl,
           bio: userData.bio,
+          role: userData.role,
+          isPhoneVerified: userData.isPhoneVerified,
+          isVerified: userData.isVerified,
+          isAwaitingVerification: userData.isAwaitingVerification,
+          recentCurrency: userData.recentCurrency,
+          createdAt: userData.createdAt,
+          profileStats: userData.profileStats,
         };
 
         storeLogin(token!, composedUser);
@@ -205,6 +239,8 @@ export const useAuth = () => {
               data.firstName && data.lastName
                 ? `${data.firstName} ${data.lastName}`.trim()
                 : authStore.user.name,
+            firstName: data.firstName || authStore.user.firstName,
+            lastName: data.lastName || authStore.user.lastName,
             profilePictureUrl:
               res.profilePictureUrl || authStore.user.profilePictureUrl,
             bio: data.bio || authStore.user.bio,

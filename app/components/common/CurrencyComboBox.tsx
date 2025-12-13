@@ -5,6 +5,7 @@ import { searchCurrencies } from "~/services/currencyService";
 type CurrencyComboBoxProps = {
   label?: string;
   value?: string; // currency code
+  selectedCurrency?: Currency | null; // full currency object for better display
   onChange: (currency: Currency | null) => void;
   placeholder?: string;
   compact?: boolean; // For inline display beside price inputs
@@ -22,6 +23,7 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 export default function CurrencyComboBox({
   label,
   value,
+  selectedCurrency,
   onChange,
   placeholder = "Select currency",
   compact = false,
@@ -36,8 +38,28 @@ export default function CurrencyComboBox({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const requestIdRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const debouncedQuery = useDebouncedValue(query, 300);
+
+  // Initialize with default value only once
+  useEffect(() => {
+    if (!isInitialized && selectedCurrency) {
+      const displayText = compact ? selectedCurrency.code : `${selectedCurrency.name} (${selectedCurrency.code})`;
+      setQuery(displayText);
+      setIsInitialized(true);
+    } else if (!isInitialized && value) {
+      setQuery(value);
+      setIsInitialized(true);
+    }
+  }, [selectedCurrency, value, compact, isInitialized]);
+
+  // Reset initialization when selectedCurrency changes from null to a value (dialog reopening)
+  useEffect(() => {
+    if (selectedCurrency && query === "") {
+      setIsInitialized(false);
+    }
+  }, [selectedCurrency, query]);
 
   const load = async (reset: boolean) => {
     if (loading) return;

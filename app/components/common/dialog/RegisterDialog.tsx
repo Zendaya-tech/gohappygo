@@ -140,29 +140,43 @@ export default function RegisterDialog({
 
               {step === 1 ? (
                 <>
+                  {/* Identity Notice */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm text-blue-800">
+                      ℹ️ Nom et prénom tels que sur la pièce d'identité
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <input
-                      type="text"
-                      id="firstName"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                      placeholder="Prénom"
-                      required
-                      value={form.firstName}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, firstName: e.target.value }))
-                      }
-                    />
-                    <input
-                      type="text"
-                      id="lastName"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                      placeholder="Nom"
-                      required
-                      value={form.lastName}
-                      onChange={(e) =>
-                        setForm((p) => ({ ...p, lastName: e.target.value }))
-                      }
-                    />
+                    <div>
+                      <input
+                        type="text"
+                        id="firstName"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                        placeholder="Prénom"
+                        required
+                        value={form.firstName}
+                        onChange={(e) =>
+                          setForm((p) => ({ ...p, firstName: e.target.value }))
+                        }
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        (Seul votre prénom apparaît sur la plateforme)
+                      </p>
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        id="lastName"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                        placeholder="Nom"
+                        required
+                        value={form.lastName}
+                        onChange={(e) =>
+                          setForm((p) => ({ ...p, lastName: e.target.value }))
+                        }
+                      />
+                    </div>
                   </div>
                   <div>
                     <PhoneInput

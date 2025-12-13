@@ -6,6 +6,7 @@ import AirportComboBox from "../AirportComboBox";
 import CurrencyComboBox from "../CurrencyComboBox";
 import type { Airport } from "../../../services/airportService";
 import type { Currency } from "../../../services/currencyService";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function CreatePackageDialog({
   open,
@@ -16,6 +17,7 @@ export default function CreatePackageDialog({
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
 
   // Step 1: General
@@ -59,14 +61,14 @@ export default function CreatePackageDialog({
     setPhotos([]);
     setWeight("");
     setPricePerKilo("");
-    setCurrency(null);
+    setCurrency(user?.recentCurrency ?? null);
     setFlightNumber("");
     setTravelDate("");
     setPackageNature("STANDARD");
     setSubmitting(false);
     setError(null);
     setSuccess(null);
-  }, [open]);
+  }, [open, user?.recentCurrency]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
@@ -411,6 +413,7 @@ export default function CreatePackageDialog({
                       </label>
                       <CurrencyComboBox
                         value={currency?.code}
+                        selectedCurrency={currency}
                         onChange={setCurrency}
                         placeholder="EUR"
                         compact

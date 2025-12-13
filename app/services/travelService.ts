@@ -18,9 +18,17 @@ export interface CreateTravelData {
   image2: File;
 }
 
+interface Airline {
+  id: number;
+  name: string;
+  logo: string;
+  iata: string;
+  icao: string;
+}
+
 export const getAirlineFromFlightNumber = async (
   flightNumber: string
-): Promise<string | null> => {
+): Promise<Airline | null> => {
   try {
     const response = await api.get(
       "/demand-and-travel/airline-from-flight-number",

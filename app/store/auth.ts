@@ -1,13 +1,50 @@
 import { create } from "zustand";
 
+export type ProfileStats = {
+  requestsCompletedCount: number;
+  requestsNegotiatingCount: number;
+  requestsCancelledCount: number;
+  requestsAcceptedCount: number;
+  requestsRejectedCount: number;
+  reviewsReceivedCount: number;
+  reviewsGivenCount: number;
+  demandsCount: number;
+  travelsCount: number;
+  bookMarkTravelCount: number;
+  bookMarkDemandCount: number;
+  transactionsCompletedCount: number;
+};
+
+export type UserRole = {
+  id: number;
+  name: string;
+};
+
+export type Currency = {
+  id: number;
+  code: string;
+  name: string;
+  symbol: string;
+};
+
 export type AuthState = {
   isLoggedIn: boolean;
   user?: {
     id: string;
     name: string;
     email?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
     profilePictureUrl?: string;
     bio?: string;
+    role?: UserRole;
+    isPhoneVerified?: boolean;
+    isVerified?: boolean;
+    isAwaitingVerification?: boolean;
+    recentCurrency?: Currency | null;
+    createdAt?: Date;
+    profileStats?: ProfileStats;
   } | null;
   token?: string | null;
   login: (

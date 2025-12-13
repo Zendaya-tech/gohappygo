@@ -8,6 +8,7 @@ import AirportComboBox from "../AirportComboBox";
 import CurrencyComboBox from "../CurrencyComboBox";
 import type { Airport } from "../../../services/airportService";
 import type { Currency } from "../../../services/currencyService";
+import { useAuth } from "../../../hooks/useAuth";
 
 type StepKey = 1 | 2 | 3 | 4;
 
@@ -39,6 +40,7 @@ export default function CreateAnnounceDialog({
 }) {
   const [step, setStep] = useState<StepKey>(1);
   const { t } = useTranslation();
+  const { user } = useAuth();
   // Form state
   const [departure, setDeparture] = useState<Airport | null>(null);
   const [arrival, setArrival] = useState<Airport | null>(null);
@@ -86,9 +88,9 @@ export default function CreateAnnounceDialog({
 
       setFetchingAirline(true);
       try {
-        const airlineName = await getAirlineFromFlightNumber(flightNumber);
-        if (airlineName) {
-          setAirline({ name: airlineName });
+        const airline = await getAirlineFromFlightNumber(flightNumber);
+        if (airline) {
+          setAirline({ name: airline.name });
         } else {
           setAirline({});
         }
@@ -116,7 +118,7 @@ export default function CreateAnnounceDialog({
       setPricePerKg(
         typeof initialData.pricePerKg === "number" ? initialData.pricePerKg : ""
       );
-      setCurrency(initialData.currency ?? null);
+      setCurrency(initialData.currency ?? user?.recentCurrency ?? null);
       setLateTax(
         typeof initialData.lateTax === "number" ? initialData.lateTax : 0
       );
@@ -138,7 +140,7 @@ export default function CreateAnnounceDialog({
       setFileUrls([]);
       setKilos("");
       setPricePerKg("");
-      setCurrency(null);
+      setCurrency(user?.recentCurrency ?? null);
       setLateTax(0);
       setNoSmileTax(0);
       setAllowExtraGrams(false);
@@ -151,7 +153,7 @@ export default function CreateAnnounceDialog({
       setError(null);
       setSuccess(null);
     }
-  }, [open, initialData]);
+  }, [open, initialData, user?.recentCurrency]);
 
   const canNext = useMemo(() => {
     if (step === 1)
@@ -551,6 +553,7 @@ export default function CreateAnnounceDialog({
                       </label>
                       <CurrencyComboBox
                         value={currency?.code}
+                        selectedCurrency={currency}
                         onChange={setCurrency}
                         placeholder="EUR"
                         compact
@@ -581,11 +584,9 @@ export default function CreateAnnounceDialog({
                       placeholder="0"
                       className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
-                    {currency && (
-                      <div className="ml-3 flex items-center px-3 text-sm text-gray-600 dark:text-gray-400">
-                        {currency.code}
-                      </div>
-                    )}
+                    <div className="ml-3 flex items-center px-3 text-sm text-gray-600 dark:text-gray-400">
+                      %
+                    </div>
                   </div>
                 </Field>
                 <Field
@@ -612,11 +613,9 @@ export default function CreateAnnounceDialog({
                       placeholder="0"
                       className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
-                    {currency && (
-                      <div className="ml-3 flex items-center px-3 text-sm text-gray-600 dark:text-gray-400">
-                        {currency.code}
-                      </div>
-                    )}
+                    <div className="ml-3 flex items-center px-3 text-sm text-gray-600 dark:text-gray-400">
+                      %
+                    </div>
                   </div>
                 </Field>
                 <div>
