@@ -52,6 +52,7 @@ export const updateProfile = async (data: UpdateProfileData) => {
     if (data.firstName) formData.append("firstName", data.firstName);
     if (data.lastName) formData.append("lastName", data.lastName);
     if (data.bio) formData.append("bio", data.bio);
+    if (data.phone) formData.append("phone", data.phone);
     if (data.profilePicture)
       formData.append("profilePicture", data.profilePicture);
 
@@ -109,7 +110,20 @@ export type LoginResponse = {
     firstName?: string;
     lastName?: string;
     email?: string;
+    phone?: string;
     bio?: string;
+    role?: {
+      id: number;
+      name: string;
+      code: string;
+      description: string;
+    };
+    isPhoneVerified?: boolean;
+    isVerified?: boolean;
+    isAwaitingVerification?: boolean;
+    recentCurrency?: any;
+    createdAt?: string;
+    profileStats?: ProfileStats;
   };
 };
 
@@ -117,6 +131,7 @@ export type UpdateProfileData = {
   firstName?: string;
   lastName?: string;
   bio?: string;
+  phone?: string;
   profilePicture?: File;
 };
 
@@ -187,6 +202,7 @@ export type GetMeResponse = {
   isPhoneVerified: boolean;
   isVerified: boolean;
   isAwaitingVerification: boolean;
+  recentCurrency?: any;
   createdAt: string;
   updatedAt: string;
   profileStats?: ProfileStats;

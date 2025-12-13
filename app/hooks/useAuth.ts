@@ -49,7 +49,7 @@ export const useAuth = () => {
               isVerified: res.user.isVerified,
               isAwaitingVerification: res.user.isAwaitingVerification,
               recentCurrency: res.user.recentCurrency,
-              createdAt: res.user.createdAt,
+              createdAt: res.user.createdAt ? new Date(res.user.createdAt) : undefined,
               profileStats: res.user.profileStats,
             }
           : {
@@ -136,7 +136,7 @@ export const useAuth = () => {
             isVerified: res.user.isVerified,
             isAwaitingVerification: res.user.isAwaitingVerification,
             recentCurrency: res.user.recentCurrency,
-            createdAt: res.user.createdAt,
+            createdAt: res.user.createdAt ? new Date(res.user.createdAt) : undefined,
             profileStats: res.user.profileStats,
           };
 
@@ -204,7 +204,7 @@ export const useAuth = () => {
           isVerified: userData.isVerified,
           isAwaitingVerification: userData.isAwaitingVerification,
           recentCurrency: userData.recentCurrency,
-          createdAt: userData.createdAt,
+          createdAt: new Date(userData.createdAt),
           profileStats: userData.profileStats,
         };
 
@@ -241,6 +241,7 @@ export const useAuth = () => {
                 : authStore.user.name,
             firstName: data.firstName || authStore.user.firstName,
             lastName: data.lastName || authStore.user.lastName,
+            phone: data.phone || authStore.user.phone,
             profilePictureUrl:
               res.profilePictureUrl || authStore.user.profilePictureUrl,
             bio: data.bio || authStore.user.bio,

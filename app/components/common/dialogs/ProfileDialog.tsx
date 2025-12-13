@@ -132,6 +132,7 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
         firstName: formData.firstName,
         lastName: formData.lastName,
         bio: formData.aboutMe,
+        phone: formData.phoneNumber,
         profilePicture: profileImageFile || undefined,
       });
 
