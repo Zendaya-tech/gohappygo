@@ -421,7 +421,7 @@ export default function Annonces() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                   {results.map((item: any) => {
                     const id = item.id?.toString() || Math.random().toString(36).slice(2);
-                    const name = item.user?.fullname || item.title || "Voyageur";
+                    const name = item.user?.fullName || item.title || "Voyageur";
                     const avatar = item.user?.selfieImage || item.images?.[0]?.fileUrl || "/favicon.ico";
                     const originName = item.departureAirport?.name || "";
                     const destName = item.arrivalAirport?.name || "";
