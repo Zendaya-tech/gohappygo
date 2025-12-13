@@ -9,7 +9,7 @@ import { useAuthStore, type AuthState } from "~/store/auth";
 
 interface PropertyCardProps {
   id: string;
-  name: string;
+  fullName: string;
   location: string;
   price: string;
   rating: string;
@@ -27,7 +27,7 @@ interface PropertyCardProps {
 
 export default function AnnounceCard({
   id,
-  name,
+  fullName,
   location,
   price,
   type,
@@ -125,7 +125,7 @@ export default function AnnounceCard({
       <div className="relative items-center  justify-center flex overflow-hidden rounded-2xl bg-gray-100  dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">
         <img
           src={image}
-          alt={name}
+          alt={fullName}
           className={`${
             type === "transporter"
               ? "max-h-full h-52 p-5 object-contain max-w-full "
@@ -203,9 +203,9 @@ export default function AnnounceCard({
       </div>
       <div className="p-6">
         <div className="flex items-center gap-2 mb-2">
-          <img src={avatar} alt={name} className="w-10 h-10 rounded-full" />
+          <img src={avatar} alt={fullName} className="w-10 h-10 rounded-full" />
           <h3 className="font-semibold text-gray-900 dark:text-white ">
-            {name}
+            {fullName}
           </h3>
         </div>
         <p className="text-gray-600 h-12 dark:text-gray-300 text-sm mb-2 line-clamp-2">

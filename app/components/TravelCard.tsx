@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 interface FavoriteCardProps {
   id: string;
-  name: string;
+  fullName: string;
   location: string;
   price: string;
   rating: string;
@@ -18,7 +18,7 @@ interface FavoriteCardProps {
 
 export default function TravelCard({
   id,
-  name,
+  fullName,
   location,
   price,
   type,
@@ -42,7 +42,7 @@ export default function TravelCard({
       <div className="relative items-center justify-center flex overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-200 h-64 dark:border-gray-800">
         <img
           src={image}
-          alt={name}
+          alt={fullName}
           className={`${
             type === "transporter"
               ? "max-h-full h-52 p-5 object-contain max-w-full"
@@ -95,9 +95,9 @@ export default function TravelCard({
       </div>
       <div className="p-6">
         <div className="flex items-center gap-2 mb-2">
-          <img src={avatar} alt={name} className="w-10 h-10 rounded-full object-cover" />
+          <img src={avatar} alt={fullName} className="w-10 h-10 rounded-full object-cover" />
           <h3 className="font-semibold text-gray-900 dark:text-white">
-            {name}
+            {fullName}
           </h3>
         </div>
         <p className="text-gray-600 h-12 dark:text-gray-300 text-sm mb-2">

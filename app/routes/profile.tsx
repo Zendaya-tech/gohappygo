@@ -850,7 +850,7 @@ const FavoritesSection = () => {
                 <>
                   <TravelCard
                     id={id}
-                    name={name}
+                    fullName={name}
                     avatar={avatar}
                     location={location}
                     price={`${pricePerKg}`}
