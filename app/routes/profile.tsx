@@ -814,8 +814,8 @@ const FavoritesSection = () => {
 
               const id = (isTravel ? bookmark.travelId : bookmark.demandId)?.toString() || bookmark.id.toString();
               const name = item.user 
-                ? `${item.user.firstName || ""} ${item.user.lastName || ""}`.trim() || "Voyageur"
-                : "Voyageur";
+                ? `${item.user.fullName }`.trim() : "Voyageur"
+        
               const avatar = item.user?.profilePictureUrl || item.images?.[0]?.fileUrl || "/favicon.ico";
               const originName = item.departureAirport?.name || "";
               const destName = item.arrivalAirport?.name || "";
