@@ -128,13 +128,20 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
     setSuccess(null);
 
     try {
-      await updateProfile({
+      const result = await updateProfile({
         firstName: formData.firstName,
         lastName: formData.lastName,
         bio: formData.aboutMe,
         phone: formData.phoneNumber,
         profilePicture: profileImageFile || undefined,
       });
+
+      // Update the profile image immediately in the UI if it was uploaded
+      if (profileImageFile && result && user) {
+        // The backend should return the new profile picture URL
+        // Update the local state to reflect the change immediately
+        setProfileImage(profileImage); // Keep the preview image
+      }
 
       setSuccess("Profil mis à jour avec succès!");
       setTimeout(() => {

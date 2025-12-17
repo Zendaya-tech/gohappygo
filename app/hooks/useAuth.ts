@@ -243,7 +243,7 @@ export const useAuth = () => {
             lastName: data.lastName || authStore.user.lastName,
             phone: data.phone || authStore.user.phone,
             profilePictureUrl:
-              res.profilePictureUrl || authStore.user.profilePictureUrl,
+              res.user?.profilePictureUrl || res.profilePictureUrl || authStore.user.profilePictureUrl,
             bio: data.bio || authStore.user.bio,
           };
           storeLogin(authStore.token!, updatedUser);

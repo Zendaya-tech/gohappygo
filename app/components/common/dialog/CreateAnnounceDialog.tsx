@@ -20,7 +20,6 @@ type InitialData = {
   pricePerKg?: number;
   currency?: Currency | null;
   lateTax?: number;
-  noSmileTax?: number;
   allowExtraGrams?: boolean;
   flightNumber?: string;
   airline?: any;
@@ -51,13 +50,13 @@ export default function CreateAnnounceDialog({
   const [pricePerKg, setPricePerKg] = useState<number | "">("");
   const [currency, setCurrency] = useState<Currency | null>(null);
   const [lateTax, setLateTax] = useState<number | "">(0);
-  const [noSmileTax, setNoSmileTax] = useState<number | "">(0);
   const [allowExtraGrams, setAllowExtraGrams] = useState<boolean>(false);
   // Supplementary info for Step 1
   const [flightNumber, setFlightNumber] = useState("");
   const [airline, setAirline] = useState<{ name?: string }>({});
   const [travelDate, setTravelDate] = useState("");
   const [fetchingAirline, setFetchingAirline] = useState(false);
+  const [flightNumberError, setFlightNumberError] = useState<string | null>(null);
   // API integration state
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,20 +82,25 @@ export default function CreateAnnounceDialog({
     const fetchAirline = async () => {
       if (!flightNumber || flightNumber.length < 2) {
         setAirline({});
+        setFlightNumberError(null);
         return;
       }
 
       setFetchingAirline(true);
+      setFlightNumberError(null);
       try {
         const airline = await getAirlineFromFlightNumber(flightNumber);
         if (airline) {
           setAirline({ name: airline.name });
+          setFlightNumberError(null);
         } else {
           setAirline({});
+          setFlightNumberError("Numéro de vol non valide");
         }
       } catch (error) {
         console.error("Error fetching airline:", error);
         setAirline({});
+        setFlightNumberError("Numéro de vol non valide");
       } finally {
         setFetchingAirline(false);
       }
@@ -122,13 +126,11 @@ export default function CreateAnnounceDialog({
       setLateTax(
         typeof initialData.lateTax === "number" ? initialData.lateTax : 0
       );
-      setNoSmileTax(
-        typeof initialData.noSmileTax === "number" ? initialData.noSmileTax : 0
-      );
       setAllowExtraGrams(Boolean(initialData.allowExtraGrams));
       setFlightNumber(initialData.flightNumber ?? "");
       setAirline(initialData.airline ?? "");
       setTravelDate(initialData.travelDate ?? "");
+      setFlightNumberError(null);
       setReservationType(initialData.reservationType ?? "single");
       setBookingType(initialData.bookingType ?? "instant");
     } else {
@@ -142,11 +144,11 @@ export default function CreateAnnounceDialog({
       setPricePerKg("");
       setCurrency(user?.recentCurrency ?? null);
       setLateTax(0);
-      setNoSmileTax(0);
       setAllowExtraGrams(false);
       setFlightNumber("");
       setAirline({});
       setTravelDate("");
+      setFlightNumberError(null);
       setReservationType("single");
       setBookingType("instant");
       setSubmitting(false);
@@ -156,14 +158,19 @@ export default function CreateAnnounceDialog({
   }, [open, initialData, user?.recentCurrency]);
 
   const canNext = useMemo(() => {
-    if (step === 1)
+    if (step === 1) {
+      const hasValidFlightNumber = !flightNumber || (flightNumber && airline.name && !flightNumberError);
       return (
-        departure !== null && arrival !== null && story.length <= 500
+        departure !== null && 
+        arrival !== null && 
+        story.length <= 500 &&
+        hasValidFlightNumber
       );
+    }
     if (step === 2) return files.length >= 2;
     if (step === 3) return Boolean(kilos) && Boolean(pricePerKg);
     return true;
-  }, [step, departure, arrival, files.length, kilos, pricePerKg, story.length]);
+  }, [step, departure, arrival, files.length, kilos, pricePerKg, story.length, flightNumber, airline.name, flightNumberError]);
 
   const onFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files ? Array.from(e.target.files) : [];
@@ -206,6 +213,11 @@ export default function CreateAnnounceDialog({
       return;
     }
 
+    if (flightNumber && (!airline.name || flightNumberError)) {
+      setError("Veuillez entrer un numéro de vol valide");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
     setSuccess(null);
@@ -228,7 +240,7 @@ export default function CreateAnnounceDialog({
         isInstant: bookingType === "instant",
         isAllowExtraWeight: allowExtraGrams,
         feeForLateComer: typeof lateTax === "number" ? lateTax : 0,
-        feeForGloomy: typeof noSmileTax === "number" ? noSmileTax : 0,
+        feeForGloomy: 0,
         departureAirportId: parseInt(departure.id),
         arrivalAirportId: parseInt(arrival.id),
         departureDatetime,
@@ -334,8 +346,17 @@ export default function CreateAnnounceDialog({
                     value={flightNumber}
                     onChange={(e) => setFlightNumber(e.target.value)}
                     placeholder="Add numero de vol sur votre billet d’avion"
-                    className="w-full rounded-xl uppercase border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full rounded-xl uppercase border ${
+                      flightNumberError 
+                        ? "border-red-500 focus:ring-red-500" 
+                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                    } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
+                  {flightNumberError && (
+                    <p className="mt-1 text-sm text-red-600 font-medium">
+                      {flightNumberError}
+                    </p>
+                  )}
                 </Field>
                 <Field label="Date de votre Voyage">
                   <input
@@ -589,35 +610,7 @@ export default function CreateAnnounceDialog({
                     </div>
                   </div>
                 </Field>
-                <Field
-                  label={
-                    <span>
-                      Taxe pour les personnes pas souriantes{" "}
-                      <span className="text-gray-400">
-                        ( parce que vous êtes heureux de rencontrer des
-                        personnes heureuses)
-                      </span>
-                    </span>
-                  }
-                >
-                  <div className="flex">
-                    <input
-                      type="number"
-                      min={0}
-                      value={noSmileTax as number}
-                      onChange={(e) =>
-                        setNoSmileTax(
-                          e.target.value === "" ? "" : Number(e.target.value)
-                        )
-                      }
-                      placeholder="0"
-                      className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                    <div className="ml-3 flex items-center px-3 text-sm text-gray-600 dark:text-gray-400">
-                      %
-                    </div>
-                  </div>
-                </Field>
+
                 <div>
                   <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
                     Tolérez vous quelques grammes de trop ?

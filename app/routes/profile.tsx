@@ -311,13 +311,15 @@ const ReservationsSection = () => {
 };
 
 const ReviewsSection = () => {
+  const [tab, setTab] = useState<"received" | "given">("received");
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReviews = async () => {
+      setLoading(true);
       try {
-        const response = await getReviews();
+        const response = await getReviews(tab === "given");
         setReviews(response.items || []);
       } catch (error) {
         console.error("Error fetching reviews:", error);
@@ -327,7 +329,7 @@ const ReviewsSection = () => {
     };
 
     fetchReviews();
-  }, []);
+  }, [tab]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -344,25 +346,50 @@ const ReviewsSection = () => {
     return (sum / reviews.length).toFixed(1);
   };
 
-  if (loading) {
-    return (
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <div className="text-center text-gray-500">
-          Chargement de vos avis...
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6">
-      {reviews.length === 0 ? (
+      {/* Tabs */}
+      <div className="flex items-center gap-6 mb-6">
+        <button
+          onClick={() => setTab("received")}
+          className={`text-sm font-semibold ${
+            tab === "received"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | Mes avis reçus
+        </button>
+        <button
+          onClick={() => setTab("given")}
+          className={`text-sm font-semibold ${
+            tab === "given"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | Mes avis donnés
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="text-center text-gray-500 py-8">
+          Chargement des avis...
+        </div>
+      ) : reviews.length === 0 ? (
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <StarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">Aucun avis reçu</p>
+            <p className="text-gray-500 text-lg">
+              {tab === "received" ? "Aucun avis reçu" : "Aucun avis donné"}
+            </p>
             <p className="text-gray-400 text-sm mt-2">
-              Les avis de vos voyageurs apparaîtront ici
+              {tab === "received" 
+                ? "Les avis de vos voyageurs apparaîtront ici"
+                : "Les avis que vous avez donnés apparaîtront ici"
+              }
             </p>
           </div>
         </div>
@@ -370,34 +397,38 @@ const ReviewsSection = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
-              Mes Avis ({reviews.length})
+              {tab === "received" ? "Avis reçus" : "Avis donnés"} ({reviews.length})
             </h3>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <StarIcon
-                    key={star}
-                    className={`h-4 w-4 ${
-                      star <= Math.round(parseFloat(calculateAverageRating() || "0"))
-                        ? "text-yellow-400 fill-current"
-                        : "text-gray-300"
-                    }`}
-                  />
-                ))}
+            {tab === "received" && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <StarIcon
+                      key={star}
+                      className={`h-4 w-4 ${
+                        star <= Math.round(parseFloat(calculateAverageRating() || "0"))
+                          ? "text-yellow-400 fill-current"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-gray-600 ml-1">
+                  {calculateAverageRating()} ({reviews.length} avis)
+                </span>
               </div>
-              <span className="text-sm text-gray-600 ml-1">
-                {calculateAverageRating()} ({reviews.length} avis)
-              </span>
-            </div>
+            )}
           </div>
 
           <div className="space-y-4">
             {reviews.map((review) => {
-              const reviewer = review.reviewer;
-              const reviewerName = reviewer 
-                ? `${reviewer.firstName} ${reviewer.lastName.charAt(0)}.`
+              // For received reviews, show the reviewer (who gave the review)
+              // For given reviews, show the reviewee (who received the review)
+              const displayUser = tab === "received" ? review.reviewer : review.reviewee;
+              const displayName = displayUser 
+                ? `${displayUser.firstName} ${displayUser.lastName.charAt(0)}.`
                 : "Utilisateur";
-              const reviewerAvatar = reviewer?.profilePictureUrl || "/favicon.ico";
+              const displayAvatar = displayUser?.profilePictureUrl || "/favicon.ico";
               const rating = parseFloat(review.rating || "0");
 
               return (
@@ -409,8 +440,8 @@ const ReviewsSection = () => {
                     {/* Avatar */}
                     <div className="flex-shrink-0">
                       <img
-                        src={reviewerAvatar}
-                        alt={reviewerName}
+                        src={displayAvatar}
+                        alt={displayName}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                     </div>
@@ -421,7 +452,7 @@ const ReviewsSection = () => {
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <h4 className="text-sm font-semibold text-gray-900">
-                            {reviewerName}
+                            {tab === "received" ? `Avis de ${displayName}` : `Avis pour ${displayName}`}
                           </h4>
                           {review.request?.travel && (
                             <p className="text-xs text-gray-500">

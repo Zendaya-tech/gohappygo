@@ -63,9 +63,10 @@ export interface PaginatedReviews {
   };
 }
 
-export const getReviews = async (): Promise<PaginatedReviews> => {
+export const getReviews = async (asReviewer?: boolean): Promise<PaginatedReviews> => {
   try {
-    const response = await api.get('/review');
+    const params = asReviewer ? { asReviewer: 'true' } : {};
+    const response = await api.get('/review', { params });
     return response.data;
   } catch (error) {
     console.error("Error fetching reviews:", error);
