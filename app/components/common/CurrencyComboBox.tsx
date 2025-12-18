@@ -42,24 +42,27 @@ export default function CurrencyComboBox({
 
   const debouncedQuery = useDebouncedValue(query, 300);
 
-  // Initialize with default value only once
+  // Initialize with default value
   useEffect(() => {
-    if (!isInitialized && selectedCurrency) {
+    if (selectedCurrency) {
       const displayText = compact ? selectedCurrency.code : `${selectedCurrency.name} (${selectedCurrency.code})`;
       setQuery(displayText);
       setIsInitialized(true);
-    } else if (!isInitialized && value) {
+    } else if (value && !selectedCurrency) {
       setQuery(value);
       setIsInitialized(true);
+    } else if (!selectedCurrency && !value) {
+      setQuery("");
+      setIsInitialized(true);
     }
-  }, [selectedCurrency, value, compact, isInitialized]);
+  }, [selectedCurrency, value, compact]);
 
-  // Reset initialization when selectedCurrency changes from null to a value (dialog reopening)
+  // Reset initialization when component unmounts or selectedCurrency becomes null
   useEffect(() => {
-    if (selectedCurrency && query === "") {
+    return () => {
       setIsInitialized(false);
-    }
-  }, [selectedCurrency, query]);
+    };
+  }, []);
 
   const load = async (reset: boolean) => {
     if (loading) return;

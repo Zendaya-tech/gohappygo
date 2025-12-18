@@ -122,7 +122,13 @@ export default function CreateAnnounceDialog({
       setPricePerKg(
         typeof initialData.pricePerKg === "number" ? initialData.pricePerKg : ""
       );
-      setCurrency(initialData.currency ?? user?.recentCurrency ?? null);
+      // Prioritize initialData currency, then user's recent currency
+      const defaultCurrency = initialData.currency || (user?.recentCurrency ? {
+        ...user.recentCurrency,
+        id: user.recentCurrency.id.toString(), // Convert number to string
+        country: "" // Add missing country property for type compatibility
+      } : null);
+      setCurrency(defaultCurrency);
       setLateTax(
         typeof initialData.lateTax === "number" ? initialData.lateTax : 0
       );
@@ -142,7 +148,13 @@ export default function CreateAnnounceDialog({
       setFileUrls([]);
       setKilos("");
       setPricePerKg("");
-      setCurrency(user?.recentCurrency ?? null);
+      // Set user's recent currency as default with proper type conversion
+      const defaultCurrency = user?.recentCurrency ? {
+        ...user.recentCurrency,
+        id: user.recentCurrency.id.toString(), // Convert number to string
+        country: "" // Add missing country property for type compatibility
+      } : null;
+      setCurrency(defaultCurrency);
       setLateTax(0);
       setAllowExtraGrams(false);
       setFlightNumber("");
@@ -163,7 +175,8 @@ export default function CreateAnnounceDialog({
       return (
         departure !== null && 
         arrival !== null && 
-        story.length <= 500 &&
+        story.trim().length > 0 && // Require description to be present
+        story.length <= 500 && // And within character limit
         hasValidFlightNumber
       );
     }
@@ -328,18 +341,32 @@ export default function CreateAnnounceDialog({
 
             {step === 1 && (
               <div className="space-y-6">
-                <AirportComboBox
-                  label="Select your airport of departure"
-                  value={departure?.code}
-                  onChange={setDeparture}
-                  placeholder="Choose airport"
-                />
-                <AirportComboBox
-                  label="Select your airport of arrival"
-                  value={arrival?.code}
-                  onChange={setArrival}
-                  placeholder="Choose airport"
-                />
+                <div>
+                  <AirportComboBox
+                    label="Select your airport of departure"
+                    value={departure?.code}
+                    onChange={setDeparture}
+                    placeholder="Choose airport"
+                  />
+                  {!departure && (
+                    <p className="mt-1 text-sm text-red-500 font-medium">
+                      Veuillez sélectionner un aéroport de départ
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <AirportComboBox
+                    label="Select your airport of arrival"
+                    value={arrival?.code}
+                    onChange={setArrival}
+                    placeholder="Choose airport"
+                  />
+                  {!arrival && (
+                    <p className="mt-1 text-sm text-red-500 font-medium">
+                      Veuillez sélectionner un aéroport d'arrivée
+                    </p>
+                  )}
+                </div>
 
                 <Field label="Numéro de Vol">
                   <input
@@ -416,15 +443,16 @@ export default function CreateAnnounceDialog({
                   <textarea
                     value={story}
                     onChange={(e) => {
-                      if (e.target.value.length <= 500) {
-                        setStory(e.target.value);
-                      }
+                      // Allow typing beyond 500 characters but show validation
+                      setStory(e.target.value);
                     }}
                     rows={5}
                     placeholder="Type here..."
                     className={`w-full resize-none rounded-xl border ${
                       story.length > 500
                         ? "border-red-500 focus:ring-red-500"
+                        : story.trim().length === 0
+                        ? "border-red-300 focus:ring-red-400"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
@@ -434,10 +462,22 @@ export default function CreateAnnounceDialog({
                         ? "text-red-500 font-semibold"
                         : story.length > 450
                         ? "text-orange-500"
+                        : story.trim().length === 0
+                        ? "text-red-400"
                         : "text-gray-400"
                     }`}
                   >
                     {story.length}/500 caractères
+                    {story.trim().length === 0 && (
+                      <span className="block text-red-500 font-medium">
+                        Une description est requise
+                      </span>
+                    )}
+                    {story.length > 500 && (
+                      <span className="block text-red-500 font-medium">
+                        Dépassement de {story.length - 500} caractères
+                      </span>
+                    )}
                   </div>
                 </Field>
                 <div>

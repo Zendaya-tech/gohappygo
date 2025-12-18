@@ -9,6 +9,7 @@ import BookingDialog from "~/components/common/dialog/BookingDialog";
 import MessageDialog from "~/components/common/dialog/MessageDialog";
 import ShareDialog from "~/components/common/dialog/ShareDialog";
 import CreateAnnounceDialog from "~/components/common/dialog/CreateAnnounceDialog";
+import AlertDialog from "~/components/common/dialog/AlertDialog";
 import { getAnnounceByIdAndType, type DemandTravelItem } from "~/services/announceService";
 import { getRandomQuotes, type Quote } from "~/services/quotesService";
 import { useAuthStore, type AuthState } from "~/store/auth";
@@ -45,12 +46,33 @@ export default function AnnounceDetail() {
   const [newRating, setNewRating] = useState<number>(0);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [quotesError, setQuotesError] = useState<string | null>(null);
-  const [bookingError, setBookingError] = useState<string | null>(null);
-  const [bookingSuccess, setBookingSuccess] = useState<boolean>(false);
+  
+  // Alert dialog state
+  const [alertDialog, setAlertDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    type: "success" | "error" | "warning";
+  }>({
+    open: false,
+    title: "",
+    message: "",
+    type: "success",
+  });
   
   // Import auth store to check if user owns this announce
   const currentUser = useAuthStore((s: AuthState) => s.user);
   const isOwnAnnounce = Boolean(currentUser && listing && listing.user?.id === Number(currentUser.id));
+  
+  // Helper function to show alert dialog
+  const showAlert = (title: string, message: string, type: "success" | "error" | "warning") => {
+    setAlertDialog({
+      open: true,
+      title,
+      message,
+      type,
+    });
+  };
   
   // Use real reviews from listing
   const reviews = useMemo(() => {
@@ -223,31 +245,45 @@ export default function AnnounceDetail() {
   const availableWeight = type === "travel" ? listing.weightAvailable : listing.weight;
 
   const handleBookingConfirm = async (cardData: BookingCardData) => {
-    setBookingError(null);
-    setBookingSuccess(false);
 
     if (!currentUser) {
-      setBookingError("Vous devez être connecté pour réserver");
       setBookOpen(false);
-      navigate("/login");
+      showAlert(
+        "Connexion requise",
+        "Vous devez être connecté pour réserver un voyage.",
+        "warning"
+      );
+      setTimeout(() => navigate("/login"), 2000);
       return;
     }
 
     if (type !== "travel") {
-      setBookingError("Vous ne pouvez réserver que des voyages");
       setBookOpen(false);
+      showAlert(
+        "Type d'annonce invalide",
+        "Vous ne pouvez réserver que des voyages.",
+        "error"
+      );
       return;
     }
 
     if (kilos <= 0) {
-      setBookingError("Veuillez entrer un poids valide");
       setBookOpen(false);
+      showAlert(
+        "Poids invalide",
+        "Veuillez entrer un poids valide supérieur à 0.",
+        "warning"
+      );
       return;
     }
 
-    if (kilos > availableWeight) {
-      setBookingError(`Le poids demandé dépasse la capacité disponible (${availableWeight}kg)`);
+    if (kilos > (availableWeight || 0)) {
       setBookOpen(false);
+      showAlert(
+        "Capacité insuffisante",
+        `Le poids demandé (${kilos}kg) dépasse la capacité disponible (${availableWeight || 0}kg).`,
+        "warning"
+      );
       return;
     }
 
@@ -260,11 +296,14 @@ export default function AnnounceDetail() {
       };
 
       const response = await createRequestToTravel(payload);
-      setBookingSuccess(true);
       setBookOpen(false);
       
       // Show success message
-      alert(`Réservation réussie! Votre demande #${response.id} a été créée.`);
+      showAlert(
+        "Réservation réussie!",
+        `Votre demande #${response.id} a été créée avec succès.`,
+        "success"
+      );
       
       // Reset kilos
       setKilos(0);
@@ -277,9 +316,12 @@ export default function AnnounceDetail() {
     } catch (error: any) {
       console.error("Booking error:", error);
       const errorMessage = error?.message || "Une erreur est survenue lors de la réservation";
-      setBookingError(errorMessage);
       setBookOpen(false);
-      alert(`Erreur: ${errorMessage}`);
+      showAlert(
+        "Erreur de réservation",
+        errorMessage,
+        "error"
+      );
     }
   };
 
@@ -287,32 +329,7 @@ export default function AnnounceDetail() {
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <Header />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-        {/* Success/Error Messages */}
-        {bookingSuccess && (
-          <div className="mb-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-4">
-            <div className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                Réservation effectuée avec succès!
-              </p>
-            </div>
-          </div>
-        )}
-        
-        {bookingError && (
-          <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4">
-            <div className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                {bookingError}
-              </p>
-            </div>
-          </div>
-        )}
+
 
         {/* Left: media + traveller + route + description */}
         <div>
@@ -825,10 +842,7 @@ export default function AnnounceDetail() {
       {/* Booking Dialog */}
       <BookingDialog
         open={bookOpen}
-        onClose={() => {
-          setBookOpen(false);
-          setBookingError(null);
-        }}
+        onClose={() => setBookOpen(false)}
         amount={total}
         email={currentUser?.email || ""}
         onConfirm={handleBookingConfirm}
@@ -879,7 +893,7 @@ export default function AnnounceDetail() {
               return "";
             }
           })(),
-          airlineId: listing.airline?.airlineId || listing.airline?.id,
+          airline: listing.airline,
           flightNumber: listing.flightNumber,
           reservationType: listing.isSharedWeight ? "shared" : "single",
           bookingType: listing.isInstant ? "instant" : "non-instant",
@@ -990,6 +1004,16 @@ export default function AnnounceDetail() {
           </div>
         </div>
       )}
+
+      {/* Alert Dialog */}
+      <AlertDialog
+        open={alertDialog.open}
+        onClose={() => setAlertDialog(prev => ({ ...prev, open: false }))}
+        title={alertDialog.title}
+        message={alertDialog.message}
+        type={alertDialog.type}
+      />
+
       <Footer />
     </div>
   );

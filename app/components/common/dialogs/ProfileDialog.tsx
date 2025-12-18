@@ -262,18 +262,11 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
 
                 {/* Form Fields */}
                 <div className="space-y-4">
-                  {/* Identity Notice */}
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-800">
-                      ℹ️ Nom et prénom tels que sur la pièce d'identité
-                    </p>
-                  </div>
-
                   {/* First Name */}
                   <div>
                     <input
                       type="text"
-                      placeholder="Prénom"
+                      placeholder="Prénom (tel que sur la pièce d'identité)"
                       value={formData.firstName}
                       onChange={(e) =>
                         handleInputChange("firstName", e.target.value)
@@ -289,7 +282,7 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
                   <div>
                     <input
                       type="text"
-                      placeholder="Nom de famille"
+                      placeholder="Nom de famille (tel que sur la pièce d'identité)"
                       value={formData.lastName}
                       onChange={(e) =>
                         handleInputChange("lastName", e.target.value)
