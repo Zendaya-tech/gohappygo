@@ -123,11 +123,12 @@ export default function CreateAnnounceDialog({
         typeof initialData.pricePerKg === "number" ? initialData.pricePerKg : ""
       );
       // Prioritize initialData currency, then user's recent currency
-      const defaultCurrency = initialData.currency || (user?.recentCurrency ? {
+      const defaultCurrency =  (user?.recentCurrency ? {
         ...user.recentCurrency,
         id: user.recentCurrency.id.toString(), // Convert number to string
         country: "" // Add missing country property for type compatibility
       } : null);
+     console.log(defaultCurrency)
       setCurrency(defaultCurrency);
       setLateTax(
         typeof initialData.lateTax === "number" ? initialData.lateTax : 0

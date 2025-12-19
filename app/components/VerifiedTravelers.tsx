@@ -59,7 +59,7 @@ export default function VerifiedTravelers() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {travels.map((travel) => {
                     const id = travel.id?.toString() || Math.random().toString(36).slice(2);
-                    const name = formatName(travel.user?.name || "Voyageur");
+                    const name = formatName(travel.user?.fullName || "Voyageur");
                     const avatar = travel.user?.selfieImage || "/favicon.ico";
                     const originName = travel.departureAirport?.name || "";
                     const destName = travel.arrivalAirport?.name || "";
@@ -78,7 +78,7 @@ export default function VerifiedTravelers() {
                         <AnnounceCard 
                             key={id} 
                             id={id} 
-                            name={name}
+                            fullName={name}
                             avatar={avatar}
                             location={route}
                             price={pricePerKg}

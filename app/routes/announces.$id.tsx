@@ -131,20 +131,34 @@ export default function AnnounceDetail() {
     loadQuotes();
   }, []);
 
-  // Simple gallery to mirror the design
+  // Simple gallery to mirror the design - Always 3 images
   const galleryImages = useMemo(() => {
-    if (!listing) return [];
+    if (!listing) return ["/logo.png", "/logo.png", "/logo.png"];
     const images = listing.images?.map(img => img.fileUrl) || [];
     
     if (type === "travel") {
       // Pour les voyages: logo de la compagnie + images
-      if (listing.airline?.logoUrl) {
-        return [listing.airline.logoUrl, ...images];
-      }
-      return images;
+      const travelImages = [];
+      
+      // Image principale (logo de la compagnie ou première image)
+      travelImages.push(listing.airline?.logoUrl || images[0] || "/logo.png");
+      
+      // Deuxième image
+      travelImages.push(images[0] || "/logo.png");
+      
+      // Troisième image
+      travelImages.push(images[1] || "/logo.png");
+      
+      return travelImages;
     } else {
-      // Pour les demandes: les 3 premières images
-      return images.slice(0, 3);
+      // Pour les demandes: toujours 3 images avec placeholders si nécessaire
+      const demandImages = [];
+      
+      demandImages.push(images[0] || "/logo.png");
+      demandImages.push(images[1] || "/logo.png");
+      demandImages.push(images[2] || "/logo.png");
+      
+      return demandImages;
     }
   }, [listing, type]);
 
@@ -375,9 +389,10 @@ export default function AnnounceDetail() {
             )}
           </div>
 
-          {/* Gallery with hover effects */}
+          {/* Gallery with hover effects - Always 3 images */}
           <div className="rounded-2xl overflow-hidden bg-white dark:bg-gray-900">
             <div className="flex flex-col md:flex-row h-auto md:h-[400px] gap-3 md:gap-4">
+              {/* Image principale */}
               <div className="flex-1 h-[300px] md:h-full">
                 <div
                   className="relative w-full h-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:shadow-lg"
@@ -387,91 +402,51 @@ export default function AnnounceDetail() {
                   }}
                 >
                   <img
-                    src={
-                      type === "travel"
-                        ? listing.airline?.logoUrl || "/favicon.ico"
-                        : listing.images?.[0]?.fileUrl || "/favicon.ico"
-                    }
-                    alt="main"
+                    src={galleryImages[0]}
+                    alt="Image principale"
                     className={`h-full w-full transition-transform duration-300 group-hover:scale-110 ${
-                      type === "travel" ? "object-contain p-8" : "object-cover"
+                      type === "travel" && galleryImages[0] === listing.airline?.logoUrl 
+                        ? "object-contain p-8" 
+                        : "object-cover"
                     }`}
                   />
-                  <div className="absolute inset-0  bg-black  opacity-0  group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
                 </div>
               </div>
+              
+              {/* Images secondaires - toujours 2 images */}
               <div className="w-full md:w-80 flex flex-row md:flex-col gap-3 h-[120px] md:h-full">
-                {type === "travel" ? (
-                  <>
-                    {listing.images?.[0] && (
-                      <div
-                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                        onClick={() => {
-                          setCurrentImageIndex(1);
-                          setSliderOpen(true);
-                        }}
-                      >
-                        <img
-                          src={listing.images[0].fileUrl}
-                          alt="thumb-1"
-                          className="h-full w-full object-cover transition-transform duration-300 "
-                        />
-                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
-                      </div>
-                    )}
-                    {listing.images?.[1] && (
-                      <div
-                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                        onClick={() => {
-                          setCurrentImageIndex(2);
-                          setSliderOpen(true);
-                        }}
-                      >
-                        <img
-                          src={listing.images[1].fileUrl}
-                          alt="thumb-2"
-                          className="h-full w-full object-cover transition-transform duration-300 "
-                        />
-                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {listing.images?.[1] && (
-                      <div
-                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                        onClick={() => {
-                          setCurrentImageIndex(1);
-                          setSliderOpen(true);
-                        }}
-                      >
-                        <img
-                          src={listing.images[1].fileUrl}
-                          alt="thumb-1"
-                          className="h-full w-full object-cover transition-transform duration-300 "
-                        />
-                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
-                      </div>
-                    )}
-                    {listing.images?.[2] && (
-                      <div
-                        className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                        onClick={() => {
-                          setCurrentImageIndex(2);
-                          setSliderOpen(true);
-                        }}
-                      >
-                        <img
-                          src={listing.images[2].fileUrl}
-                          alt="thumb-2"
-                          className="h-full w-full object-cover transition-transform duration-300 "
-                        />
-                        <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
-                      </div>
-                    )}
-                  </>
-                )}
+                {/* Deuxième image */}
+                <div
+                  className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                  onClick={() => {
+                    setCurrentImageIndex(1);
+                    setSliderOpen(true);
+                  }}
+                >
+                  <img
+                    src={galleryImages[1]}
+                    alt="Image 2"
+                    className="h-full w-full object-cover transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                </div>
+                
+                {/* Troisième image */}
+                <div
+                  className="relative flex-1 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 cursor-pointer group transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                  onClick={() => {
+                    setCurrentImageIndex(2);
+                    setSliderOpen(true);
+                  }}
+                >
+                  <img
+                    src={galleryImages[2]}
+                    alt="Image 3"
+                    className="h-full w-full object-cover transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-all duration-300 rounded-xl"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -561,20 +536,59 @@ export default function AnnounceDetail() {
                 </p>
               </div>
 
-              {/* Badges */}
-              <div className="mt-6 flex flex-wrap items-center gap-6 text-sm">
-                {/* <div className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">✓</span>
-                                    accepte qu'une personne pour tous les kilos
-                                </div>
-                                <div className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">⏱️</span>
-                                    accepte la ponctualité
-                                </div> */}
-                {/* <div className="inline-flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">⚖️</span>
-                                    n'accepte pas de grammes en trop
-                                </div> */}
+              {/* Badges - Grid 2x2 */}
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                {/* Reservation type badge */}
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <img 
+                    src="/images/badges/multiple.jpeg" 
+                    alt="Type de réservation" 
+                    className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                  />
+                  <span className="flex-1">
+                    {listing.isSharedWeight 
+                      ? "peut prendre des kilos de plusieurs voyageurs" 
+                      : "accepte qu'une personne pour tous les kilos"
+                    }
+                  </span>
+                </div>
+
+                {/* Punctuality badge */}
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <img 
+                    src="/images/badges/ponctuel.jpeg" 
+                    alt="Ponctualité" 
+                    className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                  />
+                  <span className="flex-1">ponctuel</span>
+                </div>
+
+                {/* Extra weight badge */}
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <img 
+                    src="/images/badges/kilos_trop.jpeg" 
+                    alt="Poids supplémentaire" 
+                    className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                  />
+                  <span className="flex-1">
+                    {listing.isAllowExtraWeight 
+                      ? "accepte quelques grammes en trop" 
+                      : "n'accepte pas de grammes en trop"
+                    }
+                  </span>
+                </div>
+
+                {/* Booking type badge */}
+                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                  <img 
+                    src="/images/badges/reservation.jpeg" 
+                    alt="Type de confirmation" 
+                    className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                  />
+                  <span className="flex-1">
+                    la réservation sera confirmée {listing.isInstant ? "instantanément" : "par l'HappyVoyageur"}
+                  </span>
+                </div>
               </div>
 
               {/* Capacity bar */}

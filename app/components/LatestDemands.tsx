@@ -70,7 +70,7 @@ export default function LatestDemands() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {demands.map((demand) => {
           const id = demand.id?.toString() || Math.random().toString(36).slice(2);
-          const name = formatName(demand.user?.name || "Voyageur");
+          const name = formatName(demand.user?.fullName || "Voyageur");
           const avatar = demand.user?.selfieImage || "/favicon.ico";
           const originName = demand.departureAirport?.name || "";
           const destName = demand.arrivalAirport?.name || "";
@@ -90,7 +90,7 @@ export default function LatestDemands() {
               key={id}
               id={id}
               avatar={avatar}
-              name={name}
+              fullName={name}
               location={route}
               price={pricePerKg}
               rating={priority}
