@@ -132,11 +132,18 @@ export default function RegisterDialog({
               </p>
             </div>
 
-            <form className="space-y-4 sm:space-y-6" onSubmit={onSubmit}>
+            <form
+              className="space-y-4 sm:space-y-6 text-gray-500"
+              onSubmit={onSubmit}
+            >
               {message && (
-                <div className="text-xs sm:text-sm text-green-600">{message}</div>
+                <div className="text-xs sm:text-sm text-green-600">
+                  {message}
+                </div>
               )}
-              {error && <div className="text-xs sm:text-sm text-red-600">{error}</div>}
+              {error && (
+                <div className="text-xs sm:text-sm text-red-600">{error}</div>
+              )}
 
               {step === 1 ? (
                 <>
@@ -357,7 +364,10 @@ export default function RegisterDialog({
                 {/* Boutons sociaux */}
                 <div className="flex justify-center gap-2 sm:gap-4">
                   <button className="flex text-xs sm:text-sm w-28 sm:w-32 items-center justify-center px-2 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" viewBox="0 0 24 24">
+                    <svg
+                      className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         fill="#4285F4"
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
