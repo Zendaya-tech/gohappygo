@@ -1,75 +1,142 @@
 import { useEffect, useState } from "react";
 
 export default function MessageDialog({
-    open,
-    onClose,
-    title,
-    hostName,
-    hostAvatar,
-    onSend
+  open,
+  onClose,
+  title,
+  hostName,
+  hostAvatar,
+  onSend,
 }: {
-    open: boolean;
-    onClose: () => void;
-    title: string;
-    hostName: string;
-    hostAvatar: string;
-    onSend: (message: string) => void;
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  hostName: string;
+  hostAvatar: string;
+  onSend: (message: string) => void;
 }) {
-    const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");
 
-    useEffect(() => {
-        if (!open) return;
-        const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose();
-        };
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, [open, onClose]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
 
-    useEffect(() => {
-        if (!open) return;
-        setMessage("");
-    }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    setMessage("");
+  }, [open]);
 
-    if (!open) return null;
+  if (!open) return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="fixed inset-0 bg-black/40" onClick={onClose} />
-            <div className="relative z-10 w-full max-w-md  rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
-                {/* Header */}
-                <div className="flex items-start justify-between p-6 pb-4">
-                    <div className="flex items-center gap-4">
-                        <img src={hostAvatar} alt={hostName} className="h-12 w-12 rounded-full object-cover" />
-                        <div>
-                            <div className="text-lg font-semibold text-gray-900">{title}</div>
-                            <div className="text-sm text-gray-500">{hostName}</div>
-                        </div>
-                    </div>
-                    <button onClick={onClose} aria-label="Close" className="text-gray-500 hover:text-gray-700">
-                        <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+
+      {/* Modal Container */}
+      <div className="relative z-10 w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/10">
+        <div className="flex flex-col md:flex-row">
+          {/* Left Column: Message Form */}
+          <div className="flex-1 p-6 md:p-8">
+            <div className="flex items-start gap-4 mb-6">
+              <img
+                src={hostAvatar}
+                alt={hostName}
+                className="h-12 w-12 rounded-full object-cover shadow-sm"
+              />
+              <div>
+                <div className="text-lg font-bold text-gray-900 leading-tight">
+                  {title}
                 </div>
-
-                {/* Body */}
-                <div className="px-6 pb-6">
-                    <textarea
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Your message here ..."
-                        rows={5}
-                        className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                    <button
-                        onClick={() => { if (message.trim()) { onSend(message.trim()); onClose(); } }}
-                        className="mt-4 w-full rounded-lg bg-blue-600 py-3 text-white font-semibold hover:bg-blue-700"
-                    >
-                        Send message
-                    </button>
-                </div>
+                <div className="text-sm text-gray-500">{hostName}</div>
+              </div>
             </div>
+
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Your message here ..."
+              rows={6}
+              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
+            />
+
+            <button
+              onClick={() => {
+                if (message.trim()) {
+                  onSend(message.trim());
+                  onClose();
+                }
+              }}
+              className="mt-6 w-full rounded-lg bg-[#2d6a74] py-3 text-white font-semibold hover:bg-[#25575f] transition-colors"
+            >
+              Send message
+            </button>
+          </div>
+
+          {/* Right Column: Safety Information */}
+          <div className="relative w-full md:w-[380px] bg-white p-6 md:p-8 md:border-l border-gray-100">
+            {/* Close Button positioned in the right panel as per image */}
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <div className="mt-2 flex flex-col gap-6">
+              {/* Warning Icon */}
+              <div className="text-red-500">
+                <svg
+                  className="h-9 w-9"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+
+              {/* French Safety Text */}
+              <div className="space-y-6 text-[15px] leading-relaxed text-gray-800">
+                <p>
+                  Pour garantir votre sécurité, restez toujours sur{" "}
+                  <span className="font-medium text-blue-600 hover:underline cursor-pointer">
+                    GoHappyGo
+                  </span>{" "}
+                  jusqu'au bout de votre voyage.
+                </p>
+                <p>
+                  Pour éviter les arnaques, ne cliquez jamais sur des liens de
+                  paiement ou de virement partagés par d'autres membres.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
-
-
