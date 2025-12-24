@@ -1,57 +1,74 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 export default function SupportSection() {
-    const { t } = useTranslation();
-    return (
-        <section className="px-4 py-12 mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
-                Notre <span className="text-blue-600">Support</span>
-            </h2>
+  const { t } = useTranslation();
+  return (
+    <section className="px-4 py-12 mx-auto">
+      <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
+        Nos <span className="text-blue-600">Garanties</span>
+      </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-blue-600 flex flex-col justify-between text-white p-8 rounded-2xl min-h-[220px]">
-                    <h3 className="text-xl font-bold mb-4">{t('home.supportSection.support247.title')}</h3>
-                    <p className="text-blue-100 text-2xl mb-6">{t('home.supportSection.support247.description')}</p>
-                    <button className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
-                        {t('home.supportSection.support247.cta')}
-                    </button>
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-blue-600 flex flex-col justify-between text-white p-8 rounded-2xl min-h-[220px]">
+          <h3 className="text-xl font-bold mb-4">
+            {t("home.supportSection.support247.title")}
+          </h3>
+          <p className="text-blue-100 text-2xl mb-6">
+            {t("home.supportSection.support247.description")}
+          </p>
+          <button className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100">
+            {t("home.supportSection.support247.cta")}
+          </button>
+        </div>
 
-                <div className="bg-gray-900 flex flex-col justify-between text-white p-8 rounded-2xl min-h-[220px]">
-                    <h3 className="text-xl font-bold mb-4">{t('home.supportSection.insurance.title')}</h3>
-                    <p className="text-gray-300 text-2xl mb-6">{t('home.supportSection.insurance.description')}</p>
+        <div className="bg-gray-900 flex flex-col justify-between text-white p-8 rounded-2xl min-h-[220px]">
+          <h3 className="text-xl font-bold mb-4">
+            {t("home.supportSection.insurance.title")}
+          </h3>
+          <p className="text-gray-300 text-2xl mb-6">
+            {t("home.supportSection.insurance.description")}
+          </p>
+        </div>
 
-                </div>
-
-                <div className="bg-gray-100 col-span-1 md:col-span-2 flex flex-col justify-between text-gray-900 p-6 md:p-8 rounded-2xl">
-                    <h3 className="text-xl font-bold mb-4 uppercase">{t('home.supportSection.online.title')}</h3>
-                    <p className="text-gray-800 mb-6 text-xl md:text-2xl">{t('home.supportSection.online.description')}</p>
-                    <form className="flex flex-col gap-3">
-                        <div>
-                            <label htmlFor="support-email" className="sr-only">Email</label>
-                            <input 
-                                id="support-email" 
-                                type="email" 
-                                placeholder="Votre email" 
-                                className="w-full px-4 py-3 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            />
-                        </div>
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                            <label htmlFor="support-message" className="sr-only">{t('home.supportSection.online.placeholder')}</label>
-                            <input 
-                                id="support-message" 
-                                type="text" 
-                                placeholder={t('home.supportSection.online.placeholder')} 
-                                className="flex-1 px-4 py-3 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                            />
-                            <button type="submit" className="bg-slate-800 text-white px-5 py-3 rounded-lg font-semibold hover:bg-blue-700">
-                                {t('home.supportSection.online.send')}
-                            </button>
-                        </div>
-                    </form>
-
-                </div>
+        <div className="bg-gray-100 col-span-1 md:col-span-2 flex flex-col justify-between text-gray-900 p-6 md:p-8 rounded-2xl">
+          <h3 className="text-xl font-bold mb-4 uppercase">
+            {t("home.supportSection.online.title")}
+          </h3>
+          <p className="text-gray-800 mb-6 text-xl md:text-2xl">
+            {t("home.supportSection.online.description")}
+          </p>
+          <form className="flex flex-col gap-3">
+            <div>
+              <label htmlFor="support-email" className="sr-only">
+                Email
+              </label>
+              <input
+                id="support-email"
+                type="email"
+                placeholder="Votre email"
+                className="w-full px-4 py-3 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
-        </section>
-    );
-} 
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <label htmlFor="support-message" className="sr-only">
+                {t("home.supportSection.online.placeholder")}
+              </label>
+              <input
+                id="support-message"
+                type="text"
+                placeholder={t("home.supportSection.online.placeholder")}
+                className="flex-1 px-4 py-3 bg-white rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                type="submit"
+                className="bg-slate-800 text-white px-5 py-3 rounded-lg font-semibold hover:bg-blue-700"
+              >
+                {t("home.supportSection.online.send")}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
