@@ -47,3 +47,51 @@ export const createDemand = async (data: CreateDemandData) => {
     throw error; // Propagate the error instead of returning null
   }
 };
+
+export interface UpdateDemandData {
+  flightNumber?: string;
+  description?: string;
+  departureAirportId?: number;
+  arrivalAirportId?: number;
+  travelDate?: string;
+  weight?: number;
+  pricePerKg?: number;
+  currencyId?: number;
+  packageKind?: string;
+  image1?: File;
+  image2?: File;
+  image3?: File;
+}
+
+export const updateDemand = async (demandId: number, data: UpdateDemandData) => {
+  try {
+    const formData = new FormData();
+
+    // Add all the form fields that are provided
+    if (data.flightNumber !== undefined) formData.append("flightNumber", data.flightNumber);
+    if (data.description !== undefined) formData.append("description", data.description);
+    if (data.departureAirportId !== undefined) formData.append("departureAirportId", data.departureAirportId.toString());
+    if (data.arrivalAirportId !== undefined) formData.append("arrivalAirportId", data.arrivalAirportId.toString());
+    if (data.travelDate !== undefined) formData.append("travelDate", data.travelDate);
+    if (data.weight !== undefined) formData.append("weight", data.weight.toString());
+    if (data.pricePerKg !== undefined) formData.append("pricePerKg", data.pricePerKg.toString());
+    if (data.currencyId !== undefined) formData.append("currencyId", data.currencyId.toString());
+    if (data.packageKind !== undefined) formData.append("packageKind", data.packageKind);
+
+    // Add images if provided
+    if (data.image1) formData.append("image1", data.image1);
+    if (data.image2) formData.append("image2", data.image2);
+    if (data.image3) formData.append("image3", data.image3);
+
+    const response = await api.patch(`/demand/${demandId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating demand:", error);
+    throw error;
+  }
+};

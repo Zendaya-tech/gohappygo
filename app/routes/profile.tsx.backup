@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from "react";
-import { useSearchParams } from "react-router";
 import Header from "../components/Header";
 import FooterMinimal from "~/components/FooterMinimal";
 import ProfileDialog from "../components/common/dialogs/ProfileDialog";
@@ -28,7 +27,6 @@ import { getBookmarks, type BookmarkItem, getDemandAndTravel, getUserDemandsAndT
 import { removeBookmark } from "~/services/bookmarkService";
 import { getReviews, type Review } from "~/services/reviewService";
 import { getRequests, acceptRequest, completeRequest, type RequestResponse } from "~/services/requestService";
-import { getMe, type GetMeResponse } from "~/services/authService";
 
 interface ProfileSection {
   id: string;
@@ -334,20 +332,12 @@ const ReviewsSection = () => {
   const [tab, setTab] = useState<"received" | "given">("received");
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get("user");
-  const { user: currentUser } = useAuth();
-  
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
 
   useEffect(() => {
     const fetchReviews = async () => {
       setLoading(true);
       try {
-        // For other users' profiles, only show received reviews
-        // For own profile, allow switching between received and given
-        const asReviewer = isOwnProfile ? (tab === "given") : false;
-        const response = await getReviews(asReviewer, userId ? Number(userId) : undefined);
+        const response = await getReviews(tab === "given");
         setReviews(response.items || []);
       } catch (error) {
         console.error("Error fetching reviews:", error);
@@ -357,7 +347,7 @@ const ReviewsSection = () => {
     };
 
     fetchReviews();
-  }, [tab, userId, isOwnProfile]);
+  }, [tab]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -374,33 +364,33 @@ const ReviewsSection = () => {
     return (sum / reviews.length).toFixed(1);
   };
 
+
+
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6">
-      {/* Tabs - Only show for own profile */}
-      {isOwnProfile && (
-        <div className="flex items-center gap-6 mb-6">
-          <button
-            onClick={() => setTab("received")}
-            className={`text-sm font-semibold ${
-              tab === "received"
-                ? "text-gray-900 dark:text-white"
-                : "text-gray-500"
-            }`}
-          >
-            | Mes avis reçus
-          </button>
-          <button
-            onClick={() => setTab("given")}
-            className={`text-sm font-semibold ${
-              tab === "given"
-                ? "text-gray-900 dark:text-white"
-                : "text-gray-500"
-            }`}
-          >
-            | Mes avis donnés
-          </button>
-        </div>
-      )}
+      {/* Tabs */}
+      <div className="flex items-center gap-6 mb-6">
+        <button
+          onClick={() => setTab("received")}
+          className={`text-sm font-semibold ${
+            tab === "received"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | Mes avis reçus
+        </button>
+        <button
+          onClick={() => setTab("given")}
+          className={`text-sm font-semibold ${
+            tab === "given"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | Mes avis donnés
+        </button>
+      </div>
 
       {loading ? (
         <div className="text-center text-gray-500 py-8">
@@ -411,18 +401,12 @@ const ReviewsSection = () => {
           <div className="text-center">
             <StarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
-              {isOwnProfile 
-                ? (tab === "received" ? "Aucun avis reçu" : "Aucun avis donné")
-                : "Aucun avis reçu"
-              }
+              {tab === "received" ? "Aucun avis reçu" : "Aucun avis donné"}
             </p>
             <p className="text-gray-400 text-sm mt-2">
-              {isOwnProfile 
-                ? (tab === "received" 
-                    ? "Les avis de vos voyageurs apparaîtront ici"
-                    : "Les avis que vous avez donnés apparaîtront ici"
-                  )
-                : "Cet utilisateur n'a pas encore reçu d'avis"
+              {tab === "received" 
+                ? "Les avis de vos voyageurs apparaîtront ici"
+                : "Les avis que vous avez donnés apparaîtront ici"
               }
             </p>
           </div>
@@ -431,12 +415,9 @@ const ReviewsSection = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
-              {isOwnProfile 
-                ? (tab === "received" ? "Avis reçus" : "Avis donnés")
-                : "Avis reçus"
-              } ({reviews.length})
+              {tab === "received" ? "Avis reçus" : "Avis donnés"} ({reviews.length})
             </h3>
-            {(tab === "received" || !isOwnProfile) && (
+            {tab === "received" && (
               <div className="flex items-center gap-2">
                 <div className="flex items-center">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -461,7 +442,7 @@ const ReviewsSection = () => {
             {reviews.map((review) => {
               // For received reviews, show the reviewer (who gave the review)
               // For given reviews, show the reviewee (who received the review)
-              const displayUser = (isOwnProfile && tab === "given") ? review.reviewee : review.reviewer;
+              const displayUser = tab === "received" ? review.reviewer : review.reviewee;
               const displayName = displayUser 
                 ? `${displayUser.firstName} ${displayUser.lastName.charAt(0)}.`
                 : "Utilisateur";
@@ -489,10 +470,7 @@ const ReviewsSection = () => {
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <h4 className="text-sm font-semibold text-gray-900">
-                            {isOwnProfile 
-                              ? (tab === "received" ? `Avis de ${displayName}` : `Avis pour ${displayName}`)
-                              : `Avis de ${displayName}`
-                            }
+                            {tab === "received" ? `Avis de ${displayName}` : `Avis pour ${displayName}`}
                           </h4>
                           {review.request?.travel && (
                             <p className="text-xs text-gray-500">
@@ -544,19 +522,13 @@ const TravelRequestsSection = () => {
   const [editingDemand, setEditingDemand] = useState<DemandTravelItem | null>(null);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const [demandToCancel, setDemandToCancel] = useState<DemandTravelItem | null>(null);
-  const { user: currentUser } = useAuth();
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get("user");
-  
-  // Use the profile user ID or current user ID
-  const targetUserId = userId || currentUser?.id;
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
+  const { user } = useAuth();
 
   const fetchDemands = async () => {
-    if (!targetUserId) return;
+    if (!user?.id) return;
     
     try {
-      const response = await getUserDemandsAndTravels(Number(targetUserId), "demand");
+      const response = await getUserDemandsAndTravels(Number(user.id), "demand");
       const items = Array.isArray(response) ? response : response?.items ?? [];
       setDemands(items);
     } catch (error) {
@@ -568,7 +540,7 @@ const TravelRequestsSection = () => {
 
   useEffect(() => {
     fetchDemands();
-  }, [targetUserId]);
+  }, [user?.id]);
 
   const handleCancelDemand = async () => {
     if (!demandToCancel) return;
@@ -602,7 +574,7 @@ const TravelRequestsSection = () => {
     return (
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <div className="text-center text-gray-500">
-          Chargement des demandes...
+          Chargement de vos demandes...
         </div>
       </div>
     );
@@ -615,14 +587,9 @@ const TravelRequestsSection = () => {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <QuestionMarkCircleIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">
-                {isOwnProfile ? "Aucune demande de voyage" : "Aucune demande de voyage publique"}
-              </p>
+              <p className="text-gray-500 text-lg">Aucune demande de voyage</p>
               <p className="text-gray-400 text-sm mt-2">
-                {isOwnProfile 
-                  ? "Créez une demande pour trouver un transporteur"
-                  : "Cet utilisateur n'a pas encore publié de demandes"
-                }
+                Créez une demande pour trouver un transporteur
               </p>
             </div>
           </div>
@@ -664,26 +631,23 @@ const TravelRequestsSection = () => {
                       </div>
                     </div>
 
-                    {/* Only show edit/cancel buttons for own profile */}
-                    {isOwnProfile && (
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => setEditingDemand(demand)}
-                          className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setDemandToCancel(demand);
-                            setCancelConfirmOpen(true);
-                          }}
-                          className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => setEditingDemand(demand)}
+                        className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setDemandToCancel(demand);
+                          setCancelConfirmOpen(true);
+                        }}
+                        className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -692,8 +656,8 @@ const TravelRequestsSection = () => {
         )}
       </div>
       
-      {/* Edit Package Dialog - Only show for own profile */}
-      {isOwnProfile && editingDemand && (
+      {/* Edit Package Dialog */}
+      {editingDemand && (
         <EditPackageDialog
           open={!!editingDemand}
           onClose={() => setEditingDemand(null)}
@@ -702,22 +666,20 @@ const TravelRequestsSection = () => {
         />
       )}
 
-      {/* Cancel Confirmation Dialog - Only show for own profile */}
-      {isOwnProfile && (
-        <ConfirmCancelDialog
-          open={cancelConfirmOpen}
-          onClose={() => {
-            setCancelConfirmOpen(false);
-            setDemandToCancel(null);
-          }}
-          onConfirm={handleCancelDemand}
-          title="Annuler la demande de voyage"
-          message={`Êtes-vous sûr de vouloir annuler cette demande de voyage ? Cette action ne peut pas être annulée.`}
-          confirmText="Oui, annuler"
-          cancelText="Non, garder"
-          type="danger"
-        />
-      )}
+      {/* Cancel Confirmation Dialog */}
+      <ConfirmCancelDialog
+        open={cancelConfirmOpen}
+        onClose={() => {
+          setCancelConfirmOpen(false);
+          setDemandToCancel(null);
+        }}
+        onConfirm={handleCancelDemand}
+        title="Annuler la demande de voyage"
+        message={`Êtes-vous sûr de vouloir annuler cette demande de voyage ? Cette action ne peut pas être annulée.`}
+        confirmText="Oui, annuler"
+        cancelText="Non, garder"
+        type="danger"
+      />
     </>
   );
 };
@@ -728,19 +690,13 @@ const TravelsSection = () => {
   const [editingTravel, setEditingTravel] = useState<DemandTravelItem | null>(null);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const [travelToCancel, setTravelToCancel] = useState<DemandTravelItem | null>(null);
-  const { user: currentUser } = useAuth();
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get("user");
-  
-  // Use the profile user ID or current user ID
-  const targetUserId = userId || currentUser?.id;
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
+  const { user } = useAuth();
 
   const fetchTravels = async () => {
-    if (!targetUserId) return;
+    if (!user?.id) return;
     
     try {
-      const response = await getUserDemandsAndTravels(Number(targetUserId), "travel");
+      const response = await getUserDemandsAndTravels(Number(user.id), "travel");
       const items = Array.isArray(response) ? response : response?.items ?? [];
       setTravels(items);
     } catch (error) {
@@ -752,7 +708,7 @@ const TravelsSection = () => {
 
   useEffect(() => {
     fetchTravels();
-  }, [targetUserId]);
+  }, [user?.id]);
 
   const handleCancelTravel = async () => {
     if (!travelToCancel) return;
@@ -786,7 +742,7 @@ const TravelsSection = () => {
     return (
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <div className="text-center text-gray-500">
-          Chargement des voyages...
+          Chargement de vos voyages...
         </div>
       </div>
     );
@@ -799,14 +755,9 @@ const TravelsSection = () => {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <PaperAirplaneIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">
-                {isOwnProfile ? "Aucun voyage" : "Aucun voyage public"}
-              </p>
+              <p className="text-gray-500 text-lg">Aucun voyage</p>
               <p className="text-gray-400 text-sm mt-2">
-                {isOwnProfile 
-                  ? "Publiez une annonce de voyage pour transporter des baggage"
-                  : "Cet utilisateur n'a pas encore publié de voyages"
-                }
+                Publiez une annonce de voyage pour transporter des baggage
               </p>
             </div>
           </div>
@@ -848,26 +799,23 @@ const TravelsSection = () => {
                       </div>
                     </div>
 
-                    {/* Only show edit/cancel buttons for own profile */}
-                    {isOwnProfile && (
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => setEditingTravel(travel)}
-                          className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={() => {
-                            setTravelToCancel(travel);
-                            setCancelConfirmOpen(true);
-                          }}
-                          className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => setEditingTravel(travel)}
+                        className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setTravelToCancel(travel);
+                          setCancelConfirmOpen(true);
+                        }}
+                        className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -876,8 +824,8 @@ const TravelsSection = () => {
         )}
       </div>
       
-      {/* Edit Announce Dialog - Only show for own profile */}
-      {isOwnProfile && editingTravel && (
+      {/* Edit Announce Dialog */}
+      {editingTravel && (
         <EditAnnounceDialog
           open={!!editingTravel}
           onClose={() => setEditingTravel(null)}
@@ -886,26 +834,91 @@ const TravelsSection = () => {
         />
       )}
 
-      {/* Cancel Confirmation Dialog - Only show for own profile */}
-      {isOwnProfile && (
-        <ConfirmCancelDialog
-          open={cancelConfirmOpen}
-          onClose={() => {
-            setCancelConfirmOpen(false);
-            setTravelToCancel(null);
-          }}
-          onConfirm={handleCancelTravel}
-          title="Annuler l'annonce de voyage"
-          message={`Êtes-vous sûr de vouloir annuler cette annonce de voyage ? Cette action ne peut pas être annulée.`}
-          confirmText="Oui, annuler"
-          cancelText="Non, garder"
-          type="danger"
-        />
-      )}
+      {/* Cancel Confirmation Dialog */}
+      <ConfirmCancelDialog
+        open={cancelConfirmOpen}
+        onClose={() => {
+          setCancelConfirmOpen(false);
+          setTravelToCancel(null);
+        }}
+        onConfirm={handleCancelTravel}
+        title="Annuler l'annonce de voyage"
+        message={`Êtes-vous sûr de vouloir annuler cette annonce de voyage ? Cette action ne peut pas être annulée.`}
+        confirmText="Oui, annuler"
+        cancelText="Non, garder"
+        type="danger"
+      />
     </>
   );
 };
+                    <p className="text-sm text-gray-500 mb-1">
+                      {travel.departureDatetime && formatDate(travel.departureDatetime)}
+                    </p>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Numéro de vol {travel.flightNumber}
+                    </p>
 
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold">
+                        {travel.weightAvailable} Kg
+                      </div>
+                      <div className="text-gray-700 font-semibold">
+                        € {travel.pricePerKg} / Kg
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <button 
+                        onClick={() => setEditingTravel(travel)}
+                        className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setTravelToCancel(travel);
+                          setCancelConfirmOpen(true);
+                        }}
+                        className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Edit Announce Dialog */}
+      {editingTravel && (
+        <EditAnnounceDialog
+          open={!!editingTravel}
+          onClose={() => setEditingTravel(null)}
+          travel={editingTravel}
+          onSuccess={handleEditSuccess}
+        />
+      )}
+
+      {/* Cancel Confirmation Dialog */}
+      <ConfirmCancelDialog
+        open={cancelConfirmOpen}
+        onClose={() => {
+          setCancelConfirmOpen(false);
+          setTravelToCancel(null);
+        }}
+        onConfirm={handleCancelTravel}
+        title="Annuler l'annonce de voyage"
+        message={`Êtes-vous sûr de vouloir annuler cette annonce de voyage ? Cette action ne peut pas être annulée.`}
+        confirmText="Oui, annuler"
+        cancelText="Non, garder"
+        type="danger"
+      />
+    </>
+  );
+};
 
 const FavoritesSection = () => {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
@@ -1082,45 +1095,33 @@ const FavoritesSection = () => {
 };
 
 export default function Profile() {
-  const [searchParams] = useSearchParams();
-  const userId = searchParams.get("user"); // Get user ID from query params
   const [activeSection, setActiveSection] = useState<string>("reservations");
   const [profileDialogOpen, setProfileDialogOpen] = useState<boolean>(false);
   const [createAnnounceDialogOpen, setCreateAnnounceDialogOpen] =
     useState<boolean>(false);
   const [createPackageDialogOpen, setCreatePackageDialogOpen] =
     useState<boolean>(false);
-  const { user: currentUser, isAuthenticated } = useAuth();
-  const [profileUser, setProfileUser] = useState<GetMeResponse | null>(null);
+  const { user, isAuthenticated } = useAuth();
   const [profileStats, setProfileStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
-  // Determine if this is the current user's profile or another user's profile
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
-
-  // Fetch profile data
+  // Fetch profile stats
   useEffect(() => {
-    const fetchProfileData = async () => {
-      setLoading(true);
+    const fetchProfileStats = async () => {
+      if (!isAuthenticated) return;
+      
       try {
-        // If userId is provided, fetch that user's data, otherwise fetch current user's data
-        const userData = await getMe(userId || undefined);
-        if (userData) {
-          setProfileUser(userData);
-          setProfileStats(userData.profileStats);
+        const { getMe } = await import("~/services/authService");
+        const meData = await getMe();
+        if (meData?.profileStats) {
+          setProfileStats(meData.profileStats);
         }
       } catch (error) {
-        console.error("Error fetching profile data:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching profile stats:", error);
       }
     };
 
-    fetchProfileData();
-  }, [userId]);
-
-  // Use profileUser data instead of currentUser for display
-  const displayUser = profileUser || currentUser;
+    fetchProfileStats();
+  }, [isAuthenticated]);
 
   const profileSections: ProfileSection[] = [
     {
@@ -1151,25 +1152,25 @@ export default function Profile() {
     },
     {
       id: "reviews",
-      label: isOwnProfile ? "Mes Avis" : "Avis",
+      label: "Mes Avis",
       icon: <StarIcon className="h-5 w-5" />,
       count: profileStats?.reviewsReceivedCount || 0,
     },
     {
       id: "travel-requests",
-      label: isOwnProfile ? "Mes Demandes de Voyages" : "Demandes de Voyages",
+      label: "Mes Demandes de Voyages",
       icon: <QuestionMarkCircleIcon className="h-5 w-5" />,
       count: profileStats?.demandsCount || 0,
     },
     {
       id: "travels",
-      label: isOwnProfile ? "Mes Voyages" : "Voyages",
+      label: "Mes Voyages",
       icon: <PaperAirplaneIcon className="h-5 w-5" />,
       count: profileStats?.travelsCount || 0,
     },
     {
       id: "favorites",
-      label: isOwnProfile ? "Mes Favoris" : "Favoris",
+      label: "Mes Favoris",
       icon: <HeartIcon className="h-5 w-5" />,
       count: (profileStats?.bookMarkTravelCount || 0) + (profileStats?.bookMarkDemandCount || 0),
     },
@@ -1180,13 +1181,6 @@ export default function Profile() {
       count: profileStats?.transactionsCompletedCount || 0,
     },
   ];
-
-  // Filter sections based on whether it's own profile or not
-  const visibleSections = isOwnProfile 
-    ? profileSections 
-    : profileSections.filter(section => 
-        !['reservations', 'messages', 'favorites', 'payments'].includes(section.id)
-      );
 
   const renderContent = () => {
     switch (activeSection) {
@@ -1417,166 +1411,143 @@ export default function Profile() {
       <Header />
 
       <main className="min-h-screen mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-        {loading ? (
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-500">Chargement du profil...</p>
-            </div>
-          </div>
-        ) : !displayUser ? (
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <p className="text-gray-500 text-lg">Utilisateur introuvable</p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr] gap-4 md:gap-6 lg:gap-8">
-            {/* Sidebar */}
-            <aside className="space-y-4 md:space-y-6">
-              {/* Profile Card */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 text-center">
-                {/* Profile Picture */}
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-3 md:mb-4 overflow-hidden">
-                  {displayUser?.profilePictureUrl ? (
-                    <img
-                      src={displayUser.profilePictureUrl}
-                      alt={displayUser?.firstName || displayUser?.email || "Profile"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-blue-100 flex items-center justify-center">
-                      <div className="w-16 h-16 bg-blue-300 rounded-full flex items-center justify-center">
-                        <svg
-                          className="w-8 h-8 text-blue-600"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* User Name */}
-                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
-                  {displayUser?.firstName && displayUser?.lastName 
-                    ? `${displayUser.firstName} ${displayUser.lastName}`
-                    : displayUser?.email || "Utilisateur"
-                  }
-                </h3>
-
-                {/* User Bio */}
-                {displayUser?.bio ? (
-                  <p className="text-gray-600 text-sm mb-4 italic">
-                    "{displayUser.bio}"
-                  </p>
+        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr] gap-4 md:gap-6 lg:gap-8">
+          {/* Sidebar */}
+          <aside className="space-y-4 md:space-y-6">
+            {/* Profile Card */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 text-center">
+              {/* Profile Picture */}
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-3 md:mb-4 overflow-hidden">
+                {isAuthenticated && (user as any)?.profilePictureUrl ? (
+                  <img
+                    src={(user as any).profilePictureUrl}
+                    alt={user?.name || "Profile"}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <p className="text-gray-500 text-sm mb-4">
-                    {isOwnProfile
-                      ? "Ajoutez une bio pour vous présenter aux autres utilisateurs"
-                      : "Aucune bio disponible"
-                    }
-                  </p>
-                )}
-
-                {/* Edit Profile Button - Only show for own profile */}
-                {isOwnProfile && (
-                  <button
-                    onClick={() => setProfileDialogOpen(true)}
-                    className="w-full bg-white border border-blue-500 text-blue-500 rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-50 transition-colors"
-                  >
-                    Edit Profile
-                  </button>
+                  <div className="w-full h-full bg-blue-100 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-blue-300 rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-8 h-8 text-blue-600"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                      </svg>
+                    </div>
+                  </div>
                 )}
               </div>
 
-              {/* Navigation */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-3 md:p-4">
-                <nav className="space-y-1 md:space-y-2">
-                  {visibleSections.map((section) => (
-                    <button
-                      key={section.id}
-                      onClick={() => setActiveSection(section.id)}
-                      className={`w-full flex items-center justify-between p-2 md:p-3 rounded-lg text-left transition-colors ${
-                        activeSection === section.id
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 md:gap-3">
-                        <span className="flex-shrink-0">{section.icon}</span>
-                        <span className="text-xs md:text-sm font-medium truncate">
-                          {section.label}
-                        </span>
-                      </div>
-                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
-                        {section.count}
-                      </span>
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              {/* Action Buttons - Only show for own profile */}
-              {isOwnProfile && (
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setCreateAnnounceDialogOpen(true)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl"
-                  >
-                    Publier une annonce de voyage
-                  </button>
-                  <button
-                    onClick={() => setCreatePackageDialogOpen(true)}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl"
-                  >
-                    Publier une demande de voyage
-                  </button>
-                </div>
+              {/* User Name */}
+              {isAuthenticated && user?.name ? (
+                <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
+                  {user.name}
+                </h3>
+              ) : (
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Utilisateur
+                </h3>
               )}
-            </aside>
 
-            {/* Main Content */}
-            <section>
-              {/* Section Title */}
-              <div className="mb-4 md:mb-6">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">
-                  | {visibleSections.find((s) => s.id === activeSection)?.label}
-                </h1>
-              </div>
+              {/* User Bio */}
+              {isAuthenticated && user?.bio ? (
+                <p className="text-gray-600 text-sm mb-4 italic">
+                  "{user.bio}"
+                </p>
+              ) : (
+                <p className="text-gray-500 text-sm mb-4">
+                  {isAuthenticated
+                    ? "Ajoutez une bio pour vous présenter aux autres utilisateurs"
+                    : "Veuillez vous connecter pour accéder à votre profil"}
+                </p>
+              )}
 
-              {/* Content */}
-              {renderContent()}
-            </section>
-          </div>
-        )}
+              {/* Edit Profile Button */}
+              <button
+                onClick={() => setProfileDialogOpen(true)}
+                className="w-full bg-white border border-blue-500 text-blue-500 rounded-lg px-4 py-2 text-sm font-medium hover:bg-blue-50 transition-colors"
+              >
+                Edit Profile
+              </button>
+            </div>
+
+            {/* Navigation */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-3 md:p-4">
+              <nav className="space-y-1 md:space-y-2">
+                {profileSections.map((section) => (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    className={`w-full flex items-center justify-between p-2 md:p-3 rounded-lg text-left transition-colors ${
+                      activeSection === section.id
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <span className="flex-shrink-0">{section.icon}</span>
+                      <span className="text-xs md:text-sm font-medium truncate">
+                        {section.label}
+                      </span>
+                    </div>
+                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
+                      {section.count}
+                    </span>
+                  </button>
+                ))}
+              </nav>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3">
+              <button
+                onClick={() => setCreateAnnounceDialogOpen(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl"
+              >
+                Publier une annonce de voyage
+              </button>
+              <button
+                onClick={() => setCreatePackageDialogOpen(true)}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-2xl font-medium text-sm transition-colors shadow-lg hover:shadow-xl"
+              >
+                Publier une demande de voyage
+              </button>
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <section>
+            {/* Section Title */}
+            <div className="mb-4 md:mb-6">
+              <h1 className="text-xl md:text-2xl font-bold text-gray-900">
+                | {profileSections.find((s) => s.id === activeSection)?.label}
+              </h1>
+            </div>
+
+            {/* Content */}
+            {renderContent()}
+          </section>
+        </div>
       </main>
 
-      {/* Profile Dialog - Only show for own profile */}
-      {isOwnProfile && (
-        <ProfileDialog
-          open={profileDialogOpen}
-          onClose={() => setProfileDialogOpen(false)}
-        />
-      )}
+      {/* Profile Dialog */}
+      <ProfileDialog
+        open={profileDialogOpen}
+        onClose={() => setProfileDialogOpen(false)}
+      />
 
-      {/* Create Announce Dialog - Only show for own profile */}
-      {isOwnProfile && (
-        <CreateAnnounceDialog
-          open={createAnnounceDialogOpen}
-          onClose={() => setCreateAnnounceDialogOpen(false)}
-        />
-      )}
+      {/* Create Announce Dialog */}
+      <CreateAnnounceDialog
+        open={createAnnounceDialogOpen}
+        onClose={() => setCreateAnnounceDialogOpen(false)}
+      />
 
-      {/* Create Package Dialog - Only show for own profile */}
-      {isOwnProfile && (
-        <CreatePackageDialog
-          open={createPackageDialogOpen}
-          onClose={() => setCreatePackageDialogOpen(false)}
-        />
-      )}
+      {/* Create Package Dialog */}
+      <CreatePackageDialog
+        open={createPackageDialogOpen}
+        onClose={() => setCreatePackageDialogOpen(false)}
+      />
 
       <FooterMinimal />
     </div>

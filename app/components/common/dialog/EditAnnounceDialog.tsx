@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  createTravel,
+  updateTravel,
   getAirlineFromFlightNumber,
 } from "../../../services/travelService";
 import AirportComboBox from "../AirportComboBox";
@@ -9,38 +9,25 @@ import CurrencyComboBox from "../CurrencyComboBox";
 import type { Airport } from "../../../services/airportService";
 import type { Currency } from "../../../services/currencyService";
 import { useAuth } from "../../../hooks/useAuth";
+import type { DemandTravelItem } from "../../../services/announceService";
 
 type StepKey = 1 | 2 | 3 | 4;
 
-type InitialData = {
-  departure?: Airport | null;
-  arrival?: Airport | null;
-  story?: string;
-  kilos?: number;
-  pricePerKg?: number;
-  currency?: Currency | null;
-  lateTax?: number;
-  allowExtraGrams?: boolean;
-  flightNumber?: string;
-  airline?: any;
-  travelDate?: string; // YYYY-MM-DD
-  reservationType?: "single" | "shared";
-  bookingType?: "instant" | "non-instant";
-  punctuality?: "punctual" | "very-punctual";
-};
-
-export default function CreateAnnounceDialog({
+export default function EditAnnounceDialog({
   open,
   onClose,
-  initialData,
+  travel,
+  onSuccess,
 }: {
   open: boolean;
   onClose: () => void;
-  initialData?: InitialData;
+  travel: DemandTravelItem | null;
+  onSuccess?: () => void;
 }) {
   const [step, setStep] = useState<StepKey>(1);
   const { t } = useTranslation();
   const { user } = useAuth();
+  
   // Form state
   const [departure, setDeparture] = useState<Airport | null>(null);
   const [arrival, setArrival] = useState<Airport | null>(null);
@@ -53,22 +40,20 @@ export default function CreateAnnounceDialog({
   const [lateTax, setLateTax] = useState<number | "">(0);
   const [allowExtraGrams, setAllowExtraGrams] = useState<boolean>(false);
   const [punctuality, setPunctuality] = useState<"punctual" | "very-punctual">("punctual");
+  
   // Supplementary info for Step 1
   const [flightNumber, setFlightNumber] = useState("");
   const [airline, setAirline] = useState<{ name?: string }>({});
   const [travelDate, setTravelDate] = useState("");
   const [fetchingAirline, setFetchingAirline] = useState(false);
   const [flightNumberError, setFlightNumberError] = useState<string | null>(null);
+  
   // API integration state
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [reservationType, setReservationType] = useState<"single" | "shared">(
-    "single"
-  );
-  const [bookingType, setBookingType] = useState<"instant" | "non-instant">(
-    "instant"
-  );
+  const [reservationType, setReservationType] = useState<"single" | "shared">("single");
+  const [bookingType, setBookingType] = useState<"instant" | "non-instant">("instant");
 
   useEffect(() => {
     if (!open) return;
@@ -113,66 +98,69 @@ export default function CreateAnnounceDialog({
     return () => clearTimeout(timeoutId);
   }, [flightNumber]);
 
+  // Initialize form with travel data
   useEffect(() => {
-    if (!open) return;
+    if (!open || !travel) return;
+    
     setStep(1);
-    if (initialData) {
-      setDeparture(initialData.departure ?? null);
-      setArrival(initialData.arrival ?? null);
-      setStory(initialData.story ?? "");
-      setKilos(typeof initialData.kilos === "number" ? initialData.kilos : "");
-      setPricePerKg(
-        typeof initialData.pricePerKg === "number" ? initialData.pricePerKg : ""
-      );
-      // Prioritize initialData currency, then user's recent currency
-      const defaultCurrency =  (user?.recentCurrency ? {
-        ...user.recentCurrency,
-        id: user.recentCurrency.id.toString(), // Convert number to string
-        country: "" // Add missing country property for type compatibility
-      } : null);
-     console.log(defaultCurrency)
-      setCurrency(defaultCurrency);
-      setLateTax(
-        typeof initialData.lateTax === "number" ? initialData.lateTax : 0
-      );
-      setAllowExtraGrams(Boolean(initialData.allowExtraGrams));
-      setPunctuality(initialData.punctuality ?? "punctual");
-      setFlightNumber(initialData.flightNumber ?? "");
-      setAirline(initialData.airline ?? "");
-      setTravelDate(initialData.travelDate ?? "");
-      setFlightNumberError(null);
-      setReservationType(initialData.reservationType ?? "single");
-      setBookingType(initialData.bookingType ?? "instant");
-    } else {
-      // Reset all fields when no initial data
-      setDeparture(null);
-      setArrival(null);
-      setStory("");
-      setFiles([]);
-      setFileUrls([]);
-      setKilos("");
-      setPricePerKg("");
-      // Set user's recent currency as default with proper type conversion
-      const defaultCurrency = user?.recentCurrency ? {
-        ...user.recentCurrency,
-        id: user.recentCurrency.id.toString(), // Convert number to string
-        country: "" // Add missing country property for type compatibility
-      } : null;
-      setCurrency(defaultCurrency);
-      setLateTax(0);
-      setAllowExtraGrams(false);
-      setPunctuality("punctual");
-      setFlightNumber("");
-      setAirline({});
-      setTravelDate("");
-      setFlightNumberError(null);
-      setReservationType("single");
-      setBookingType("instant");
-      setSubmitting(false);
-      setError(null);
-      setSuccess(null);
+    
+    // Set airports - convert from backend format to frontend format
+    if (travel.departureAirport) {
+      setDeparture({
+        id: travel.departureAirportId.toString(),
+        code: travel.departureAirport.name.split(' ')[0] || "", // Use first word as code fallback
+        name: travel.departureAirport.name,
+        city: travel.departureAirport.municipality || "",
+        country: travel.departureAirport.isoCountry || "",
+      });
     }
-  }, [open, initialData, user?.recentCurrency]);
+    
+    if (travel.arrivalAirport) {
+      setArrival({
+        id: travel.arrivalAirportId.toString(),
+        code: travel.arrivalAirport.name.split(' ')[0] || "", // Use first word as code fallback
+        name: travel.arrivalAirport.name,
+        city: travel.arrivalAirport.municipality || "",
+        country: travel.arrivalAirport.isoCountry || "",
+      });
+    }
+    
+    // Set other fields
+    setStory(travel.description || "");
+    setKilos(travel.weightAvailable || travel.totalWeightAllowance || "");
+    const priceValue = typeof travel.pricePerKg === 'string' ? parseFloat(travel.pricePerKg) : travel.pricePerKg;
+    setPricePerKg(priceValue || "");
+    
+    // Set currency - use user's recent currency as fallback since travel doesn't have currency info
+    const defaultCurrency = user?.recentCurrency ? {
+      ...user.recentCurrency,
+      id: user.recentCurrency.id.toString(),
+      country: ""
+    } : null;
+    setCurrency(defaultCurrency);
+    
+    setLateTax(travel.feeForLateComer || 0);
+    setAllowExtraGrams(Boolean(travel.isAllowExtraWeight));
+    setPunctuality("punctual"); // Default value since not stored in backend yet
+    setFlightNumber(travel.flightNumber || "");
+    
+    // Set travel date
+    if (travel.departureDatetime) {
+      const date = new Date(travel.departureDatetime);
+      setTravelDate(date.toISOString().split('T')[0]);
+    }
+    
+    setReservationType(travel.isSharedWeight ? "shared" : "single");
+    setBookingType(travel.isInstant ? "instant" : "non-instant");
+    
+    // Reset other states
+    setFiles([]);
+    setFileUrls([]);
+    setFlightNumberError(null);
+    setSubmitting(false);
+    setError(null);
+    setSuccess(null);
+  }, [open, travel, user?.recentCurrency]);
 
   const canNext = useMemo(() => {
     if (step === 1) {
@@ -180,12 +168,12 @@ export default function CreateAnnounceDialog({
       return (
         departure !== null && 
         arrival !== null && 
-        story.trim().length > 0 && // Require description to be present
-        story.length <= 500 && // And within character limit
+        story.trim().length > 0 && 
+        story.length <= 500 && 
         hasValidFlightNumber
       );
     }
-    if (step === 2) return files.length >= 2;
+    if (step === 2) return true; // Images are optional for edit
     if (step === 3) return Boolean(kilos) && Boolean(pricePerKg);
     return true;
   }, [step, departure, arrival, files.length, kilos, pricePerKg, story.length, flightNumber, airline.name, flightNumberError]);
@@ -221,11 +209,8 @@ export default function CreateAnnounceDialog({
   };
 
   const handleSubmit = async () => {
-    if (files.length < 2) {
-      setError("Veuillez ajouter au moins 2 images");
-      return;
-    }
-
+    if (!travel) return;
+    
     if (!departure || !arrival) {
       setError("Veuillez sélectionner les aéroports de départ et d'arrivée");
       return;
@@ -244,14 +229,14 @@ export default function CreateAnnounceDialog({
       // Convert travelDate to datetime format (assuming departure time)
       const departureDatetime = travelDate
         ? `${travelDate}T12:00:00Z`
-        : new Date().toISOString();
+        : undefined;
 
       if (!currency) {
         setError("Veuillez sélectionner une devise");
         return;
       }
 
-      const travelData = {
+      const updateData: any = {
         description: story,
         flightNumber,
         isSharedWeight: reservationType === "shared",
@@ -261,32 +246,34 @@ export default function CreateAnnounceDialog({
         feeForGloomy: 0,
         departureAirportId: parseInt(departure.id),
         arrivalAirportId: parseInt(arrival.id),
-        departureDatetime,
         pricePerKg: typeof pricePerKg === "number" ? pricePerKg : 0,
         currencyId: parseInt(currency.id),
         totalWeightAllowance: typeof kilos === "number" ? kilos : 0,
-        image1: files[0],
-        image2: files[1],
       };
 
-      const result = await createTravel(travelData);
+      if (departureDatetime) {
+        updateData.departureDatetime = departureDatetime;
+      }
+
+      // Add images if provided
+      if (files[0]) updateData.image1 = files[0];
+      if (files[1]) updateData.image2 = files[1];
+
+      const result = await updateTravel(travel.id, updateData);
 
       if (result) {
-        setSuccess("Annonce de voyage créée avec succès!");
+        setSuccess("Annonce de voyage mise à jour avec succès!");
         setTimeout(() => {
+          onSuccess?.();
           onClose();
         }, 2000);
       } else {
-        setError(
-          "Erreur lors de la création de l'annonce. Veuillez réessayer."
-        );
+        setError("Erreur lors de la mise à jour de l'annonce. Veuillez réessayer.");
       }
     } catch (err: any) {
       // Check if it's a 401 error (user not authenticated)
       if (err?.response?.status === 401 || err?.status === 401) {
-        setError(
-          "Vous devez être connecté pour créer une annonce. Veuillez vous connecter."
-        );
+        setError("Vous devez être connecté pour modifier une annonce. Veuillez vous connecter.");
       } else {
         // Handle validation errors from backend
         if (err?.response?.data?.message) {
@@ -296,9 +283,7 @@ export default function CreateAnnounceDialog({
             setError(err.response.data.message);
           }
         } else {
-          setError(
-            "Erreur lors de la création de l'annonce. Veuillez réessayer."
-          );
+          setError("Erreur lors de la mise à jour de l'annonce. Veuillez réessayer.");
         }
       }
     } finally {
@@ -306,7 +291,7 @@ export default function CreateAnnounceDialog({
     }
   };
 
-  if (!open) return null;
+  if (!open || !travel) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center p-4">
@@ -326,7 +311,7 @@ export default function CreateAnnounceDialog({
             <header className="mb-4 md:mb-6">
               <h2 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white">
                 <span className="uppercase text-sm md:text-base">
-                  {t("dialogs.createAnnounce.title")}
+                  Modifier l'annonce de voyage
                 </span>{" "}
                 <span className="text-sm md:text-base">- Step {step} of 4</span>
               </h2>
@@ -377,7 +362,7 @@ export default function CreateAnnounceDialog({
                   <input
                     value={flightNumber}
                     onChange={(e) => setFlightNumber(e.target.value)}
-                    placeholder="Add numero de vol sur votre billet d’avion"
+                    placeholder="Add numero de vol sur votre billet d'avion"
                     className={`w-full rounded-xl uppercase border ${
                       flightNumberError 
                         ? "border-red-500 focus:ring-red-500" 
@@ -444,7 +429,7 @@ export default function CreateAnnounceDialog({
                   </p>
                 </Field>
 
-                <Field label="Tell a bit more  about your travel">
+                <Field label="Tell a bit more about your travel">
                   <textarea
                     value={story}
                     onChange={(e) => {
@@ -537,7 +522,7 @@ export default function CreateAnnounceDialog({
             {step === 2 && (
               <div className="space-y-6">
                 <p className="text-gray-700 dark:text-gray-300 font-medium">
-                  Upload at least 2 pictures about your travel
+                  Upload new pictures (optional - leave empty to keep existing images)
                 </p>
                 <label className="block cursor-pointer rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-10 text-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
                   <input
@@ -609,7 +594,7 @@ export default function CreateAnnounceDialog({
                             e.target.value === "" ? "" : Number(e.target.value)
                           )
                         }
-                        placeholder="enter  your price per kilos"
+                        placeholder="enter your price per kilos"
                         className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </Field>
@@ -688,7 +673,7 @@ export default function CreateAnnounceDialog({
                     <label className="inline-flex items-center gap-2">
                       <input
                         type="radio"
-                        name="punctuality"
+                        name="punctuality-edit"
                         checked={punctuality === "punctual"}
                         onChange={() => setPunctuality("punctual")}
                         className="text-blue-600 focus:ring-blue-500"
@@ -698,7 +683,7 @@ export default function CreateAnnounceDialog({
                     <label className="inline-flex items-center gap-2">
                       <input
                         type="radio"
-                        name="punctuality"
+                        name="punctuality-edit"
                         checked={punctuality === "very-punctual"}
                         onChange={() => setPunctuality("very-punctual")}
                         className="text-blue-600 focus:ring-blue-500"
@@ -754,9 +739,6 @@ export default function CreateAnnounceDialog({
                 >
                   ‹ Back
                 </button>
-                <button className="text-sm text-gray-500">
-                  Save as unfinished
-                </button>
               </div>
               {step < 4 ? (
                 <button
@@ -780,7 +762,7 @@ export default function CreateAnnounceDialog({
                       : "bg-indigo-600 hover:bg-indigo-700"
                   }`}
                 >
-                  {submitting ? "Publication en cours..." : "Publish"}
+                  {submitting ? "Mise à jour en cours..." : "Update"}
                 </button>
               )}
             </div>

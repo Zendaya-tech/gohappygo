@@ -15,6 +15,7 @@ import { getRandomQuotes, type Quote } from "~/services/quotesService";
 import { useAuthStore, type AuthState } from "~/store/auth";
 import { createRequestToTravel, type CreateRequestToTravelPayload } from "~/services/requestService";
 import type { BookingCardData } from "~/components/common/dialog/BookingDialog";
+import { calculatePricing, type PricingCalculationResponse } from "~/services/pricingService";
 
 // Reviews are now fetched from the API
 
@@ -46,6 +47,8 @@ export default function AnnounceDetail() {
   const [newRating, setNewRating] = useState<number>(0);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [quotesError, setQuotesError] = useState<string | null>(null);
+  const [pricingData, setPricingData] = useState<PricingCalculationResponse | null>(null);
+  const [pricingLoading, setPricingLoading] = useState(false);
   
   // Alert dialog state
   const [alertDialog, setAlertDialog] = useState<{
@@ -90,7 +93,11 @@ export default function AnnounceDetail() {
   // Format user name from firstName and lastName
   const userName = useMemo(() => {
     if (!listing?.user) return "Voyageur";
-    return listing?.user.fullName|| "Voyageur";
+    const { firstName, lastName } = listing.user;
+    if (firstName && lastName) {
+      return `${firstName} ${lastName}`;
+    }
+    return firstName || lastName || "Voyageur";
   }, [listing?.user]);
   
   const averageRating = reviews.length > 0
@@ -129,6 +136,43 @@ export default function AnnounceDetail() {
     };
     loadQuotes();
   }, []);
+
+  // Calculate pricing when weight or listing changes
+  useEffect(() => {
+    const calculatePrice = async () => {
+      if (!listing || kilos <= 0 || type !== "travel") {
+        setPricingData(null);
+        return;
+      }
+
+      setPricingLoading(true);
+      try {
+        const pricing = await calculatePricing(kilos, Number(id));
+        setPricingData(pricing);
+      } catch (error) {
+        console.error("Error calculating pricing:", error);
+        // Fallback calculation if API fails
+        const subtotal = kilos * (listing.pricePerKg || 0);
+        const serviceFee = subtotal * 0.05; // 5% service fee
+        const vatRate = 0.20; // 20% VAT
+        const vat = subtotal * vatRate;
+        const insurance = 2.50; // Fixed insurance fee
+        const platformTax = 0; // No platform tax
+        const total = subtotal + serviceFee + vat + insurance + platformTax;
+        
+        setPricingData({
+          travelerPayment: subtotal,
+          fee: serviceFee,
+          tvaAmount: vat,
+          totalAmount: total
+        });
+      } finally {
+        setPricingLoading(false);
+      }
+    };
+
+    calculatePrice();
+  }, [kilos, listing, type, id]);
 
   // Simple gallery to mirror the design - Always 3 images
   const galleryImages = useMemo(() => {
@@ -241,19 +285,9 @@ export default function AnnounceDetail() {
     );
   }
 
-  // Pricing calculation similar to the right-hand summary in the mock
-  const pricePerKg = listing.pricePerKg || 0;
-  const subtotal = kilos * pricePerKg;
-  const platformCommission = 0; // can be adjusted later
-  const vatRate = 0.24;
-
-  const vat = subtotal * vatRate;
-  const insurance = 0;
-  const platformTax = 10; // flat example
-  const total = Math.max(
-    0,
-    subtotal + platformCommission + vat + insurance + platformTax
-  );
+  // Pricing calculation using API data
+  const pricePerKg = listing?.pricePerKg || 0;
+  const total = pricingData?.totalAmount || 0;
 
   const availableWeight = type === "travel" ? listing.weightAvailable : listing.weight;
 
@@ -472,7 +506,7 @@ export default function AnnounceDetail() {
                 </div>
                 <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   <button
-                    onClick={() => navigate("/profile")}
+                    onClick={() => navigate(`/profile?user=${listing.user?.id}`)}
                     disabled={isOwnAnnounce}
                     className={`rounded-lg px-4 sm:px-5 py-2 text-sm font-semibold shadow-sm transition-colors duration-200 flex-1 sm:flex-none ${
                       isOwnAnnounce
@@ -736,35 +770,70 @@ export default function AnnounceDetail() {
                       className="mb-6 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
 
-                    <div className="space-y-3 text-sm">
-                      <div className="flex items-center justify-between text-gray-500">
-                        <span>commission plateforme</span>
-                        <span>€{platformCommission.toFixed(2)}</span>
+                    {pricingLoading && kilos > 0 ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                       </div>
-                      <div className="flex items-center justify-between text-gray-500">
-                        <span>TVA 24 %</span>
-                        <span>€{vat.toFixed(2)}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-gray-500">
-                        <span>Assurance</span>
-                        <span>€{insurance.toFixed(2)}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-gray-500">
-                        <span>Platform Tax</span>
-                        <span>€{platformTax.toFixed(2)}</span>
-                      </div>
-                    </div>
+                    ) : pricingData && kilos > 0 ? (
+                      <>
+                        <div className="space-y-3 text-sm">
+                          <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
+                            <span>Frais de service</span>
+                            <div className="flex items-center gap-2">
+                              <span>€{pricingData.fee.toFixed(2)}</span>
+                              <button className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100">
+                                ?
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
+                            <span>TVA 20%</span>
+                            <div className="flex items-center gap-2">
+                              <span>€{pricingData.tvaAmount.toFixed(2)}</span>
+                              <button className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100">
+                                ?
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
+                            <div className="flex items-center gap-2">
+                              <span>Assurance Protection</span>
+                              <span>Juridique Internationale</span>
+                              <img 
+                                src="/images/axa-logo.svg" 
+                                alt="AXA" 
+                                className="h-6 w-6 rounded object-contain"
+                                onError={(e) => {
+                                  // Fallback if image doesn't exist
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span>€2.50</span>
+                              <button className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100">
+                                ?
+                              </button>
+                            </div>
+                          </div>
+                        </div>
 
-                    <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-700 dark:text-gray-300">
-                          Total with taxes
-                        </span>
-                        <span className="font-semibold text-gray-900 dark:text-white">
-                          €{total.toFixed(2)}
-                        </span>
+                        <div className="mt-6 border-t border-gray-200 dark:border-gray-800 pt-4">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-700 dark:text-gray-300 font-medium">
+                              Total with taxes
+                            </span>
+                            <span className="font-bold text-lg text-gray-900 dark:text-white">
+                              €{pricingData.totalAmount.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    ) : kilos > 0 ? (
+                      <div className="text-center py-4 text-gray-500 text-sm">
+                        Entrez un poids pour voir le calcul des prix
                       </div>
-                    </div>
+                    ) : null}
                   </>
                 ) : (
                   <>
@@ -814,10 +883,12 @@ export default function AnnounceDetail() {
                 {type === "travel" ? (
                   <button
                     onClick={() => setBookOpen(true)}
-                    disabled={isOwnAnnounce}
+                    disabled={isOwnAnnounce || kilos <= 0 || !pricingData}
                     className={`mt-6 w-full rounded-lg px-4 py-4 text-sm font-semibold transition-colors duration-200 ${
                       isOwnAnnounce
                         ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        : kilos <= 0 || !pricingData
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
                   >
@@ -892,7 +963,7 @@ export default function AnnounceDetail() {
             city: listing.arrivalAirport?.municipality || "",
             country: listing.arrivalAirport?.isoCountry || "",
           },
-          story: listing.description || "",
+          story: "", // Ne pas pré-remplir la description car c'est un autre utilisateur
           kilos: availableWeight,
           pricePerKg: listing.pricePerKg,
           travelDate: (() => {

@@ -63,9 +63,12 @@ export interface PaginatedReviews {
   };
 }
 
-export const getReviews = async (asReviewer?: boolean): Promise<PaginatedReviews> => {
+export const getReviews = async (asReviewer?: boolean, userId?: number): Promise<PaginatedReviews> => {
   try {
-    const params = asReviewer ? { asReviewer: 'true' } : {};
+    const params: any = {};
+    if (asReviewer) params.asReviewer = 'true';
+    if (userId) params.userId = userId.toString();
+    
     const response = await api.get('/review', { params });
     return response.data;
   } catch (error) {

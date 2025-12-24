@@ -81,9 +81,10 @@ export const changePassword = async (data: ChangePasswordData) => {
   }
 };
 
-export const getMe = async (): Promise<GetMeResponse | null> => {
+export const getMe = async (userId?: string | number): Promise<GetMeResponse | null> => {
   try {
-    const response = await api.get(`/auth/me`);
+    const params = userId ? { userId } : {};
+    const response = await api.get(`/auth/me`, { params });
     return response.data;
   } catch (error) {
     console.error("Get me error:", error);
