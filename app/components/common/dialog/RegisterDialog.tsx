@@ -116,11 +116,11 @@ export default function RegisterDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div
         ref={ref}
-        className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
+        className="relative w-full max-w-5xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden"
       >
         <div className="flex flex-col md:flex-row">
           {/* Côté gauche - Formulaire */}
-          <div className="w-full md:w-1/2 p-4 sm:p-6 md:p-8 overflow-y-auto max-h-[90vh]">
+          <div className="w-full md:w-3/3 p-4 sm:p-6 md:p-8 overflow-y-auto max-h-[90vh]">
             <div className="mb-4">
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                 {step === 1 ? "Inscription" : "Vérification"}
@@ -147,37 +147,36 @@ export default function RegisterDialog({
 
               {step === 1 ? (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                      <input
-                        type="text"
-                        id="firstName"
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                        placeholder="Prénom (tel que sur la pièce d'identité)"
-                        required
-                        value={form.firstName}
-                        onChange={(e) =>
-                          setForm((p) => ({ ...p, firstName: e.target.value }))
-                        }
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        (Seul votre prénom apparaît sur la plateforme)
-                      </p>
-                    </div>
-                    <div>
-                      <input
-                        type="text"
-                        id="lastName"
-                        className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
-                        placeholder="Nom de famille (tel que sur la pièce d'identité)"
-                        required
-                        value={form.lastName}
-                        onChange={(e) =>
-                          setForm((p) => ({ ...p, lastName: e.target.value }))
-                        }
-                      />
-                    </div>
+                  <div>
+                    <input
+                      type="text"
+                      id="firstName"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      placeholder="Saisissez votre prénom (et tout deuxièmes prénoms) tel que sur la pièce d'identité"
+                      required
+                      value={form.firstName}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, firstName: e.target.value }))
+                      }
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      (Seul votre prénom apparaît sur la plateforme)
+                    </p>
                   </div>
+                  <div>
+                    <input
+                      type="text"
+                      id="lastName"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      placeholder="Saisissez votre nom tel qu'il apparait sur la pièce d'identité"
+                      required
+                      value={form.lastName}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, lastName: e.target.value }))
+                      }
+                    />
+                  </div>
+
                   <div>
                     <PhoneInput
                       defaultCountry="fr"
@@ -416,7 +415,7 @@ export default function RegisterDialog({
           </div>
 
           {/* Côté droit - Image (caché sur mobile) */}
-          <div className="hidden md:block md:w-1/2 bg-gradient-to-br from-green-500 to-blue-600 relative">
+          <div className="hidden md:block md:w-1/3 bg-gradient-to-br from-green-500 to-blue-600 relative">
             <img
               src="/images/login.jpg"
               alt="Register"
