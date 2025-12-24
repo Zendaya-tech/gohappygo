@@ -1,6 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
 import AnnounceCard from "~/components/AnnounceCard";
@@ -36,6 +36,7 @@ export default function Annonces() {
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [weightRange, setWeightRange] = useState({ min: "", max: "" });
   const [selectedAirline, setSelectedAirline] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -211,6 +212,7 @@ export default function Annonces() {
     setPriceRange({ min: "", max: "" });
     setWeightRange({ min: "", max: "" });
     setSelectedAirline(null);
+    navigate(`/annonces`);
   };
 
   return (
