@@ -20,10 +20,23 @@ import ProfileTravelCard, {
   type ProfileTravel,
 } from "~/components/common/ProfileTravelCard";
 import AnnounceCard from "~/components/AnnounceCard";
-import { getBookmarks, type BookmarkItem, getDemandAndTravel, getUserDemandsAndTravels, deleteTravel, deleteDemand, type DemandTravelItem } from "~/services/announceService";
+import {
+  getBookmarks,
+  type BookmarkItem,
+  getDemandAndTravel,
+  getUserDemandsAndTravels,
+  deleteTravel,
+  deleteDemand,
+  type DemandTravelItem,
+} from "~/services/announceService";
 import { removeBookmark } from "~/services/bookmarkService";
 import { getReviews, type Review } from "~/services/reviewService";
-import { getRequests, acceptRequest, completeRequest, type RequestResponse } from "~/services/requestService";
+import {
+  getRequests,
+  acceptRequest,
+  completeRequest,
+  type RequestResponse,
+} from "~/services/requestService";
 
 interface ProfileSection {
   id: string;
@@ -88,7 +101,9 @@ const sampleReservations: Reservation[] = [
 ];
 
 const ReservationsSection = () => {
-  const [tab, setTab] = useState<"pending" | "accepted" | "completed">("pending");
+  const [tab, setTab] = useState<"pending" | "accepted" | "completed">(
+    "pending"
+  );
   const [requests, setRequests] = useState<RequestResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -142,7 +157,8 @@ const ReservationsSection = () => {
 
   const filtered = requests.filter((r) => {
     const status = r.currentStatus?.status?.toUpperCase();
-    if (tab === "pending") return status === "NEGOTIATING" || status === "PENDING";
+    if (tab === "pending")
+      return status === "NEGOTIATING" || status === "PENDING";
     if (tab === "accepted") return status === "ACCEPTED";
     if (tab === "completed") return status === "COMPLETED";
     return false;
@@ -190,7 +206,7 @@ const ReservationsSection = () => {
           | Terminées
         </button>
       </div>
-      
+
       {filtered.length === 0 ? (
         <div className="text-center text-gray-500 py-8">
           Aucune réservation dans cette catégorie
@@ -202,13 +218,21 @@ const ReservationsSection = () => {
             const requester = request.requester;
             const departureCity = travel?.departureAirport?.city || "Paris";
             const arrivalCity = travel?.arrivalAirport?.city || "New-York";
-            const travelDate = travel?.departureDatetime ? formatDate(travel.departureDatetime) : "";
+            const travelDate = travel?.departureDatetime
+              ? formatDate(travel.departureDatetime)
+              : "";
             const flightNumber = travel?.flightNumber || "N/A";
             const weight = request.weight || 0;
-            const pricePerKg = typeof travel?.pricePerKg === 'string' ? parseFloat(travel.pricePerKg) : (travel?.pricePerKg || 0);
+            const pricePerKg =
+              typeof travel?.pricePerKg === "string"
+                ? parseFloat(travel.pricePerKg)
+                : travel?.pricePerKg || 0;
             const price = (pricePerKg * weight).toFixed(0);
-            const requesterName = requester ? `${requester.firstName} ${requester.lastName.charAt(0)}.` : "Utilisateur";
-            const requesterAvatar = (requester as any)?.profilePictureUrl || "/favicon.ico";
+            const requesterName = requester
+              ? `${requester.firstName} ${requester.lastName.charAt(0)}.`
+              : "Utilisateur";
+            const requesterAvatar =
+              (requester as any)?.profilePictureUrl || "/favicon.ico";
 
             return (
               <div
@@ -221,8 +245,12 @@ const ReservationsSection = () => {
                     {/* Plane Icon */}
                     <div className="flex-shrink-0">
                       <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                        <svg
+                          className="w-8 h-8 text-blue-600"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
                         </svg>
                       </div>
                     </div>
@@ -232,9 +260,7 @@ const ReservationsSection = () => {
                       <h3 className="text-xl font-bold text-gray-900 mb-1">
                         {departureCity} → {arrivalCity}
                       </h3>
-                      <p className="text-sm text-gray-500 mb-1">
-                        {travelDate}
-                      </p>
+                      <p className="text-sm text-gray-500 mb-1">{travelDate}</p>
                       <p className="text-sm text-gray-600 mb-4">
                         Numéro de vol {flightNumber}
                       </p>
@@ -342,11 +368,12 @@ const ReviewsSection = () => {
 
   const calculateAverageRating = () => {
     if (reviews.length === 0) return 0;
-    const sum = reviews.reduce((acc, review) => acc + parseFloat(review.rating || "0"), 0);
+    const sum = reviews.reduce(
+      (acc, review) => acc + parseFloat(review.rating || "0"),
+      0
+    );
     return (sum / reviews.length).toFixed(1);
   };
-
-
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6">
@@ -365,9 +392,7 @@ const ReviewsSection = () => {
         <button
           onClick={() => setTab("given")}
           className={`text-sm font-semibold ${
-            tab === "given"
-              ? "text-gray-900 dark:text-white"
-              : "text-gray-500"
+            tab === "given" ? "text-gray-900 dark:text-white" : "text-gray-500"
           }`}
         >
           | Mes avis donnés
@@ -386,10 +411,9 @@ const ReviewsSection = () => {
               {tab === "received" ? "Aucun avis reçu" : "Aucun avis donné"}
             </p>
             <p className="text-gray-400 text-sm mt-2">
-              {tab === "received" 
+              {tab === "received"
                 ? "Les avis de vos voyageurs apparaîtront ici"
-                : "Les avis que vous avez donnés apparaîtront ici"
-              }
+                : "Les avis que vous avez donnés apparaîtront ici"}
             </p>
           </div>
         </div>
@@ -397,7 +421,8 @@ const ReviewsSection = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
-              {tab === "received" ? "Avis reçus" : "Avis donnés"} ({reviews.length})
+              {tab === "received" ? "Avis reçus" : "Avis donnés"} (
+              {reviews.length})
             </h3>
             {tab === "received" && (
               <div className="flex items-center gap-2">
@@ -406,7 +431,8 @@ const ReviewsSection = () => {
                     <StarIcon
                       key={star}
                       className={`h-4 w-4 ${
-                        star <= Math.round(parseFloat(calculateAverageRating() || "0"))
+                        star <=
+                        Math.round(parseFloat(calculateAverageRating() || "0"))
                           ? "text-yellow-400 fill-current"
                           : "text-gray-300"
                       }`}
@@ -424,11 +450,13 @@ const ReviewsSection = () => {
             {reviews.map((review) => {
               // For received reviews, show the reviewer (who gave the review)
               // For given reviews, show the reviewee (who received the review)
-              const displayUser = tab === "received" ? review.reviewer : review.reviewee;
-              const displayName = displayUser 
+              const displayUser =
+                tab === "received" ? review.reviewer : review.reviewee;
+              const displayName = displayUser
                 ? `${displayUser.firstName} ${displayUser.lastName.charAt(0)}.`
                 : "Utilisateur";
-              const displayAvatar = displayUser?.profilePictureUrl || "/favicon.ico";
+              const displayAvatar =
+                displayUser?.profilePictureUrl || "/favicon.ico";
               const rating = parseFloat(review.rating || "0");
 
               return (
@@ -452,7 +480,9 @@ const ReviewsSection = () => {
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <h4 className="text-sm font-semibold text-gray-900">
-                            {tab === "received" ? `Avis de ${displayName}` : `Avis pour ${displayName}`}
+                            {tab === "received"
+                              ? `Avis de ${displayName}`
+                              : `Avis pour ${displayName}`}
                           </h4>
                           {review.request?.travel && (
                             <p className="text-xs text-gray-500">
@@ -505,10 +535,15 @@ const TravelRequestsSection = () => {
 
   const fetchDemands = async () => {
     if (!user?.id) return;
-    
+
     try {
-      const response = await getUserDemandsAndTravels(Number(user.id), "demand");
-      const items = Array.isArray(response) ? response : response?.items ?? [];
+      const response = await getUserDemandsAndTravels(
+        Number(user.id),
+        "demand"
+      );
+      const items = Array.isArray(response)
+        ? response
+        : (response?.items ?? []);
       setDemands(items);
     } catch (error) {
       console.error("Error fetching demands:", error);
@@ -578,7 +613,11 @@ const TravelRequestsSection = () => {
                 {/* Image */}
                 <div className="flex-shrink-0">
                   <img
-                    src={demand.images?.[0]?.fileUrl || demand.user?.profilePictureUrl || "/favicon.ico"}
+                    src={
+                      demand.images?.[0]?.fileUrl ||
+                      demand.user?.profilePictureUrl ||
+                      "/favicon.ico"
+                    }
                     alt="Demande"
                     className="w-32 h-32 object-cover rounded-xl"
                   />
@@ -587,7 +626,8 @@ const TravelRequestsSection = () => {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-bold text-gray-900 mb-1">
-                    {demand.departureAirport?.name} → {demand.arrivalAirport?.name}
+                    {demand.departureAirport?.name} →{" "}
+                    {demand.arrivalAirport?.name}
                   </h3>
                   <p className="text-sm text-gray-500 mb-1">
                     {demand.deliveryDate && formatDate(demand.deliveryDate)}
@@ -609,7 +649,7 @@ const TravelRequestsSection = () => {
                     <button className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors">
                       Edit
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteDemand(demand.id)}
                       className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
                     >
@@ -633,10 +673,15 @@ const TravelsSection = () => {
 
   const fetchTravels = async () => {
     if (!user?.id) return;
-    
+
     try {
-      const response = await getUserDemandsAndTravels(Number(user.id), "travel");
-      const items = Array.isArray(response) ? response : response?.items ?? [];
+      const response = await getUserDemandsAndTravels(
+        Number(user.id),
+        "travel"
+      );
+      const items = Array.isArray(response)
+        ? response
+        : (response?.items ?? []);
       setTravels(items);
     } catch (error) {
       console.error("Error fetching travels:", error);
@@ -706,7 +751,11 @@ const TravelsSection = () => {
                 {/* Image */}
                 <div className="flex-shrink-0">
                   <img
-                    src={travel.images?.[0]?.fileUrl || travel.user?.profilePictureUrl || "/favicon.ico"}
+                    src={
+                      travel.images?.[0]?.fileUrl ||
+                      travel.user?.profilePictureUrl ||
+                      "/favicon.ico"
+                    }
                     alt="Voyage"
                     className="w-32 h-32 object-cover rounded-xl"
                   />
@@ -715,10 +764,12 @@ const TravelsSection = () => {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-bold text-gray-900 mb-1">
-                    {travel.departureAirport?.name} → {travel.arrivalAirport?.name}
+                    {travel.departureAirport?.name} →{" "}
+                    {travel.arrivalAirport?.name}
                   </h3>
                   <p className="text-sm text-gray-500 mb-1">
-                    {travel.departureDatetime && formatDate(travel.departureDatetime)}
+                    {travel.departureDatetime &&
+                      formatDate(travel.departureDatetime)}
                   </p>
                   <p className="text-sm text-gray-600 mb-3">
                     Numéro de vol {travel.flightNumber}
@@ -737,7 +788,7 @@ const TravelsSection = () => {
                     <button className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors">
                       Edit
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDeleteTravel(travel.id)}
                       className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
                     >
@@ -782,14 +833,17 @@ const FavoritesSection = () => {
   };
 
   const formatName = (fullName: string) => {
-    const parts = fullName.split(' ');
+    const parts = fullName.split(" ");
     if (parts.length >= 2) {
       return `${parts[0]} ${parts[1].charAt(0)}.`;
     }
     return fullName;
   };
 
-  const handleRemoveBookmark = async (bookmarkType: "TRAVEL" | "DEMAND", itemId: number) => {
+  const handleRemoveBookmark = async (
+    bookmarkType: "TRAVEL" | "DEMAND",
+    itemId: number
+  ) => {
     try {
       // Convert to lowercase for API endpoint
       const type = bookmarkType.toLowerCase();
@@ -831,49 +885,59 @@ const FavoritesSection = () => {
               Mes Favoris ({bookmarks.length})
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bookmarks.map((bookmark) => {
               // Determine if it's a travel or demand
-              const isTravel = bookmark.bookmarkType === "TRAVEL" && bookmark.travel;
-              const isDemand = bookmark.bookmarkType === "DEMAND" && bookmark.demand;
-              
+              const isTravel =
+                bookmark.bookmarkType === "TRAVEL" && bookmark.travel;
+              const isDemand =
+                bookmark.bookmarkType === "DEMAND" && bookmark.demand;
+
               if (!isTravel && !isDemand) return null;
 
               // Get the actual item (travel or demand)
               const item: any = isTravel ? bookmark.travel : bookmark.demand;
               if (!item) return null;
 
-              const id = (isTravel ? bookmark.travelId : bookmark.demandId)?.toString() || bookmark.id.toString();
-              const name = item.user 
-                ? `${item.user.fullName }`.trim() : "Voyageur"
-        
-              const avatar = item.user?.profilePictureUrl || item.images?.[0]?.fileUrl || "/favicon.ico";
+              const id =
+                (isTravel
+                  ? bookmark.travelId
+                  : bookmark.demandId
+                )?.toString() || bookmark.id.toString();
+              const name = item.user
+                ? `${item.user.fullName}`.trim()
+                : "Voyageur";
+
+              const avatar =
+                item.user?.profilePictureUrl ||
+                item.images?.[0]?.fileUrl ||
+                "/favicon.ico";
               const originName = item.departureAirport?.name || "";
               const destName = item.arrivalAirport?.name || "";
               const location = `${originName} → ${destName}`;
               // Parse pricePerKg as it's returned as string from API
-              const pricePerKg = typeof item.pricePerKg === 'string' 
-                ? parseFloat(item.pricePerKg) 
-                : (item.pricePerKg ?? 0);
+              const pricePerKg =
+                typeof item.pricePerKg === "string"
+                  ? parseFloat(item.pricePerKg)
+                  : (item.pricePerKg ?? 0);
               const rating = "4.7";
-              
+
               // Pour les voyages (travel), utiliser le logo de la compagnie
               // Pour les demandes (demand), utiliser l'avatar de l'utilisateur
-              const image = isTravel 
-                ? item.airline?.logoUrl || avatar
-                : avatar;
-              
+              const image = isTravel ? item.airline?.logoUrl || avatar : avatar;
+
               const featured = Boolean(item.user?.isVerified);
-              
+
               // Use weightAvailable for travel type, weight for demand type
-              const availableWeight = isTravel 
-                ? item.weightAvailable ?? 0
-                : item.weight ?? 0;
-              
+              const availableWeight = isTravel
+                ? (item.weightAvailable ?? 0)
+                : (item.weight ?? 0);
+
               // Get the date from the correct field
-              const dateString = item.departureDatetime || item.deliveryDate || item.travelDate;
+              const dateString =
+                item.departureDatetime || item.deliveryDate || item.travelDate;
               const departure = dateString ? formatDate(dateString) : undefined;
-              
+
               const airline = item.airline?.name;
               const type = isTravel ? "transporter" : "traveler";
 
@@ -888,14 +952,18 @@ const FavoritesSection = () => {
                     rating={rating}
                     image={image}
                     featured={featured}
-                    weight={availableWeight ? `${availableWeight}kg` : undefined}
+                    weight={
+                      availableWeight ? `${availableWeight}kg` : undefined
+                    }
                     departure={departure}
                     airline={airline}
                     type={type as any}
-                    onRemove={() => handleRemoveBookmark(
-                      bookmark.bookmarkType, 
-                      isTravel ? bookmark.travelId! : bookmark.demandId!
-                    )}
+                    onRemove={() =>
+                      handleRemoveBookmark(
+                        bookmark.bookmarkType,
+                        isTravel ? bookmark.travelId! : bookmark.demandId!
+                      )
+                    }
                   />
                   {/* Remove from favorites button */}
                   {/* <button 
@@ -919,7 +987,8 @@ const FavoritesSection = () => {
                       />
                     </svg>
                   </button> */}
-              </>);
+                </>
+              );
             })}
           </div>
         </div>
@@ -942,7 +1011,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchProfileStats = async () => {
       if (!isAuthenticated) return;
-      
+
       try {
         const { getMe } = await import("~/services/authService");
         const meData = await getMe();
@@ -1006,7 +1075,9 @@ export default function Profile() {
       id: "favorites",
       label: "Mes Favoris",
       icon: <HeartIcon className="h-5 w-5" />,
-      count: (profileStats?.bookMarkTravelCount || 0) + (profileStats?.bookMarkDemandCount || 0),
+      count:
+        (profileStats?.bookMarkTravelCount || 0) +
+        (profileStats?.bookMarkDemandCount || 0),
     },
     {
       id: "payments",
@@ -1351,7 +1422,7 @@ export default function Profile() {
           </aside>
 
           {/* Main Content */}
-          <section>
+          <section className="mx-15">
             {/* Section Title */}
             <div className="mb-4 md:mb-6">
               <h1 className="text-xl md:text-2xl font-bold text-gray-900">
