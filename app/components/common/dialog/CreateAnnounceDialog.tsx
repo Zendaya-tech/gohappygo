@@ -56,7 +56,9 @@ export default function CreateAnnounceDialog({
   const [airline, setAirline] = useState<{ name?: string }>({});
   const [travelDate, setTravelDate] = useState("");
   const [fetchingAirline, setFetchingAirline] = useState(false);
-  const [flightNumberError, setFlightNumberError] = useState<string | null>(null);
+  const [flightNumberError, setFlightNumberError] = useState<string | null>(
+    null
+  );
   // API integration state
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -123,12 +125,14 @@ export default function CreateAnnounceDialog({
         typeof initialData.pricePerKg === "number" ? initialData.pricePerKg : ""
       );
       // Prioritize initialData currency, then user's recent currency
-      const defaultCurrency =  (user?.recentCurrency ? {
-        ...user.recentCurrency,
-        id: user.recentCurrency.id.toString(), // Convert number to string
-        country: "" // Add missing country property for type compatibility
-      } : null);
-     console.log(defaultCurrency)
+      const defaultCurrency = user?.recentCurrency
+        ? {
+            ...user.recentCurrency,
+            id: user.recentCurrency.id.toString(), // Convert number to string
+            country: "", // Add missing country property for type compatibility
+          }
+        : null;
+      console.log(defaultCurrency);
       setCurrency(defaultCurrency);
       setLateTax(
         typeof initialData.lateTax === "number" ? initialData.lateTax : 0
@@ -150,11 +154,13 @@ export default function CreateAnnounceDialog({
       setKilos("");
       setPricePerKg("");
       // Set user's recent currency as default with proper type conversion
-      const defaultCurrency = user?.recentCurrency ? {
-        ...user.recentCurrency,
-        id: user.recentCurrency.id.toString(), // Convert number to string
-        country: "" // Add missing country property for type compatibility
-      } : null;
+      const defaultCurrency = user?.recentCurrency
+        ? {
+            ...user.recentCurrency,
+            id: user.recentCurrency.id.toString(), // Convert number to string
+            country: "", // Add missing country property for type compatibility
+          }
+        : null;
       setCurrency(defaultCurrency);
       setLateTax(0);
       setAllowExtraGrams(false);
@@ -172,19 +178,37 @@ export default function CreateAnnounceDialog({
 
   const canNext = useMemo(() => {
     if (step === 1) {
-      const hasValidFlightNumber = !flightNumber || (flightNumber && airline.name && !flightNumberError);
+      const hasValidFlightNumber =
+        !flightNumber || (flightNumber && airline.name && !flightNumberError);
+
+      // Check if airports are selected and different
+      const airportsAreDifferent =
+        departure && arrival && departure.id !== arrival.id;
+
       return (
-        departure !== null && 
-        arrival !== null && 
-        story.trim().length > 0 && // Require description to be present
-        story.length <= 500 && // And within character limit
+        departure !== null &&
+        arrival !== null &&
+        airportsAreDifferent && // Added this condition
+        story.trim().length > 0 &&
+        story.length <= 500 &&
         hasValidFlightNumber
       );
     }
     if (step === 2) return files.length >= 2;
     if (step === 3) return Boolean(kilos) && Boolean(pricePerKg);
     return true;
-  }, [step, departure, arrival, files.length, kilos, pricePerKg, story.length, flightNumber, airline.name, flightNumberError]);
+  }, [
+    step,
+    departure,
+    arrival,
+    files.length,
+    kilos,
+    pricePerKg,
+    story.length,
+    flightNumber,
+    airline.name,
+    flightNumberError,
+  ]);
 
   const onFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files ? Array.from(e.target.files) : [];
@@ -367,6 +391,13 @@ export default function CreateAnnounceDialog({
                       Veuillez sélectionner un aéroport d'arrivée
                     </p>
                   )}
+                  {/* Added this check below */}
+                  {departure && arrival && departure.id === arrival.id && (
+                    <p className="mt-1 text-sm text-red-500 font-semibold italic">
+                      L'aéroport d'arrivée doit être différent de l'aéroport de
+                      départ.
+                    </p>
+                  )}
                 </div>
 
                 <Field label="Numéro de Vol">
@@ -375,8 +406,8 @@ export default function CreateAnnounceDialog({
                     onChange={(e) => setFlightNumber(e.target.value)}
                     placeholder="Add numero de vol sur votre billet d’avion"
                     className={`w-full rounded-xl uppercase border ${
-                      flightNumberError 
-                        ? "border-red-500 focus:ring-red-500" 
+                      flightNumberError
+                        ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
@@ -404,8 +435,8 @@ export default function CreateAnnounceDialog({
                         fetchingAirline
                           ? "Recherche en cours..."
                           : flightNumber
-                          ? "Détectée automatiquement"
-                          : "Entrez d'abord le numéro de vol"
+                            ? "Détectée automatiquement"
+                            : "Entrez d'abord le numéro de vol"
                       }
                       className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-3 text-sm text-gray-600 dark:text-gray-400 cursor-not-allowed"
                     />
@@ -453,8 +484,8 @@ export default function CreateAnnounceDialog({
                       story.length > 500
                         ? "border-red-500 focus:ring-red-500"
                         : story.trim().length === 0
-                        ? "border-red-300 focus:ring-red-400"
-                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                          ? "border-red-300 focus:ring-red-400"
+                          : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
                   <div
@@ -462,10 +493,10 @@ export default function CreateAnnounceDialog({
                       story.length > 500
                         ? "text-red-500 font-semibold"
                         : story.length > 450
-                        ? "text-orange-500"
-                        : story.trim().length === 0
-                        ? "text-red-400"
-                        : "text-gray-400"
+                          ? "text-orange-500"
+                          : story.trim().length === 0
+                            ? "text-red-400"
+                            : "text-gray-400"
                     }`}
                   >
                     {story.length}/500 caractères
@@ -778,7 +809,11 @@ function StepsNav({ step }: { step: StepKey }) {
         }`}
       >
         {index <= step ? (
-          <svg className="h-2.5 w-2.5 md:h-3 md:w-3" viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            className="h-2.5 w-2.5 md:h-3 md:w-3"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path
               fillRule="evenodd"
               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -797,7 +832,9 @@ function StepsNav({ step }: { step: StepKey }) {
         >
           {title}
         </div>
-        <div className="text-xs md:text-sm text-gray-400 truncate">{subtitle}</div>
+        <div className="text-xs md:text-sm text-gray-400 truncate">
+          {subtitle}
+        </div>
       </div>
     </div>
   );
