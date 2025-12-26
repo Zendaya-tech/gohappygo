@@ -42,6 +42,8 @@ export default function SearchFiltersBar({
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const emit = (
     next?: Partial<{
       from: string;
@@ -57,6 +59,28 @@ export default function SearchFiltersBar({
   };
 
   const handleSearch = async () => {
+    setErrorMessage(null);
+
+    const validations = [
+      // [
+      //   !from || !to,
+      //   "Veuillez sélectionner les aéroports de départ et d'arrivée.",
+      // ],
+      [
+        from && to && from === to,
+        "L'aéroport de départ et d'arrivée ne peuvent pas être identiques.",
+      ],
+      // [!date, "Veuillez sélectionner une date de voyage."],
+      // [weight < 0, "Le poids doit être un nombre positif."],
+    ] as const;
+
+    for (const [condition, message] of validations) {
+      if (condition) {
+        setErrorMessage(message);
+        return;
+      }
+    }
+
     setIsLoading(true);
 
     // Simulate processing time for better UX
@@ -82,7 +106,7 @@ export default function SearchFiltersBar({
         <div className="md:border-r md:border-gray-200 md:pr-4">
           <AirportComboBox
             label="Départ"
-            value={from}
+            value={from !== to ? from : ""}
             placeholder="Aéroport de départ"
             onChange={(airport: Airport | null) => {
               const code = airport?.id || "";
@@ -96,7 +120,7 @@ export default function SearchFiltersBar({
         <div className="md:border-r md:border-gray-200 md:pr-4">
           <AirportComboBox
             label="Arrivée"
-            value={to}
+            value={to !== from ? to : ""}
             placeholder="Aéroport d'arrivée"
             onChange={(airport: Airport | null) => {
               const code = airport?.id || "";
@@ -194,6 +218,11 @@ export default function SearchFiltersBar({
           </button>
         </div>
       </div>
+      {errorMessage && (
+        <div className="mt-3 text-red-600 text-sm text-center">
+          {errorMessage}
+        </div>
+      )}
     </div>
   );
 }

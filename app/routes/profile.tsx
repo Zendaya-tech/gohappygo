@@ -24,7 +24,15 @@ import ProfileTravelCard, {
   type ProfileTravel,
 } from "~/components/common/ProfileTravelCard";
 import AnnounceCard from "~/components/AnnounceCard";
-import { getBookmarks, type BookmarkItem, getDemandAndTravel, getUserDemandsAndTravels, deleteTravel, deleteDemand, type DemandTravelItem } from "~/services/announceService";
+import {
+  getBookmarks,
+  type BookmarkItem,
+  getDemandAndTravel,
+  getUserDemandsAndTravels,
+  deleteTravel,
+  deleteDemand,
+  type DemandTravelItem,
+} from "~/services/announceService";
 import { removeBookmark } from "~/services/bookmarkService";
 import { getReviews, type Review } from "~/services/reviewService";
 import { getRequests, acceptRequest, completeRequest, type RequestResponse } from "~/services/requestService";
@@ -93,7 +101,9 @@ const sampleReservations: Reservation[] = [
 ];
 
 const ReservationsSection = () => {
-  const [tab, setTab] = useState<"pending" | "accepted" | "completed">("pending");
+  const [tab, setTab] = useState<"pending" | "accepted" | "completed">(
+    "pending"
+  );
   const [requests, setRequests] = useState<RequestResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -148,7 +158,8 @@ const ReservationsSection = () => {
 
   const filtered = requests.filter((r) => {
     const status = r.currentStatus?.status?.toUpperCase();
-    if (tab === "pending") return status === "NEGOTIATING" || status === "PENDING";
+    if (tab === "pending")
+      return status === "NEGOTIATING" || status === "PENDING";
     if (tab === "accepted") return status === "ACCEPTED";
     if (tab === "completed") return status === "COMPLETED";
     return false;
@@ -196,7 +207,7 @@ const ReservationsSection = () => {
           | Terminées
         </button>
       </div>
-      
+
       {filtered.length === 0 ? (
         <div className="text-center text-gray-500 py-8">
           Aucune réservation dans cette catégorie
@@ -208,13 +219,21 @@ const ReservationsSection = () => {
             const requester = request.requester;
             const departureCity = travel?.departureAirport?.city || "Paris";
             const arrivalCity = travel?.arrivalAirport?.city || "New-York";
-            const travelDate = travel?.departureDatetime ? formatDate(travel.departureDatetime) : "";
+            const travelDate = travel?.departureDatetime
+              ? formatDate(travel.departureDatetime)
+              : "";
             const flightNumber = travel?.flightNumber || "N/A";
             const weight = request.weight || 0;
-            const pricePerKg = typeof travel?.pricePerKg === 'string' ? parseFloat(travel.pricePerKg) : (travel?.pricePerKg || 0);
+            const pricePerKg =
+              typeof travel?.pricePerKg === "string"
+                ? parseFloat(travel.pricePerKg)
+                : travel?.pricePerKg || 0;
             const price = (pricePerKg * weight).toFixed(0);
-            const requesterName = requester ? `${requester.firstName} ${requester.lastName.charAt(0)}.` : "Utilisateur";
-            const requesterAvatar = (requester as any)?.profilePictureUrl || "/favicon.ico";
+            const requesterName = requester
+              ? `${requester.firstName} ${requester.lastName.charAt(0)}.`
+              : "Utilisateur";
+            const requesterAvatar =
+              (requester as any)?.profilePictureUrl || "/favicon.ico";
 
             return (
               <div
@@ -227,8 +246,12 @@ const ReservationsSection = () => {
                     {/* Plane Icon */}
                     <div className="flex-shrink-0">
                       <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                        <svg
+                          className="w-8 h-8 text-blue-600"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
                         </svg>
                       </div>
                     </div>
@@ -238,9 +261,7 @@ const ReservationsSection = () => {
                       <h3 className="text-xl font-bold text-gray-900 mb-1">
                         {departureCity} → {arrivalCity}
                       </h3>
-                      <p className="text-sm text-gray-500 mb-1">
-                        {travelDate}
-                      </p>
+                      <p className="text-sm text-gray-500 mb-1">{travelDate}</p>
                       <p className="text-sm text-gray-600 mb-4">
                         Numéro de vol {flightNumber}
                       </p>
@@ -370,7 +391,10 @@ const ReviewsSection = () => {
 
   const calculateAverageRating = () => {
     if (reviews.length === 0) return 0;
-    const sum = reviews.reduce((acc, review) => acc + parseFloat(review.rating || "0"), 0);
+    const sum = reviews.reduce(
+      (acc, review) => acc + parseFloat(review.rating || "0"),
+      0
+    );
     return (sum / reviews.length).toFixed(1);
   };
 
@@ -443,7 +467,8 @@ const ReviewsSection = () => {
                     <StarIcon
                       key={star}
                       className={`h-4 w-4 ${
-                        star <= Math.round(parseFloat(calculateAverageRating() || "0"))
+                        star <=
+                        Math.round(parseFloat(calculateAverageRating() || "0"))
                           ? "text-yellow-400 fill-current"
                           : "text-gray-300"
                       }`}
@@ -465,7 +490,8 @@ const ReviewsSection = () => {
               const displayName = displayUser 
                 ? `${displayUser.firstName} ${displayUser.lastName.charAt(0)}.`
                 : "Utilisateur";
-              const displayAvatar = displayUser?.profilePictureUrl || "/favicon.ico";
+              const displayAvatar =
+                displayUser?.profilePictureUrl || "/favicon.ico";
               const rating = parseFloat(review.rating || "0");
 
               return (
@@ -935,14 +961,17 @@ const FavoritesSection = () => {
   };
 
   const formatName = (fullName: string) => {
-    const parts = fullName.split(' ');
+    const parts = fullName.split(" ");
     if (parts.length >= 2) {
       return `${parts[0]} ${parts[1].charAt(0)}.`;
     }
     return fullName;
   };
 
-  const handleRemoveBookmark = async (bookmarkType: "TRAVEL" | "DEMAND", itemId: number) => {
+  const handleRemoveBookmark = async (
+    bookmarkType: "TRAVEL" | "DEMAND",
+    itemId: number
+  ) => {
     try {
       // Convert to lowercase for API endpoint
       const type = bookmarkType.toLowerCase();
@@ -984,49 +1013,59 @@ const FavoritesSection = () => {
               Mes Favoris ({bookmarks.length})
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bookmarks.map((bookmark) => {
               // Determine if it's a travel or demand
-              const isTravel = bookmark.bookmarkType === "TRAVEL" && bookmark.travel;
-              const isDemand = bookmark.bookmarkType === "DEMAND" && bookmark.demand;
-              
+              const isTravel =
+                bookmark.bookmarkType === "TRAVEL" && bookmark.travel;
+              const isDemand =
+                bookmark.bookmarkType === "DEMAND" && bookmark.demand;
+
               if (!isTravel && !isDemand) return null;
 
               // Get the actual item (travel or demand)
               const item: any = isTravel ? bookmark.travel : bookmark.demand;
               if (!item) return null;
 
-              const id = (isTravel ? bookmark.travelId : bookmark.demandId)?.toString() || bookmark.id.toString();
-              const name = item.user 
-                ? `${item.user.fullName }`.trim() : "Voyageur"
-        
-              const avatar = item.user?.profilePictureUrl || item.images?.[0]?.fileUrl || "/favicon.ico";
+              const id =
+                (isTravel
+                  ? bookmark.travelId
+                  : bookmark.demandId
+                )?.toString() || bookmark.id.toString();
+              const name = item.user
+                ? `${item.user.fullName}`.trim()
+                : "Voyageur";
+
+              const avatar =
+                item.user?.profilePictureUrl ||
+                item.images?.[0]?.fileUrl ||
+                "/favicon.ico";
               const originName = item.departureAirport?.name || "";
               const destName = item.arrivalAirport?.name || "";
               const location = `${originName} → ${destName}`;
               // Parse pricePerKg as it's returned as string from API
-              const pricePerKg = typeof item.pricePerKg === 'string' 
-                ? parseFloat(item.pricePerKg) 
-                : (item.pricePerKg ?? 0);
+              const pricePerKg =
+                typeof item.pricePerKg === "string"
+                  ? parseFloat(item.pricePerKg)
+                  : (item.pricePerKg ?? 0);
               const rating = "4.7";
-              
+
               // Pour les voyages (travel), utiliser le logo de la compagnie
               // Pour les demandes (demand), utiliser l'avatar de l'utilisateur
-              const image = isTravel 
-                ? item.airline?.logoUrl || avatar
-                : avatar;
-              
+              const image = isTravel ? item.airline?.logoUrl || avatar : avatar;
+
               const featured = Boolean(item.user?.isVerified);
-              
+
               // Use weightAvailable for travel type, weight for demand type
-              const availableWeight = isTravel 
-                ? item.weightAvailable ?? 0
-                : item.weight ?? 0;
-              
+              const availableWeight = isTravel
+                ? (item.weightAvailable ?? 0)
+                : (item.weight ?? 0);
+
               // Get the date from the correct field
-              const dateString = item.departureDatetime || item.deliveryDate || item.travelDate;
+              const dateString =
+                item.departureDatetime || item.deliveryDate || item.travelDate;
               const departure = dateString ? formatDate(dateString) : undefined;
-              
+
               const airline = item.airline?.name;
               const type = isTravel ? "transporter" : "traveler";
 
@@ -1041,14 +1080,18 @@ const FavoritesSection = () => {
                     rating={rating}
                     image={image}
                     featured={featured}
-                    weight={availableWeight ? `${availableWeight}kg` : undefined}
+                    weight={
+                      availableWeight ? `${availableWeight}kg` : undefined
+                    }
                     departure={departure}
                     airline={airline}
                     type={type as any}
-                    onRemove={() => handleRemoveBookmark(
-                      bookmark.bookmarkType, 
-                      isTravel ? bookmark.travelId! : bookmark.demandId!
-                    )}
+                    onRemove={() =>
+                      handleRemoveBookmark(
+                        bookmark.bookmarkType,
+                        isTravel ? bookmark.travelId! : bookmark.demandId!
+                      )
+                    }
                   />
                   {/* Remove from favorites button */}
                   {/* <button 
@@ -1072,7 +1115,8 @@ const FavoritesSection = () => {
                       />
                     </svg>
                   </button> */}
-              </>);
+                </>
+              );
             })}
           </div>
         </div>
@@ -1171,7 +1215,9 @@ export default function Profile() {
       id: "favorites",
       label: isOwnProfile ? "Mes Favoris" : "Favoris",
       icon: <HeartIcon className="h-5 w-5" />,
-      count: (profileStats?.bookMarkTravelCount || 0) + (profileStats?.bookMarkDemandCount || 0),
+      count:
+        (profileStats?.bookMarkTravelCount || 0) +
+        (profileStats?.bookMarkDemandCount || 0),
     },
     {
       id: "payments",
@@ -1539,7 +1585,7 @@ export default function Profile() {
             </aside>
 
             {/* Main Content */}
-            <section>
+            <section className="mx-15">
               {/* Section Title */}
               <div className="mb-4 md:mb-6">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900">

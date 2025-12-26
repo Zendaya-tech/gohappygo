@@ -1,6 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import FooterMinimal from "~/components/FooterMinimal";
 import AnnounceCard from "~/components/AnnounceCard";
@@ -36,6 +36,7 @@ export default function Annonces() {
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [weightRange, setWeightRange] = useState({ min: "", max: "" });
   const [selectedAirline, setSelectedAirline] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -110,18 +111,22 @@ export default function Annonces() {
         filters.page = 1;
 
         const apiRes = await getDemandAndTravel(filters);
-        let items = Array.isArray(apiRes) ? apiRes : apiRes?.items ?? [];
+        let items = Array.isArray(apiRes) ? apiRes : (apiRes?.items ?? []);
         const responseMeta = apiRes?.meta;
 
         // Apply client-side sorting for "lowest-price"
         if (selectedFilters.includes("lowest-price")) {
-          items = [...items].sort((a, b) => (a.pricePerKg || 0) - (b.pricePerKg || 0));
+          items = [...items].sort(
+            (a, b) => (a.pricePerKg || 0) - (b.pricePerKg || 0)
+          );
         }
 
         // Apply client-side sorting for "travel-date"
         if (selectedFilters.includes("travel-date")) {
-          items = [...items].sort((a, b) => 
-            new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime()
+          items = [...items].sort(
+            (a, b) =>
+              new Date(a.deliveryDate).getTime() -
+              new Date(b.deliveryDate).getTime()
           );
         }
 
@@ -136,7 +141,15 @@ export default function Annonces() {
     };
     fetchResults();
     return () => controller.abort();
-  }, [location.search, urlParams, selectedFilters, priceRange, weightRange, selectedAirline, buildFilters]);
+  }, [
+    location.search,
+    urlParams,
+    selectedFilters,
+    priceRange,
+    weightRange,
+    selectedAirline,
+    buildFilters,
+  ]);
 
   // Load more results for infinite scroll
   const loadMore = useCallback(async () => {
@@ -148,18 +161,22 @@ export default function Annonces() {
       filters.page = currentPage + 1;
 
       const apiRes = await getDemandAndTravel(filters);
-      let items = Array.isArray(apiRes) ? apiRes : apiRes?.items ?? [];
+      let items = Array.isArray(apiRes) ? apiRes : (apiRes?.items ?? []);
       const responseMeta = apiRes?.meta;
 
       // Apply client-side sorting for "lowest-price"
       if (selectedFilters.includes("lowest-price")) {
-        items = [...items].sort((a, b) => (a.pricePerKg || 0) - (b.pricePerKg || 0));
+        items = [...items].sort(
+          (a, b) => (a.pricePerKg || 0) - (b.pricePerKg || 0)
+        );
       }
 
       // Apply client-side sorting for "travel-date"
       if (selectedFilters.includes("travel-date")) {
-        items = [...items].sort((a, b) => 
-          new Date(a.deliveryDate).getTime() - new Date(b.deliveryDate).getTime()
+        items = [...items].sort(
+          (a, b) =>
+            new Date(a.deliveryDate).getTime() -
+            new Date(b.deliveryDate).getTime()
         );
       }
 
@@ -195,6 +212,7 @@ export default function Annonces() {
     setPriceRange({ min: "", max: "" });
     setWeightRange({ min: "", max: "" });
     setSelectedAirline(null);
+    navigate(`/annonces`);
   };
 
   return (
@@ -238,11 +256,13 @@ export default function Annonces() {
               </div>
 
               {/* Filtrer non disponible button */}
-              <div className="mb-3 md:mb-4">
-                <button className="w-full text-left px-3 md:px-4 py-2 text-xs md:text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-                  Filtrer non disponible
-                </button>
-              </div>
+              {results.length === 0 && (
+                <div className="mb-3 md:mb-4">
+                  <button className="w-full text-left px-3 md:px-4 py-2 text-xs md:text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                    Filtrer non disponible
+                  </button>
+                </div>
+              )}
 
               <div className="space-y-2 md:space-y-3">
                 {filters.map((filter) => {
@@ -254,14 +274,16 @@ export default function Annonces() {
                           label={filter.label}
                           value={selectedAirline || ""}
                           onChange={(airline: Airline | null) => {
-                            setSelectedAirline(airline ? String(airline.id) : null);
+                            setSelectedAirline(
+                              airline ? String(airline.id) : null
+                            );
                           }}
                           placeholder="Rechercher une compagnie"
                         />
                       </div>
                     );
                   }
-                  
+
                   return (
                     <label
                       key={filter.id}
@@ -292,7 +314,10 @@ export default function Annonces() {
                     placeholder="Min"
                     value={priceRange.min}
                     onChange={(e) =>
-                      setPriceRange((prev) => ({ ...prev, min: e.target.value }))
+                      setPriceRange((prev) => ({
+                        ...prev,
+                        min: e.target.value,
+                      }))
                     }
                     className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
@@ -301,7 +326,10 @@ export default function Annonces() {
                     placeholder="Max"
                     value={priceRange.max}
                     onChange={(e) =>
-                      setPriceRange((prev) => ({ ...prev, max: e.target.value }))
+                      setPriceRange((prev) => ({
+                        ...prev,
+                        max: e.target.value,
+                      }))
                     }
                     className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
@@ -319,7 +347,10 @@ export default function Annonces() {
                     placeholder="Min"
                     value={weightRange.min}
                     onChange={(e) =>
-                      setWeightRange((prev) => ({ ...prev, min: e.target.value }))
+                      setWeightRange((prev) => ({
+                        ...prev,
+                        min: e.target.value,
+                      }))
                     }
                     className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
@@ -328,7 +359,10 @@ export default function Annonces() {
                     placeholder="Max"
                     value={weightRange.max}
                     onChange={(e) =>
-                      setWeightRange((prev) => ({ ...prev, max: e.target.value }))
+                      setWeightRange((prev) => ({
+                        ...prev,
+                        max: e.target.value,
+                      }))
                     }
                     className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                   />
@@ -340,9 +374,15 @@ export default function Annonces() {
           {/* Right Section - Results Grid */}
           <div className="flex-1 w-full">
             {loading && (
-              <div className="text-sm text-gray-500 text-center py-8">Chargement…</div>
+              <div className="text-sm text-gray-500 text-center py-8">
+                Chargement…
+              </div>
             )}
-            {error && <div className="text-sm text-red-600 text-center py-8">{error}</div>}
+            {error && (
+              <div className="text-sm text-red-600 text-center py-8">
+                {error}
+              </div>
+            )}
             {!loading && !error && results.length === 0 && (
               <div className="flex flex-col items-center justify-center py-16 px-4">
                 {/* Empty state illustration */}
@@ -420,9 +460,15 @@ export default function Annonces() {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
                   {results.map((item: any) => {
-                    const id = item.id?.toString() || Math.random().toString(36).slice(2);
-                    const name = item.user?.fullName || item.title || "Voyageur";
-                    const avatar = item.user?.selfieImage || item.images?.[0]?.fileUrl || "/favicon.ico";
+                    const id =
+                      item.id?.toString() ||
+                      Math.random().toString(36).slice(2);
+                    const name =
+                      item.user?.fullName || item.title || "Voyageur";
+                    const avatar =
+                      item.user?.selfieImage ||
+                      item.images?.[0]?.fileUrl ||
+                      "/favicon.ico";
                     const originName = item.departureAirport?.name || "";
                     const destName = item.arrivalAirport?.name || "";
                     const route = `${originName} - ${destName}`;
@@ -431,29 +477,32 @@ export default function Annonces() {
                     
                     // Pour les transporteurs (travel), utiliser le logo de la compagnie
                     // Pour les voyageurs (demand), utiliser l'avatar de l'utilisateur
-                    const image = item.type === "travel" 
-                      ? item.airline?.logoUrl || avatar
-                      : avatar;
-                    
+                    const image =
+                      item.type === "travel"
+                        ? item.airline?.logoUrl || avatar
+                        : avatar;
+
                     const featured = Boolean(item.user?.isVerified);
-                    
+
                     // Use weightAvailable for travel type, weight for demand type
-                    const availableWeight = item.type === "travel" 
-                      ? item.weightAvailable ?? 0
-                      : item.weight ?? 0;
-                    
-                    const departure = item.deliveryDate 
+                    const availableWeight =
+                      item.type === "travel"
+                        ? (item.weightAvailable ?? 0)
+                        : (item.weight ?? 0);
+
+                    const departure = item.deliveryDate
                       ? formatDate(item.deliveryDate)
                       : undefined;
-                    
+
                     const airline = item.airline?.name;
-                    const type = item.type === "travel" ? "transporter" : "traveler";
+                    const type =
+                      item.type === "travel" ? "transporter" : "traveler";
 
                     return (
                       <AnnounceCard
                         key={id}
                         id={id}
-                      fullName={name}
+                        fullName={name}
                         avatar={avatar}
                         location={route}
                         price={`${pricePerKg}`}
@@ -478,9 +527,18 @@ export default function Annonces() {
                   <div ref={sentinelRef} className="w-full py-8 min-h-[100px]">
                     {loadingMore && (
                       <div className="flex justify-center items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                        <div
+                          className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                          style={{ animationDelay: "0ms" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                          style={{ animationDelay: "150ms" }}
+                        ></div>
+                        <div
+                          className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+                          style={{ animationDelay: "300ms" }}
+                        ></div>
                       </div>
                     )}
                   </div>

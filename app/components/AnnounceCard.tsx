@@ -46,9 +46,10 @@ export default function AnnounceCard({
   const [isLoading, setIsLoading] = useState(false);
   const isLoggedIn = useAuthStore((s: AuthState) => s.isLoggedIn);
   const currentUser = useAuthStore((s: AuthState) => s.user);
-  
+
   // Vérifier si l'annonce appartient à l'utilisateur connecté
-  const isOwnAnnounce = currentUser && userId && Number(currentUser.id) === Number(userId);
+  const isOwnAnnounce =
+    currentUser && userId && Number(currentUser.id) === Number(userId);
 
   // Use the isBookmarked prop from API response or check bookmark status
   useEffect(() => {
@@ -76,7 +77,7 @@ export default function AnnounceCard({
 
     // Si l'utilisateur n'est pas connecté, ouvrir la modal de connexion
     if (!isLoggedIn) {
-      window.dispatchEvent(new Event('open-login-dialog'));
+      window.dispatchEvent(new Event("open-login-dialog"));
       return;
     }
 
@@ -158,46 +159,45 @@ export default function AnnounceCard({
                 : "bg-white/80 dark:bg-gray-900/70 hover:bg-white dark:hover:bg-gray-800"
             }`}
           >
-          {isLoading ? (
-            <svg
-              className="w-5 h-5 animate-spin text-gray-600 dark:text-gray-300"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
+            {isLoading ? (
+              <svg
+                className="w-5 h-5 animate-spin text-gray-600 dark:text-gray-300"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+            ) : (
+              <svg
+                className={`w-5 h-5 transition-colors duration-200 ${
+                  isFavorite ? "text-white" : "text-gray-600 dark:text-gray-300"
+                }`}
+                fill={isFavorite ? "currentColor" : "none"}
                 stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-          ) : (
-            <svg
-              className={`w-5 h-5 transition-colors duration-200 ${
-                isFavorite ? "text-white" : "text-gray-600 dark:text-gray-300"
-              }`}
-              fill={isFavorite ? "currentColor" : "none"}
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          )}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+            )}
           </button>
         )}
-        
 
         {airline && <></>}
       </div>
@@ -209,12 +209,12 @@ export default function AnnounceCard({
           </h3>
         </div>
         <p className="text-gray-600 h-14 dark:text-gray-300 text-sm mb-2 ">
-          {( location.length-3 > 80 ? `${location.slice(0, 80)} ...` : location)}
+          {location.length - 3 > 80 ? `${location.slice(0, 80)} ...` : location}
         </p>
         {
           <p className="text-blue-600 text-sm font-medium mb-2">
             {type === "transporter" ? "Espace disponible" : "Espace demandé"}:{" "}
-             {weight??"0 kg"}
+            {weight ?? "0 kg"}
           </p>
         }
         {departure && (
@@ -234,16 +234,28 @@ export default function AnnounceCard({
               {price} € / kg
             </span>
             <div className="flex items-center space-x-1">
-              <svg
-                className="w-4 h-4 text-yellow-400"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                {rating}
-              </span>
+              {Number(rating) > 0 ? (
+                <>
+                  <svg
+                    className="w-4 h-4 text-yellow-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    {rating}
+                  </span>
+                </>
+              ) : (
+                <svg
+                  className="w-4 h-4 text-gray-300 dark:text-gray-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              )}
             </div>
           </div>
         )}
