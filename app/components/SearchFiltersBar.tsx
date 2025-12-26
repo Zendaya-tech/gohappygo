@@ -67,7 +67,7 @@ export default function SearchFiltersBar({
       //   "Veuillez sélectionner les aéroports de départ et d'arrivée.",
       // ],
       [
-        from === to,
+        from && to && from === to,
         "L'aéroport de départ et d'arrivée ne peuvent pas être identiques.",
       ],
       // [!date, "Veuillez sélectionner une date de voyage."],
