@@ -427,7 +427,7 @@ export default function Annonces() {
                     const destName = item.arrivalAirport?.name || "";
                     const route = `${originName} - ${destName}`;
                     const pricePerKg = item.pricePerKg ?? 0;
-                    const rating = "4.7"; // Default rating since it's not in the new structure
+                    const rating = item.user.rating; // Default rating since it's not in the new structure
                     
                     // Pour les transporteurs (travel), utiliser le logo de la compagnie
                     // Pour les voyageurs (demand), utiliser l'avatar de l'utilisateur

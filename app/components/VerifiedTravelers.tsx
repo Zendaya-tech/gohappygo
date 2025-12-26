@@ -65,7 +65,7 @@ export default function VerifiedTravelers() {
                     const destName = travel.arrivalAirport?.name || "";
                     const route = `${originName} → ${destName}`;
                     const pricePerKg = travel.pricePerKg?.toString() || "0";
-                    const rating = "4.8"; // Rating par défaut
+                    const rating = travel.user?.rating
                     
                     // Pour les voyageurs, utiliser le logo de la compagnie
                     const image = travel.airline?.logoUrl || avatar;

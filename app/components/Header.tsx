@@ -73,8 +73,10 @@ export default function Header() {
     if (isLoggedIn) {
       const loadUnreadCount = async () => {
         try {
+          console.log("Loading notification counts...");
           const counts = await notificationService.getNotificationCounts();
-          setUnreadCount(counts.unread);
+          console.log("Notification counts received:", counts);
+          setUnreadCount(counts.unreadCount);
         } catch (error) {
           console.error("Failed to load notification counts:", error);
         }
@@ -82,6 +84,8 @@ export default function Header() {
       loadUnreadCount();
       const interval = setInterval(loadUnreadCount, 30000); // Refresh every 30 seconds
       return () => clearInterval(interval);
+    } else {
+      console.log("User not logged in, skipping notification count load");
     }
   }, [isLoggedIn]);
 

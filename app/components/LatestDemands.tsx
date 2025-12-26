@@ -76,7 +76,7 @@ export default function LatestDemands() {
           const destName = demand.arrivalAirport?.name || "";
           const route = `${originName} → ${destName}`;
           const pricePerKg = demand.pricePerKg?.toString() || "0";
-          const priority = getPriority(demand);
+          const priority = demand.user.rating
           
           // Pour les demandes, utiliser la première image du tableau images
           const image = demand.images?.[0]?.fileUrl || avatar;
