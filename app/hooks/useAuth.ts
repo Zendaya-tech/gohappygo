@@ -82,7 +82,8 @@ export const useAuth = () => {
       password: string,
       firstName?: string,
       lastName?: string,
-      phoneNumber?: string
+      phoneNumber?: string,
+      countryCode?: string
     ) => {
       try {
         const res = await apiRegister(
@@ -90,7 +91,8 @@ export const useAuth = () => {
           password,
           firstName,
           lastName,
-          phoneNumber
+          phoneNumber,
+          countryCode
         );
 
         if (!res) {

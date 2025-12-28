@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { useAuth } from "../../../hooks/useAuth";
+import CountryComboBox, { type Country, STRIPE_COUNTRIES } from "../CountryComboBox";
 
 export default function RegisterDialog({
   open,
@@ -22,6 +23,9 @@ export default function RegisterDialog({
     lastName: "",
     phoneNumber: "",
   });
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(
+    STRIPE_COUNTRIES.find(c => c.code === "FR") || null // France par défaut
+  );
   const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const makeRefHandler =
@@ -32,7 +36,21 @@ export default function RegisterDialog({
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const handleCountryChange = (country: Country | null) => {
+    setSelectedCountry(country);
+    // Reset phone number when country changes
+    setForm(p => ({ ...p, phoneNumber: "" }));
+  };
+
   const { register, verifyEmail } = useAuth();
+
+  // Update phone input when country changes
+  useEffect(() => {
+    if (selectedCountry) {
+      // Force re-render of PhoneInput with new country
+      setForm(p => ({ ...p, phoneNumber: "" }));
+    }
+  }, [selectedCountry]);
 
   useEffect(() => {
     if (!open) return;
@@ -60,6 +78,10 @@ export default function RegisterDialog({
         setError("Les mots de passe ne correspondent pas");
         return;
       }
+      if (!selectedCountry) {
+        setError("Veuillez sélectionner votre pays de résidence");
+        return;
+      }
       setSubmitting(true);
       setError(null);
       setMessage(null);
@@ -70,7 +92,8 @@ export default function RegisterDialog({
           form.password,
           form.firstName,
           form.lastName,
-          form.phoneNumber
+          form.phoneNumber,
+          selectedCountry?.code
         );
         setMessage(res.message);
         setStep(2);
@@ -178,8 +201,21 @@ export default function RegisterDialog({
                   </div>
 
                   <div>
+                    <CountryComboBox
+                      label="Pays de résidence"
+                      selectedCountry={selectedCountry}
+                      onChange={handleCountryChange}
+                      placeholder="Sélectionnez votre pays"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-gray-900">
+                      Numéro de téléphone
+                    </label>
                     <PhoneInput
-                      defaultCountry="fr"
+                      key={selectedCountry?.code || "default"} // Force re-render when country changes
+                      defaultCountry={selectedCountry?.code.toLowerCase() as any || "fr"}
                       value={form.phoneNumber}
                       onChange={(phone) =>
                         setForm((p) => ({ ...p, phoneNumber: phone }))
@@ -187,13 +223,18 @@ export default function RegisterDialog({
                       inputClassName="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                       countrySelectorStyleProps={{
                         className:
-                          "border border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent",
+                          "border border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pointer-events-none opacity-75",
                       }}
                       inputProps={{
                         placeholder: "Numéro de téléphone",
                         required: true,
                       }}
+                      disableCountryGuess
+                      forceDialCode
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Le code pays est automatiquement défini selon votre pays de résidence
+                    </p>
                   </div>
                   <div>
                     <input

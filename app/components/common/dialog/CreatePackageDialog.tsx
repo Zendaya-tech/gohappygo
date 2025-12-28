@@ -32,6 +32,7 @@ export default function CreatePackageDialog({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   // Step 3: Price & Booking
   const [weight, setWeight] = useState("");
@@ -68,6 +69,7 @@ export default function CreatePackageDialog({
     setSubmitting(false);
     setError(null);
     setSuccess(null);
+    setValidationErrors({});
   }, [open, user?.recentCurrency]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,38 +88,60 @@ export default function CreatePackageDialog({
     setPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const nextStep = () => {
-    if (currentStep < 3) setCurrentStep(currentStep + 1);
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
-  };
-
-  const canProceedToNext = () => {
+  const validateCurrentStep = () => {
+    const errors: Record<string, string> = {};
+    
     switch (currentStep) {
       case 1:
-        return (
-          departureAirport !== null &&
-          arrivalAirport !== null &&
-          Boolean(baggageDescription) &&
-          baggageDescription.length <= 500
-        );
+        if (!departureAirport) errors.departure = "Veuillez sélectionner un aéroport de départ";
+        if (!arrivalAirport) errors.arrival = "Veuillez sélectionner un aéroport d'arrivée";
+        if (!baggageDescription.trim()) errors.description = "Veuillez décrire votre baggage";
+        if (baggageDescription.length > 500) errors.description = "La description ne peut pas dépasser 500 caractères";
+        if (!flightNumber.trim()) errors.flightNumber = "Veuillez saisir le numéro de vol";
+        if (!travelDate) errors.travelDate = "Veuillez sélectionner une date de voyage";
+        break;
       case 2:
-        return photos.length >= 3;
+        if (photos.length < 3) errors.photos = "Veuillez ajouter 3 images de votre baggage";
+        break;
       case 3:
-        return (
-          Boolean(weight) &&
-          Boolean(pricePerKilo) &&
-          Boolean(flightNumber) &&
-          Boolean(travelDate)
-        );
-      default:
-        return false;
+        if (!weight || parseFloat(weight) <= 0) errors.weight = "Veuillez saisir un poids valide";
+        if (!pricePerKilo || parseFloat(pricePerKilo) <= 0) errors.price = "Veuillez saisir un prix valide";
+        if (!currency) errors.currency = "Veuillez sélectionner une devise";
+        break;
+    }
+    
+    return errors;
+  };
+
+  const nextStep = () => {
+    const errors = validateCurrentStep();
+    setValidationErrors(errors);
+    
+    if (Object.keys(errors).length === 0) {
+      if (currentStep < 3) setCurrentStep(currentStep + 1);
     }
   };
 
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      setValidationErrors({}); // Clear errors when going back
+    }
+  };
+
+  const canProceedToNext = () => {
+    // Always return true to keep button active
+    return true;
+  };
+
   const handleSubmit = async () => {
+    const errors = validateCurrentStep();
+    setValidationErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     if (photos.length < 3) {
       setError("Veuillez ajouter 3 images");
       return;
@@ -233,34 +257,60 @@ export default function CreatePackageDialog({
 
             {currentStep === 1 && (
               <div className="space-y-6">
-                <AirportComboBox
-                  label={t("dialogs.createAnnounce.departure")}
-                  value={departureAirport?.code}
-                  onChange={setDepartureAirport}
-                  placeholder={t("dialogs.createAnnounce.departure")}
-                />
-                <AirportComboBox
-                  label={t("dialogs.createAnnounce.arrival")}
-                  value={arrivalAirport?.code}
-                  onChange={setArrivalAirport}
-                  placeholder={t("dialogs.createAnnounce.arrival")}
-                />
+                <div>
+                  <AirportComboBox
+                    label={t("dialogs.createAnnounce.departure")}
+                    value={departureAirport?.code}
+                    onChange={setDepartureAirport}
+                    placeholder={t("dialogs.createAnnounce.departure")}
+                  />
+                  {validationErrors.departure && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.departure}</p>
+                  )}
+                </div>
+                
+                <div>
+                  <AirportComboBox
+                    label={t("dialogs.createAnnounce.arrival")}
+                    value={arrivalAirport?.code}
+                    onChange={setArrivalAirport}
+                    placeholder={t("dialogs.createAnnounce.arrival")}
+                  />
+                  {validationErrors.arrival && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.arrival}</p>
+                  )}
+                </div>
 
                 <Field label={t("dialogs.createAnnounce.flightNumber")}>
                   <input
                     value={flightNumber}
                     onChange={(e) => setFlightNumber(e.target.value)}
                     placeholder={t("dialogs.createAnnounce.flightNumber")}
-                    className="w-full uppercase rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full uppercase rounded-xl border ${
+                      validationErrors.flightNumber 
+                        ? "border-red-500 focus:ring-red-500" 
+                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                    } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
+                  {validationErrors.flightNumber && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.flightNumber}</p>
+                  )}
                 </Field>
+                
                 <Field label={t("dialogs.createAnnounce.travelDate")}>
                   <input
                     type="date"
                     value={travelDate}
                     onChange={(e) => setTravelDate(e.target.value)}
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full rounded-xl border ${
+                      validationErrors.travelDate 
+                        ? "border-red-500 focus:ring-red-500" 
+                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                    } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
+                  {validationErrors.travelDate && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.travelDate}</p>
+                  )}
                 </Field>
 
                 <Field label={t("dialogs.createAnnounce.story")}>
@@ -274,7 +324,7 @@ export default function CreatePackageDialog({
                     rows={5}
                     placeholder={t("dialogs.createAnnounce.story")}
                     className={`w-full resize-none rounded-xl border ${
-                      baggageDescription.length > 500
+                      validationErrors.description || baggageDescription.length > 500
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
@@ -290,6 +340,9 @@ export default function CreatePackageDialog({
                   >
                     {baggageDescription.length}/500 caractères
                   </div>
+                  {validationErrors.description && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.description}</p>
+                  )}
                 </Field>
 
                 <div>
@@ -350,6 +403,9 @@ export default function CreatePackageDialog({
                   />
                   {t("common.upload")} ({photos.length}/3)
                 </label>
+                {validationErrors.photos && (
+                  <p className="text-sm text-red-600">{validationErrors.photos}</p>
+                )}
                 {photos.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {photos.map((photo, idx) => (
@@ -391,8 +447,15 @@ export default function CreatePackageDialog({
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder={t("dialogs.createAnnounce.weight")}
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full rounded-xl border ${
+                      validationErrors.weight 
+                        ? "border-red-500 focus:ring-red-500" 
+                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                    } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
+                  {validationErrors.weight && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.weight}</p>
+                  )}
                 </Field>
                 <div>
                   <div className="flex gap-4">
@@ -404,8 +467,15 @@ export default function CreatePackageDialog({
                         value={pricePerKilo}
                         onChange={(e) => setPricePerKilo(e.target.value)}
                         placeholder={t("dialogs.createAnnounce.pricePerKilo")}
-                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className={`w-full rounded-xl border ${
+                          validationErrors.price 
+                            ? "border-red-500 focus:ring-red-500" 
+                            : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                        } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                       />
+                      {validationErrors.price && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.price}</p>
+                      )}
                     </Field>
                     <div className="w-32">
                       <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-white">
@@ -418,6 +488,9 @@ export default function CreatePackageDialog({
                         placeholder="EUR"
                         compact
                       />
+                      {validationErrors.currency && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.currency}</p>
+                      )}
                     </div>
                   </div>
                   <p className="mt-1 text-xs text-gray-500">
@@ -442,22 +515,17 @@ export default function CreatePackageDialog({
               </div>
               {currentStep < 3 ? (
                 <button
-                  disabled={!canProceedToNext()}
                   onClick={nextStep}
-                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white ${
-                    canProceedToNext()
-                      ? "bg-indigo-600 hover:bg-indigo-700"
-                      : "bg-gray-300 cursor-not-allowed"
-                  }`}
+                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700"
                 >
                   {t("common.next")} ›
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
-                  disabled={!canProceedToNext() || submitting}
+                  disabled={submitting}
                   className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white ${
-                    canProceedToNext() && !submitting
+                    !submitting
                       ? "bg-indigo-600 hover:bg-indigo-700"
                       : "bg-gray-300 cursor-not-allowed"
                   }`}

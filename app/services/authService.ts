@@ -15,20 +15,28 @@ export const register = async (
   password: string,
   firstName?: string,
   lastName?: string,
-  phoneNumber?: string
+  phoneNumber?: string,
+  countryCode?: string
 ) => {
   try {
-    const response = await api.post(`/auth/register`, {
-      email,
-      password,
-      firstName,
-      lastName,
-      phoneNumber,
+    const formData = new FormData();
+    
+    formData.append("email", email);
+    formData.append("password", password);
+    if (firstName) formData.append("firstName", firstName);
+    if (lastName) formData.append("lastName", lastName);
+    if (phoneNumber) formData.append("phoneNumber", phoneNumber);
+    if (countryCode) formData.append("countryCode", countryCode);
+
+    const response = await api.post(`/auth/register`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
     return response.data;
   } catch (error) {
     console.error(error);
-    return null;
+    throw error; // Throw instead of returning null to handle errors properly
   }
 };
 

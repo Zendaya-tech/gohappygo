@@ -16,6 +16,7 @@ import { useAuthStore, type AuthState } from "~/store/auth";
 import { createRequestToTravel, type CreateRequestToTravelPayload } from "~/services/requestService";
 import type { BookingCardData } from "~/components/common/dialog/BookingDialog";
 import { calculatePricing, type PricingCalculationResponse } from "~/services/pricingService";
+import { addBookmark, removeBookmark, checkIfBookmarked } from "~/services/bookmarkService";
 
 // Reviews are now fetched from the API
 
@@ -44,11 +45,21 @@ export default function AnnounceDetail() {
   const [createOpen, setCreateOpen] = useState<boolean>(false);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [isBookmarkLoading, setIsBookmarkLoading] = useState<boolean>(false);
   const [newRating, setNewRating] = useState<number>(0);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [quotesError, setQuotesError] = useState<string | null>(null);
   const [pricingData, setPricingData] = useState<PricingCalculationResponse | null>(null);
   const [pricingLoading, setPricingLoading] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState<{
+    serviceFee: boolean;
+    vat: boolean;
+    insurance: boolean;
+  }>({
+    serviceFee: false,
+    vat: false,
+    insurance: false,
+  });
   
   // Alert dialog state
   const [alertDialog, setAlertDialog] = useState<{
@@ -65,6 +76,7 @@ export default function AnnounceDetail() {
   
   // Import auth store to check if user owns this announce
   const currentUser = useAuthStore((s: AuthState) => s.user);
+  const isLoggedIn = useAuthStore((s: AuthState) => s.isLoggedIn);
   const isOwnAnnounce = Boolean(currentUser && listing && listing.user?.id === Number(currentUser.id));
   
   // Helper function to show alert dialog
@@ -75,6 +87,69 @@ export default function AnnounceDetail() {
       message,
       type,
     });
+  };
+
+  // Handle bookmark toggle
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent any default behavior
+
+    // If user is not logged in, show login prompt
+    if (!isLoggedIn) {
+      showAlert(
+        "Connexion requise",
+        "Vous devez être connecté pour ajouter aux favoris.",
+        "warning"
+      );
+      return;
+    }
+
+    if (isBookmarkLoading || !listing) return;
+
+    setIsBookmarkLoading(true);
+
+    try {
+      const bookmarkType = type === "travel" ? "TRAVEL" : "DEMAND";
+      const itemId = Number(id);
+
+      if (isFavorite) {
+        // Remove bookmark
+        await removeBookmark(bookmarkType, itemId);
+        setIsFavorite(false);
+        showAlert(
+          "Retiré des favoris",
+          "Cette annonce a été retirée de vos favoris.",
+          "success"
+        );
+      } else {
+        // Add bookmark
+        const bookmarkData: any = {
+          bookmarkType: bookmarkType as "TRAVEL" | "DEMAND",
+        };
+
+        if (bookmarkType === "TRAVEL") {
+          bookmarkData.travelId = itemId;
+        } else {
+          bookmarkData.demandId = itemId;
+        }
+
+        await addBookmark(bookmarkData);
+        setIsFavorite(true);
+        showAlert(
+          "Ajouté aux favoris",
+          "Cette annonce a été ajoutée à vos favoris.",
+          "success"
+        );
+      }
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+      showAlert(
+        "Erreur",
+        "Une erreur est survenue lors de la mise à jour des favoris.",
+        "error"
+      );
+    } finally {
+      setIsBookmarkLoading(false);
+    }
   };
   
   // Use real reviews from listing
@@ -173,6 +248,27 @@ export default function AnnounceDetail() {
 
     calculatePrice();
   }, [kilos, listing, type, id]);
+
+  // Check bookmark status when listing loads
+  useEffect(() => {
+    const checkBookmarkStatus = async () => {
+      if (!listing || !isLoggedIn) {
+        setIsFavorite(false);
+        return;
+      }
+
+      try {
+        const bookmarkType = type === "travel" ? "TRAVEL" : "DEMAND";
+        const bookmarkStatus = await checkIfBookmarked(bookmarkType, Number(id));
+        setIsFavorite(bookmarkStatus);
+      } catch (error) {
+        console.error("Error checking bookmark status:", error);
+        setIsFavorite(false);
+      }
+    };
+
+    checkBookmarkStatus();
+  }, [listing, isLoggedIn, type, id]);
 
   // Simple gallery to mirror the design - Always 3 images
   const galleryImages = useMemo(() => {
@@ -391,27 +487,50 @@ export default function AnnounceDetail() {
             </button>
             {!isOwnAnnounce && (
               <button
-                onClick={() => setIsFavorite(!isFavorite)}
-                className={`inline-flex items-center gap-2 transition-all duration-200 hover:scale-105 ${
+                onClick={handleFavoriteClick}
+                disabled={isBookmarkLoading}
+                className={`inline-flex items-center gap-2 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed ${
                   isFavorite
                     ? "text-red-500"
                     : "text-gray-500 hover:text-rose-600"
                 }`}
               >
-              <svg
-                className="h-4 w-4 transition-colors duration-200"
-                fill={isFavorite ? "currentColor" : "none"}
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
-                />
-              </svg>
-                {isFavorite ? "Retirer des favoris" : "Add to favourite"}
+                {isBookmarkLoading ? (
+                  <svg
+                    className="h-4 w-4 animate-spin text-gray-600 dark:text-gray-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="h-4 w-4 transition-colors duration-200"
+                    fill={isFavorite ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
+                    />
+                  </svg>
+                )}
+                {isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
               </button>
             )}
             
@@ -714,7 +833,7 @@ export default function AnnounceDetail() {
                             />
                             <div className="flex-1">
                               <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {review.name} • {reviewDate}
+                                {review.fullName} • {reviewDate}
                               </div>
                               <p className="mt-1 text-gray-800 dark:text-gray-200">
                                 {review.comment}
@@ -781,39 +900,80 @@ export default function AnnounceDetail() {
                             <span>Frais de service</span>
                             <div className="flex items-center gap-2">
                               <span>€{pricingData.fee.toFixed(2)}</span>
-                              <button className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100">
-                                ?
-                              </button>
+                              <div className="relative">
+                                <button 
+                                  className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100"
+                                  onMouseEnter={() => setTooltipVisible(prev => ({ ...prev, serviceFee: true }))}
+                                  onMouseLeave={() => setTooltipVisible(prev => ({ ...prev, serviceFee: false }))}
+                                >
+                                  ?
+                                </button>
+                                {tooltipVisible.serviceFee && (
+                                  <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-10">
+                                    <div className="font-semibold mb-1">Frais de service GoHappyGo</div>
+                                    <div>Ces frais couvrent le traitement sécurisé de votre paiement, le support client 24/7, et la garantie de transaction.</div>
+                                    <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                           <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
                             <span>TVA 20%</span>
                             <div className="flex items-center gap-2">
                               <span>€{pricingData.tvaAmount.toFixed(2)}</span>
-                              <button className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100">
-                                ?
-                              </button>
+                              <div className="relative">
+                                <button 
+                                  className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100"
+                                  onMouseEnter={() => setTooltipVisible(prev => ({ ...prev, vat: true }))}
+                                  onMouseLeave={() => setTooltipVisible(prev => ({ ...prev, vat: false }))}
+                                >
+                                  ?
+                                </button>
+                                {tooltipVisible.vat && (
+                                  <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-10">
+                                    <div className="font-semibold mb-1">Taxe sur la Valeur Ajoutée</div>
+                                    <div>TVA française de 20% appliquée conformément à la réglementation fiscale en vigueur sur les services numériques.</div>
+                                    <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                           <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
-                            <div className="flex items-center gap-2">
-                              <span>Assurance Protection</span>
-                              <span>Juridique Internationale</span>
-                              <img 
-                                src="/images/axa-logo.svg" 
-                                alt="AXA" 
-                                className="h-6 w-6 rounded object-contain"
-                                onError={(e) => {
-                                  // Fallback if image doesn't exist
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-2">
+                                <span>Assurance Protection</span>
+                                <img 
+                                  src="/images/axa-logo.svg" 
+                                  alt="AXA" 
+                                  className="h-6 w-6 rounded object-contain"
+                                  onError={(e) => {
+                                    // Fallback if image doesn't exist
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              </div>
+                              <span className="text-xs text-gray-500 dark:text-gray-400">Juridique Internationale</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span>€2.50</span>
-                              <button className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100">
-                                ?
-                              </button>
+                              <span className="text-green-600 font-semibold">Offert !</span>
+                              <div className="relative">
+                                <button 
+                                  className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100"
+                                  onMouseEnter={() => setTooltipVisible(prev => ({ ...prev, insurance: true }))}
+                                  onMouseLeave={() => setTooltipVisible(prev => ({ ...prev, insurance: false }))}
+                                >
+                                  ?
+                                </button>
+                                {tooltipVisible.insurance && (
+                                  <div className="absolute bottom-full right-0 mb-2 w-72 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg z-10">
+                                    <div className="font-semibold mb-1">Assurance Protection Juridique AXA</div>
+                                    <div>Protection juridique internationale offerte par AXA. Couvre les litiges liés au transport, assistance juridique 24/7, et remboursement des frais de justice jusqu'à 15 000€.</div>
+                                    <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>

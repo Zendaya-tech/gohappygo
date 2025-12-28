@@ -19,7 +19,6 @@ type InitialData = {
   kilos?: number;
   pricePerKg?: number;
   currency?: Currency | null;
-  lateTax?: number;
   allowExtraGrams?: boolean;
   flightNumber?: string;
   airline?: any;
@@ -50,7 +49,6 @@ export default function CreateAnnounceDialog({
   const [kilos, setKilos] = useState<number | "">("");
   const [pricePerKg, setPricePerKg] = useState<number | "">("");
   const [currency, setCurrency] = useState<Currency | null>(null);
-  const [lateTax, setLateTax] = useState<number | "">(0);
   const [allowExtraGrams, setAllowExtraGrams] = useState<boolean>(false);
   const [punctuality, setPunctuality] = useState<"punctual" | "very-punctual">("punctual");
   // Supplementary info for Step 1
@@ -65,6 +63,7 @@ export default function CreateAnnounceDialog({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [reservationType, setReservationType] = useState<"single" | "shared">(
     "single"
   );
@@ -115,6 +114,35 @@ export default function CreateAnnounceDialog({
     return () => clearTimeout(timeoutId);
   }, [flightNumber]);
 
+  const validateCurrentStep = () => {
+    const errors: Record<string, string> = {};
+    
+    switch (step) {
+      case 1:
+        if (!departure) errors.departure = "Veuillez sélectionner un aéroport de départ";
+        if (!arrival) errors.arrival = "Veuillez sélectionner un aéroport d'arrivée";
+        if (departure && arrival && departure.id === arrival.id) {
+          errors.airports = "L'aéroport d'arrivée doit être différent de l'aéroport de départ";
+        }
+        if (!story.trim()) errors.story = "Veuillez décrire votre voyage";
+        if (story.length > 500) errors.story = "La description ne peut pas dépasser 500 caractères";
+        if (flightNumber && (!airline.name || flightNumberError)) {
+          errors.flightNumber = "Veuillez entrer un numéro de vol valide";
+        }
+        break;
+      case 2:
+        if (files.length < 2) errors.photos = "Veuillez ajouter au moins 2 images";
+        break;
+      case 3:
+        if (!kilos || Number(kilos) <= 0) errors.kilos = "Veuillez saisir un nombre de kilos valide";
+        if (!pricePerKg || Number(pricePerKg) <= 0) errors.pricePerKg = "Veuillez saisir un prix valide";
+        if (!currency) errors.currency = "Veuillez sélectionner une devise";
+        break;
+    }
+    
+    return errors;
+  };
+
   useEffect(() => {
     if (!open) return;
     setStep(1);
@@ -136,9 +164,6 @@ export default function CreateAnnounceDialog({
         : null;
       console.log(defaultCurrency);
       setCurrency(defaultCurrency);
-      setLateTax(
-        typeof initialData.lateTax === "number" ? initialData.lateTax : 0
-      );
       setAllowExtraGrams(Boolean(initialData.allowExtraGrams));
       setPunctuality(initialData.punctuality ?? "punctual");
       setFlightNumber(initialData.flightNumber ?? "");
@@ -165,7 +190,6 @@ export default function CreateAnnounceDialog({
           }
         : null;
       setCurrency(defaultCurrency);
-      setLateTax(0);
       setAllowExtraGrams(false);
       setPunctuality("punctual");
       setFlightNumber("");
@@ -177,42 +201,14 @@ export default function CreateAnnounceDialog({
       setSubmitting(false);
       setError(null);
       setSuccess(null);
+      setValidationErrors({});
     }
   }, [open, initialData, user?.recentCurrency]);
 
   const canNext = useMemo(() => {
-    if (step === 1) {
-      const hasValidFlightNumber =
-        !flightNumber || (flightNumber && airline.name && !flightNumberError);
-
-      // Check if airports are selected and different
-      const airportsAreDifferent =
-        departure && arrival && departure.id !== arrival.id;
-
-      return (
-        departure !== null &&
-        arrival !== null &&
-        airportsAreDifferent && // Added this condition
-        story.trim().length > 0 &&
-        story.length <= 500 &&
-        hasValidFlightNumber
-      );
-    }
-    if (step === 2) return files.length >= 2;
-    if (step === 3) return Boolean(kilos) && Boolean(pricePerKg);
+    // Always return true to keep button active
     return true;
-  }, [
-    step,
-    departure,
-    arrival,
-    files.length,
-    kilos,
-    pricePerKg,
-    story.length,
-    flightNumber,
-    airline.name,
-    flightNumberError,
-  ]);
+  }, []);
 
   const onFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files ? Array.from(e.target.files) : [];
@@ -245,6 +241,13 @@ export default function CreateAnnounceDialog({
   };
 
   const handleSubmit = async () => {
+    const errors = validateCurrentStep();
+    setValidationErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     if (files.length < 2) {
       setError("Veuillez ajouter au moins 2 images");
       return;
@@ -281,7 +284,7 @@ export default function CreateAnnounceDialog({
         isSharedWeight: reservationType === "shared",
         isInstant: bookingType === "instant",
         isAllowExtraWeight: allowExtraGrams,
-        feeForLateComer: typeof lateTax === "number" ? lateTax : 0,
+        punctualityLevel: punctuality === "very-punctual", // false = punctual, true = very punctual
         feeForGloomy: 0,
         departureAirportId: parseInt(departure.id),
         arrivalAirportId: parseInt(arrival.id),
@@ -377,10 +380,8 @@ export default function CreateAnnounceDialog({
                     onChange={setDeparture}
                     placeholder="Choose airport"
                   />
-                  {!departure && (
-                    <p className="mt-1 text-sm text-red-500 font-medium">
-                      Veuillez sélectionner un aéroport de départ
-                    </p>
+                  {validationErrors.departure && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.departure}</p>
                   )}
                 </div>
                 <div>
@@ -390,17 +391,11 @@ export default function CreateAnnounceDialog({
                     onChange={setArrival}
                     placeholder="Choose airport"
                   />
-                  {!arrival && (
-                    <p className="mt-1 text-sm text-red-500 font-medium">
-                      Veuillez sélectionner un aéroport d'arrivée
-                    </p>
+                  {validationErrors.arrival && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.arrival}</p>
                   )}
-                  {/* Added this check below */}
-                  {departure && arrival && departure.id === arrival.id && (
-                    <p className="mt-1 text-sm text-red-500 font-semibold italic">
-                      L'aéroport d'arrivée doit être différent de l'aéroport de
-                      départ.
-                    </p>
+                  {validationErrors.airports && (
+                    <p className="mt-1 text-sm text-red-600 font-semibold italic">{validationErrors.airports}</p>
                   )}
                 </div>
 
@@ -410,14 +405,14 @@ export default function CreateAnnounceDialog({
                     onChange={(e) => setFlightNumber(e.target.value)}
                     placeholder="Add numero de vol sur votre billet d’avion"
                     className={`w-full rounded-xl uppercase border ${
-                      flightNumberError
+                      validationErrors.flightNumber || flightNumberError
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
-                  {flightNumberError && (
+                  {(validationErrors.flightNumber || flightNumberError) && (
                     <p className="mt-1 text-sm text-red-600 font-medium">
-                      {flightNumberError}
+                      {validationErrors.flightNumber || flightNumberError}
                     </p>
                   )}
                 </Field>
@@ -485,11 +480,9 @@ export default function CreateAnnounceDialog({
                     rows={5}
                     placeholder="Type here..."
                     className={`w-full resize-none rounded-xl border ${
-                      story.length > 500
+                      validationErrors.story || story.length > 500
                         ? "border-red-500 focus:ring-red-500"
-                        : story.trim().length === 0
-                          ? "border-red-300 focus:ring-red-400"
-                          : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
                   <div
@@ -498,23 +491,19 @@ export default function CreateAnnounceDialog({
                         ? "text-red-500 font-semibold"
                         : story.length > 450
                           ? "text-orange-500"
-                          : story.trim().length === 0
-                            ? "text-red-400"
-                            : "text-gray-400"
+                          : "text-gray-400"
                     }`}
                   >
                     {story.length}/500 caractères
-                    {story.trim().length === 0 && (
-                      <span className="block text-red-500 font-medium">
-                        Une description est requise
-                      </span>
-                    )}
                     {story.length > 500 && (
                       <span className="block text-red-500 font-medium">
                         Dépassement de {story.length - 500} caractères
                       </span>
                     )}
                   </div>
+                  {validationErrors.story && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.story}</p>
+                  )}
                 </Field>
                 <div>
                   <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
@@ -581,6 +570,9 @@ export default function CreateAnnounceDialog({
                   />
                   Click to upload files ({files.length}/2)
                 </label>
+                {validationErrors.photos && (
+                  <p className="text-sm text-red-600">{validationErrors.photos}</p>
+                )}
                 {files.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {files.map((f, idx) => (
@@ -625,8 +617,15 @@ export default function CreateAnnounceDialog({
                       )
                     }
                     placeholder="Enter number of kilos"
-                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full rounded-xl border ${
+                      validationErrors.kilos 
+                        ? "border-red-500 focus:ring-red-500" 
+                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                    } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
+                  {validationErrors.kilos && (
+                    <p className="mt-1 text-sm text-red-600">{validationErrors.kilos}</p>
+                  )}
                 </Field>
                 <div>
                   <div className="flex gap-4">
@@ -641,8 +640,15 @@ export default function CreateAnnounceDialog({
                           )
                         }
                         placeholder="enter  your price per kilos"
-                        className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className={`w-full rounded-xl border ${
+                          validationErrors.pricePerKg 
+                            ? "border-red-500 focus:ring-red-500" 
+                            : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                        } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                       />
+                      {validationErrors.pricePerKg && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.pricePerKg}</p>
+                      )}
                     </Field>
                     <div className="w-32">
                       <label className="mb-2 block text-sm font-semibold text-gray-900 dark:text-white">
@@ -655,37 +661,12 @@ export default function CreateAnnounceDialog({
                         placeholder="EUR"
                         compact
                       />
+                      {validationErrors.currency && (
+                        <p className="mt-1 text-sm text-red-600">{validationErrors.currency}</p>
+                      )}
                     </div>
                   </div>
                 </div>
-                <Field
-                  label={
-                    <span>
-                      Taxe pour les personnes en retard{" "}
-                      <span className="text-gray-400">
-                        (juste pour préciser à quel point vous êtes ponctuel)
-                      </span>
-                    </span>
-                  }
-                >
-                  <div className="flex">
-                    <input
-                      type="number"
-                      min={0}
-                      value={lateTax as number}
-                      onChange={(e) =>
-                        setLateTax(
-                          e.target.value === "" ? "" : Number(e.target.value)
-                        )
-                      }
-                      placeholder="0"
-                      className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                    <div className="ml-3 flex items-center px-3 text-sm text-gray-600 dark:text-gray-400">
-                      %
-                    </div>
-                  </div>
-                </Field>
 
                 <div>
                   <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
@@ -775,13 +756,14 @@ export default function CreateAnnounceDialog({
               <div className="flex items-center gap-3">
                 <button
                   className="rounded-xl bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  onClick={() =>
-                    step > 1
-                      ? setStep(
-                          (s) => Math.max(1, (s - 1) as StepKey) as StepKey
-                        )
-                      : onClose()
-                  }
+                  onClick={() => {
+                    if (step > 1) {
+                      setStep((s) => Math.max(1, (s - 1) as StepKey) as StepKey);
+                      setValidationErrors({}); // Clear errors when going back
+                    } else {
+                      onClose();
+                    }
+                  }}
                 >
                   ‹ Back
                 </button>
@@ -791,13 +773,15 @@ export default function CreateAnnounceDialog({
               </div>
               {step < 4 ? (
                 <button
-                  disabled={!canNext}
-                  onClick={() => setStep((s) => (s + 1) as StepKey)}
-                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white ${
-                    canNext
-                      ? "bg-indigo-600 hover:bg-indigo-700"
-                      : "bg-gray-300 cursor-not-allowed"
-                  }`}
+                  onClick={() => {
+                    const errors = validateCurrentStep();
+                    setValidationErrors(errors);
+                    
+                    if (Object.keys(errors).length === 0) {
+                      setStep((s) => (s + 1) as StepKey);
+                    }
+                  }}
+                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700"
                 >
                   Next ›
                 </button>

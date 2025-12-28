@@ -243,11 +243,23 @@ const ReservationsSection = () => {
                 <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6">
                   {/* Left Section - Trip Details */}
                   <div className="flex gap-6">
-                    {/* Plane Icon */}
+                    {/* Airline Logo */}
                     <div className="flex-shrink-0">
-                      <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
+                      <div className="w-24 h-16 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center p-2">
+                        {travel?.airline?.logoUrl ? (
+                          <img
+                            src={travel.airline.logoUrl}
+                            alt={travel.airline.name || "Airline"}
+                            className="max-w-full max-h-full object-contain"
+                            onError={(e) => {
+                              // Fallback to plane icon if logo fails to load
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            }}
+                          />
+                        ) : null}
                         <svg
-                          className="w-8 h-8 text-blue-600"
+                          className={`w-8 h-8 text-blue-600 ${travel?.airline?.logoUrl ? 'hidden' : ''}`}
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >

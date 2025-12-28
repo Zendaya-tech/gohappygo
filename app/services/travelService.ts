@@ -6,7 +6,7 @@ export interface CreateTravelData {
   isSharedWeight: boolean;
   isInstant: boolean;
   isAllowExtraWeight: boolean;
-  feeForLateComer: number;
+  punctualityLevel: boolean; // false = punctual, true = very punctual
   feeForGloomy: number;
   departureAirportId: number;
   arrivalAirportId: number;
@@ -53,7 +53,7 @@ export const createTravel = async (data: CreateTravelData) => {
     formData.append("isSharedWeight", data.isSharedWeight.toString());
     formData.append("isInstant", data.isInstant.toString());
     formData.append("isAllowExtraWeight", data.isAllowExtraWeight.toString());
-    formData.append("feeForLateComer", data.feeForLateComer.toString());
+    formData.append("punctualityLevel", data.punctualityLevel.toString());
     formData.append("feeForGloomy", data.feeForGloomy.toString());
     formData.append("departureAirportId", data.departureAirportId.toString());
     formData.append("arrivalAirportId", data.arrivalAirportId.toString());
@@ -88,7 +88,7 @@ export interface UpdateTravelData {
   isSharedWeight?: boolean;
   isInstant?: boolean;
   isAllowExtraWeight?: boolean;
-  feeForLateComer?: number;
+  punctualityLevel?: boolean; // false = punctual, true = very punctual
   feeForGloomy?: number;
   departureAirportId?: number;
   arrivalAirportId?: number;
@@ -110,7 +110,7 @@ export const updateTravel = async (travelId: number, data: UpdateTravelData) => 
     if (data.isSharedWeight !== undefined) formData.append("isSharedWeight", data.isSharedWeight.toString());
     if (data.isInstant !== undefined) formData.append("isInstant", data.isInstant.toString());
     if (data.isAllowExtraWeight !== undefined) formData.append("isAllowExtraWeight", data.isAllowExtraWeight.toString());
-    if (data.feeForLateComer !== undefined) formData.append("feeForLateComer", data.feeForLateComer.toString());
+    if (data.punctualityLevel !== undefined) formData.append("punctualityLevel", data.punctualityLevel.toString());
     if (data.feeForGloomy !== undefined) formData.append("feeForGloomy", data.feeForGloomy.toString());
     if (data.departureAirportId !== undefined) formData.append("departureAirportId", data.departureAirportId.toString());
     if (data.arrivalAirportId !== undefined) formData.append("arrivalAirportId", data.arrivalAirportId.toString());
