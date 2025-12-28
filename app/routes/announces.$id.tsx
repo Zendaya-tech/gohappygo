@@ -833,7 +833,7 @@ export default function AnnounceDetail() {
                             />
                             <div className="flex-1">
                               <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {review.fullName} • {reviewDate}
+                                {review.reviewer.fullName} • {reviewDate}
                               </div>
                               <p className="mt-1 text-gray-800 dark:text-gray-200">
                                 {review.comment}
