@@ -158,7 +158,7 @@ export default function AnnounceDetail() {
     return listing.reviews.map((review) => ({
       id: review.id,
       rating: parseFloat(review.rating) || 0,
-      name: `${review.reviewer?.firstName || ""} ${review.reviewer?.lastName || ""}`.trim() || "Anonyme",
+      name: `${review.reviewer?.fullName}` || "Anonyme",
       avatar: review.reviewer?.profilePictureUrl || "/favicon.ico",
       comment: review.comment || "",
       createdAt: review.createdAt,
@@ -833,7 +833,7 @@ export default function AnnounceDetail() {
                             />
                             <div className="flex-1">
                               <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {review.reviewer.fullName} • {reviewDate}
+                                {review.name} • {reviewDate}
                               </div>
                               <p className="mt-1 text-gray-800 dark:text-gray-200">
                                 {review.comment}
