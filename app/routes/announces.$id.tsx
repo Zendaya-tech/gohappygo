@@ -168,11 +168,11 @@ export default function AnnounceDetail() {
   // Format user name from firstName and lastName
   const userName = useMemo(() => {
     if (!listing?.user) return "Voyageur";
-    const { firstName, lastName } = listing.user;
-    if (firstName && lastName) {
-      return `${firstName} ${lastName}`;
+    const { firstName, lastName,fullName } = listing.user;
+    if (fullName) {
+      return fullName;
     }
-    return firstName || lastName || "Voyageur";
+    return firstName +" "+ lastName ;
   }, [listing?.user]);
   
   const averageRating = reviews.length > 0
