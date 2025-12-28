@@ -34,10 +34,6 @@ export default function VerifiedTravelers() {
 
   // Fonction pour formater le nom (prénom + première lettre du nom)
   const formatName = (fullName: string) => {
-    const parts = fullName.split(" ");
-    if (parts.length >= 2) {
-      return `${parts[0]} ${parts[1].charAt(0)}`;
-    }
     return fullName;
   };
 
