@@ -171,6 +171,9 @@ export default function RegisterDialog({
               {step === 1 ? (
                 <>
                   <div>
+                    <label htmlFor="firstName" className="mb-2 block text-sm font-semibold text-gray-900">
+                      Prénom
+                    </label>
                     <input
                       type="text"
                       id="firstName"
@@ -187,6 +190,9 @@ export default function RegisterDialog({
                     </p>
                   </div>
                   <div>
+                    <label htmlFor="lastName" className="mb-2 block text-sm font-semibold text-gray-900">
+                      Nom de famille
+                    </label>
                     <input
                       type="text"
                       id="lastName"
@@ -237,6 +243,9 @@ export default function RegisterDialog({
                     </p>
                   </div>
                   <div>
+                    <label htmlFor="email" className="mb-2 block text-sm font-semibold text-gray-900">
+                      Adresse email
+                    </label>
                     <input
                       type="email"
                       id="email"
@@ -251,6 +260,9 @@ export default function RegisterDialog({
                   </div>
 
                   <div>
+                    <label htmlFor="password" className="mb-2 block text-sm font-semibold text-gray-900">
+                      Mot de passe
+                    </label>
                     <input
                       type="password"
                       id="password"
@@ -265,6 +277,9 @@ export default function RegisterDialog({
                   </div>
 
                   <div>
+                    <label htmlFor="confirmPassword" className="mb-2 block text-sm font-semibold text-gray-900">
+                      Confirmer le mot de passe
+                    </label>
                     <input
                       type="password"
                       id="confirmPassword"

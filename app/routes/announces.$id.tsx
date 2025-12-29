@@ -384,6 +384,7 @@ export default function AnnounceDetail() {
   // Pricing calculation using API data
   const pricePerKg = listing?.pricePerKg || 0;
   const total = pricingData?.totalAmount || 0;
+  const currencySymbol = listing?.currency?.symbol || "€"; // Fallback to Euro if no currency
 
   const availableWeight = type === "travel" ? listing.weightAvailable : listing.weight;
 
@@ -675,7 +676,7 @@ export default function AnnounceDetail() {
                 </div>
                 <div className="md:col-span-3 text-left md:text-right mt-2 md:mt-0">
                   <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                    €{listing.pricePerKg}
+                    {currencySymbol}{listing.pricePerKg}
                     <span className="text-base font-semibold">/Kilo</span>
                   </div>
                 </div>
@@ -712,7 +713,9 @@ export default function AnnounceDetail() {
                     alt="Ponctualité" 
                     className="h-8 w-8 rounded-full object-cover flex-shrink-0"
                   />
-                  <span className="flex-1">ponctuel</span>
+                  <span className="flex-1">
+                    {listing.punctualityLevel ? "très ponctuel" : "ponctuel"}
+                  </span>
                 </div>
 
                 {/* Extra weight badge */}
@@ -870,7 +873,7 @@ export default function AnnounceDetail() {
                 {type === "travel" ? (
                   <>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      €{listing.pricePerKg}
+                      {currencySymbol}{listing.pricePerKg}
                       <span className="text-base font-semibold">/Kilo</span>
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-6">
@@ -899,7 +902,7 @@ export default function AnnounceDetail() {
                           <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
                             <span>Frais de service</span>
                             <div className="flex items-center gap-2">
-                              <span>€{pricingData.fee.toFixed(2)}</span>
+                              <span>{currencySymbol}{pricingData.fee.toFixed(2)}</span>
                               <div className="relative">
                                 <button 
                                   className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100"
@@ -921,7 +924,7 @@ export default function AnnounceDetail() {
                           <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
                             <span>TVA 20%</span>
                             <div className="flex items-center gap-2">
-                              <span>€{pricingData.tvaAmount.toFixed(2)}</span>
+                              <span>{currencySymbol}{pricingData.tvaAmount.toFixed(2)}</span>
                               <div className="relative">
                                 <button 
                                   className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100"
@@ -984,7 +987,7 @@ export default function AnnounceDetail() {
                               Total with taxes
                             </span>
                             <span className="font-bold text-lg text-gray-900 dark:text-white">
-                              €{pricingData.totalAmount.toFixed(2)}
+                              {currencySymbol}{pricingData.totalAmount.toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -1052,7 +1055,7 @@ export default function AnnounceDetail() {
                         : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
                   >
-                    {isOwnAnnounce ? "Votre voyage" : "Book now"}
+                    {isOwnAnnounce ? "Votre voyage" : `Payer ${currencySymbol}${total.toFixed(2)}`}
                   </button>
                 ) : (
                   !isOwnAnnounce && (
@@ -1088,6 +1091,7 @@ export default function AnnounceDetail() {
         open={bookOpen}
         onClose={() => setBookOpen(false)}
         amount={total}
+        currencySymbol={currencySymbol}
         email={currentUser?.email || ""}
         onConfirm={handleBookingConfirm}
       />

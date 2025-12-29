@@ -517,6 +517,7 @@ export default function Annonces() {
                         type={type as any}
                         isBookmarked={item.isBookmarked}
                         userId={item.user?.id}
+                        currencySymbol={item.currency?.symbol || "€"}
                       />
                     );
                   })}

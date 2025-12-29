@@ -166,7 +166,7 @@ export default function Footer() {
                     href="/faq"
                     className="hover:text-gray-900 dark:hover:text-gray-100"
                   >
-                    {t("footer.support.faq")}
+                    Foire aux questions
                   </a>
                 </li>
                 <li>

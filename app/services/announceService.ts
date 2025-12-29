@@ -68,6 +68,12 @@ export interface Airline {
   logoUrl: string;
 }
 
+export interface Currency {
+  id: number;
+  code: string;
+  symbol: string;
+}
+
 export interface User {
   id: number;
   email: string;
@@ -119,6 +125,7 @@ export interface DemandTravelItem {
   departureAirport: Airport;
   arrivalAirport: Airport;
   airline: Airline;
+  currency?: Currency;
   userId: number;
   status: "active" | string;
   deliveryDate?: string; // For unified API
@@ -135,6 +142,7 @@ export interface DemandTravelItem {
   isSharedWeight?: boolean;
   isInstant?: boolean;
   isAllowExtraWeight?: boolean;
+  punctualityLevel?: boolean;
   feeForLateComer?: number;
   feeForGloomy?: number;
   user: User;

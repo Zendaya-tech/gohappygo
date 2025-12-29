@@ -23,6 +23,7 @@ interface PropertyCardProps {
   type?: "traveler" | "transporter";
   isBookmarked?: boolean;
   userId?: number; // ID de l'utilisateur qui a créé l'annonce
+  currencySymbol?: string; // Symbole de la devise
 }
 
 export default function AnnounceCard({
@@ -41,6 +42,7 @@ export default function AnnounceCard({
   avatar,
   isBookmarked = false,
   userId,
+  currencySymbol = "€", // Valeur par défaut Euro
 }: PropertyCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -231,7 +233,7 @@ export default function AnnounceCard({
         {departure && (
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-white">
-              {price} € / kg
+              {price} {currencySymbol} / kg
             </span>
             <div className="flex items-center space-x-1">
               {Number(rating) > 0 ? (

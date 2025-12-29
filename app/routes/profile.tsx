@@ -1499,7 +1499,7 @@ export default function Profile() {
                   {displayUser?.profilePictureUrl ? (
                     <img
                       src={displayUser.profilePictureUrl}
-                      alt={displayUser?.firstName || displayUser?.email || "Profile"}
+                      alt={displayUser?.fullName || "Profile"}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -1519,8 +1519,8 @@ export default function Profile() {
 
                 {/* User Name */}
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
-                  {displayUser?.firstName && displayUser?.lastName 
-                    ? `${displayUser.firstName} ${displayUser.lastName}`
+                  {displayUser?.fullName
+                    ? `${displayUser.fullName}`
                     : displayUser?.email || "Utilisateur"
                   }
                 </h3>

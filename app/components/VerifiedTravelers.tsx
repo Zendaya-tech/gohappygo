@@ -89,6 +89,7 @@ export default function VerifiedTravelers() {
               featured={featured}
               type={type}
               isBookmarked={travel.isBookmarked}
+              currencySymbol={travel.currency?.symbol || "€"}
             />
           );
         })}

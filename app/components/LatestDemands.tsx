@@ -100,6 +100,7 @@ export default function LatestDemands() {
               featured={featured}
               type={type}
               isBookmarked={demand.isBookmarked}
+              currencySymbol={demand.currency?.symbol || "€"}
             />
           );
         })}

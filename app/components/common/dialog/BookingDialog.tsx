@@ -11,12 +11,14 @@ export interface BookingCardData {
 
 function CheckoutForm({
     amount,
+    currencySymbol,
     onConfirm,
     onClose,
     isSubmitting,
     setIsSubmitting
 }: {
     amount: number;
+    currencySymbol: string;
     onConfirm: (data: BookingCardData) => Promise<void>;
     onClose: () => void;
     isSubmitting: boolean;
@@ -122,7 +124,7 @@ function CheckoutForm({
                             : "bg-blue-600 hover:bg-blue-700"
                     }`}
                 >
-                    {isSubmitting ? "Traitement..." : `Payer €${amount.toFixed(2)}`}
+                    {isSubmitting ? "Traitement..." : `Payer ${currencySymbol}${amount.toFixed(2)}`}
                 </button>
             </div>
         </form>
@@ -133,12 +135,14 @@ export default function BookingDialog({
     open,
     onClose,
     amount,
+    currencySymbol = "€",
     email,
     onConfirm
 }: {
     open: boolean;
     onClose: () => void;
     amount: number;
+    currencySymbol?: string;
     email?: string;
     onConfirm: (cardData: BookingCardData) => Promise<void>;
 }) {
@@ -194,6 +198,7 @@ export default function BookingDialog({
                 <Elements stripe={stripePromise}>
                     <CheckoutForm
                         amount={amount}
+                        currencySymbol={currencySymbol}
                         onConfirm={onConfirm}
                         onClose={onClose}
                         isSubmitting={isSubmitting}
