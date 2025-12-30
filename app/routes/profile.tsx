@@ -38,6 +38,7 @@ import { removeBookmark } from "~/services/bookmarkService";
 import { getReviews, type Review } from "~/services/reviewService";
 import { getRequests, acceptRequest, completeRequest, type RequestResponse } from "~/services/requestService";
 import { getMe, type GetMeResponse } from "~/services/authService";
+import { getTransactions, releaseFunds, getBalance, type Transaction, type Balance } from "~/services/transactionService";
 
 interface ProfileSection {
   id: string;
@@ -933,6 +934,335 @@ const TravelsSection = () => {
 };
 
 
+const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
+  const [tab, setTab] = useState<"balance" | "transactions" | "earnings">("balance");
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balance, setBalance] = useState<Balance | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [releasingFunds, setReleasingFunds] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetch balance
+        const balanceData = await getBalance();
+        setBalance(balanceData);
+
+        // Fetch transactions
+        const transactionData = await getTransactions(1, 10);
+        setTransactions(transactionData.items);
+        setHasMore(transactionData.items.length === 10);
+      } catch (error) {
+        console.error("Error fetching payment data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const loadMoreTransactions = async () => {
+    try {
+      const nextPage = page + 1;
+      const transactionData = await getTransactions(nextPage, 10);
+      setTransactions(prev => [...prev, ...transactionData.items]);
+      setPage(nextPage);
+      setHasMore(transactionData.items.length === 10);
+    } catch (error) {
+      console.error("Error loading more transactions:", error);
+    }
+  };
+
+  const handleReleaseFunds = async (transactionId: number) => {
+    setReleasingFunds(transactionId);
+    try {
+      await releaseFunds(transactionId);
+      // Refresh data
+      const balanceData = await getBalance();
+      setBalance(balanceData);
+      const transactionData = await getTransactions(1, 10);
+      setTransactions(transactionData.items);
+    } catch (error) {
+      console.error("Error releasing funds:", error);
+    } finally {
+      setReleasingFunds(null);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "completed":
+        return "Terminé";
+      case "pending":
+        return "En attente";
+      case "failed":
+        return "Échoué";
+      default:
+        return status;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="text-center text-gray-500">
+          Chargement des données de paiement...
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Tabs */}
+      <div className="flex items-center gap-6 mb-6">
+        <button
+          onClick={() => setTab("balance")}
+          className={`text-sm font-semibold ${
+            tab === "balance"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | Solde
+        </button>
+        <button
+          onClick={() => setTab("transactions")}
+          className={`text-sm font-semibold ${
+            tab === "transactions"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | Transactions
+        </button>
+        <button
+          onClick={() => setTab("earnings")}
+          className={`text-sm font-semibold ${
+            tab === "earnings"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | Gains
+        </button>
+      </div>
+
+      {/* Balance Tab */}
+      {tab === "balance" && balance && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Available Balance */}
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium opacity-90">Solde disponible</h3>
+                <CurrencyDollarIcon className="h-6 w-6 opacity-75" />
+              </div>
+              <div className="text-2xl font-bold">
+                {balance.available.toFixed(2)} {balance.currency.toUpperCase()}
+              </div>
+              <p className="text-xs opacity-75 mt-1">Prêt à être retiré</p>
+            </div>
+
+            {/* Pending Balance */}
+            <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium opacity-90">Solde en attente</h3>
+                <svg className="h-6 w-6 opacity-75" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <div className="text-2xl font-bold">
+                {balance.pending.toFixed(2)} {balance.currency.toUpperCase()}
+              </div>
+              <p className="text-xs opacity-75 mt-1">En cours de traitement</p>
+            </div>
+
+            {/* Total Balance */}
+            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-medium opacity-90">Solde total</h3>
+                <svg className="h-6 w-6 opacity-75" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                </svg>
+              </div>
+              <div className="text-2xl font-bold">
+                {(balance.available + balance.pending).toFixed(2)} {balance.currency.toUpperCase()}
+              </div>
+              <p className="text-xs opacity-75 mt-1">Disponible + En attente</p>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <button className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+              Retirer des fonds
+            </button>
+            <button className="flex-1 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+              Historique des retraits
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Transactions Tab */}
+      {tab === "transactions" && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Historique des transactions
+            </h3>
+            <div className="text-sm text-gray-500">
+              {transactions.length} transaction{transactions.length > 1 ? 's' : ''}
+            </div>
+          </div>
+
+          {transactions.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              Aucune transaction pour le moment
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {transactions.map((transaction) => (
+                <div
+                  key={transaction.id}
+                  className="border border-gray-200 rounded-xl p-4 hover:shadow-sm transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                          <CurrencyDollarIcon className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900">
+                            Transaction #{transaction.id}
+                          </h4>
+                          {transaction.request && (
+                            <p className="text-sm text-gray-500">
+                              Demande #{transaction.request.id} - {transaction.request.weight}kg
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span>{formatDate(transaction.createdAt)}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(transaction.status)}`}>
+                          {getStatusText(transaction.status)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold text-gray-900">
+                        {transaction.amount.toFixed(2)} {transaction.currencyCode.toUpperCase()}
+                      </div>
+                      {transaction.status.toLowerCase() === "paid" && (
+                        <button
+                          onClick={() => handleReleaseFunds(transaction.id)}
+                          disabled={releasingFunds === transaction.id}
+                          className="mt-2 text-sm bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {releasingFunds === transaction.id ? "..." : "Libérer"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {hasMore && (
+                <button
+                  onClick={loadMoreTransactions}
+                  className="w-full py-3 text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Charger plus de transactions
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Earnings Tab */}
+      {tab === "earnings" && balance && (
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+            Analyse des gains
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Earnings Chart Placeholder */}
+            <div className="bg-gray-50 rounded-xl p-6 h-64 flex items-center justify-center">
+              <div className="text-center text-gray-500">
+                <svg className="h-12 w-12 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L3.5 15.9l.01 2.59z"/>
+                </svg>
+                <p>Graphique des gains</p>
+                <p className="text-sm">Bientôt disponible</p>
+              </div>
+            </div>
+
+            {/* Earnings Summary */}
+            <div className="space-y-4">
+              <div className="bg-blue-50 rounded-xl p-4">
+                <h4 className="font-medium text-blue-900 mb-2">Solde disponible</h4>
+                <div className="text-2xl font-bold text-blue-600">
+                  {balance.available.toFixed(2)} {balance.currency.toUpperCase()}
+                </div>
+                <p className="text-sm text-blue-700">Prêt à être retiré</p>
+              </div>
+
+              <div className="bg-green-50 rounded-xl p-4">
+                <h4 className="font-medium text-green-900 mb-2">Solde en attente</h4>
+                <div className="text-2xl font-bold text-green-600">
+                  {balance.pending.toFixed(2)} {balance.currency.toUpperCase()}
+                </div>
+                <p className="text-sm text-green-700">En cours de traitement</p>
+              </div>
+
+              <div className="bg-purple-50 rounded-xl p-4">
+                <h4 className="font-medium text-purple-900 mb-2">Solde total</h4>
+                <div className="text-2xl font-bold text-purple-600">
+                  {(balance.available + balance.pending).toFixed(2)} {balance.currency.toUpperCase()}
+                </div>
+                <p className="text-sm text-purple-700">Disponible + En attente</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const FavoritesSection = () => {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1443,16 +1773,7 @@ export default function Profile() {
       case "favorites":
         return <FavoritesSection />;
       case "payments":
-        return (
-          <div className="bg-white rounded-2xl border border-gray-200 p-8">
-            <div className="flex items-center justify-center h-64">
-              <div className="text-center">
-                <CurrencyDollarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 text-lg">Aucun paiement</p>
-              </div>
-            </div>
-          </div>
-        );
+        return <PaymentsSection profileStats={profileStats} />;
       default:
         return null;
     }

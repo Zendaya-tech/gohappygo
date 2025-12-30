@@ -115,11 +115,6 @@ export default function AnnounceDetail() {
         // Remove bookmark
         await removeBookmark(bookmarkType, itemId);
         setIsFavorite(false);
-        showAlert(
-          "Retiré des favoris",
-          "Cette annonce a été retirée de vos favoris.",
-          "success"
-        );
       } else {
         // Add bookmark
         const bookmarkData: any = {
@@ -134,19 +129,9 @@ export default function AnnounceDetail() {
 
         await addBookmark(bookmarkData);
         setIsFavorite(true);
-        showAlert(
-          "Ajouté aux favoris",
-          "Cette annonce a été ajoutée à vos favoris.",
-          "success"
-        );
       }
     } catch (error) {
       console.error("Error toggling bookmark:", error);
-      showAlert(
-        "Erreur",
-        "Une erreur est survenue lors de la mise à jour des favoris.",
-        "error"
-      );
     } finally {
       setIsBookmarkLoading(false);
     }
@@ -271,7 +256,7 @@ export default function AnnounceDetail() {
         const serviceFee = subtotal * 0.05; // 5% service fee
         const vatRate = 0.20; // 20% VAT
         const vat = subtotal * vatRate;
-        const insurance = 2.50; // Fixed insurance fee
+        const insurance = 0; // Insurance is free
         const platformTax = 0; // No platform tax
         const total = subtotal + serviceFee + vat + insurance + platformTax;
         
@@ -451,11 +436,11 @@ export default function AnnounceDetail() {
       return;
     }
 
-    if (kilos <= 0) {
+    if (kilos < 0) {
       setBookOpen(false);
       showAlert(
         "Poids invalide",
-        "Veuillez entrer un poids valide supérieur à 0.",
+        "Veuillez entrer un poids valide supérieur ou égal à 0.",
         "warning"
       );
       return;
@@ -1096,11 +1081,11 @@ export default function AnnounceDetail() {
                 {type === "travel" ? (
                   <button
                     onClick={() => setBookOpen(true)}
-                    disabled={isOwnAnnounce || kilos <= 0 || !pricingData}
+                    disabled={isOwnAnnounce || !pricingData}
                     className={`mt-6 w-full rounded-lg px-4 py-4 text-sm font-semibold transition-colors duration-200 ${
                       isOwnAnnounce
                         ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                        : kilos <= 0 || !pricingData
+                        : !pricingData
                         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                         : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
