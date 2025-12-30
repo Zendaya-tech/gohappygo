@@ -11,7 +11,7 @@ import type { Currency } from "../../../services/currencyService";
 import { useAuth } from "../../../hooks/useAuth";
 import type { DemandTravelItem } from "../../../services/announceService";
 
-type StepKey = 1 | 2 | 3 | 4;
+type StepKey = 1 | 2 | 3;
 
 export default function EditAnnounceDialog({
   open,
@@ -32,8 +32,6 @@ export default function EditAnnounceDialog({
   const [departure, setDeparture] = useState<Airport | null>(null);
   const [arrival, setArrival] = useState<Airport | null>(null);
   const [story, setStory] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
-  const [fileUrls, setFileUrls] = useState<string[]>([]);
   const [kilos, setKilos] = useState<number | "">("");
   const [pricePerKg, setPricePerKg] = useState<number | "">("");
   const [currency, setCurrency] = useState<Currency | null>(null);
@@ -139,7 +137,7 @@ export default function EditAnnounceDialog({
     } : null;
     setCurrency(defaultCurrency);
     
-    setLateTax(travel.feeForLateComer || 0);
+    setLateTax(travel.feeForGloomy || 0);
     setAllowExtraGrams(Boolean(travel.isAllowExtraWeight));
     setPunctuality("punctual"); // Default value since not stored in backend yet
     setFlightNumber(travel.flightNumber || "");
@@ -154,8 +152,6 @@ export default function EditAnnounceDialog({
     setBookingType(travel.isInstant ? "instant" : "non-instant");
     
     // Reset other states
-    setFiles([]);
-    setFileUrls([]);
     setFlightNumberError(null);
     setSubmitting(false);
     setError(null);
@@ -173,40 +169,9 @@ export default function EditAnnounceDialog({
         hasValidFlightNumber
       );
     }
-    if (step === 2) return true; // Images are optional for edit
-    if (step === 3) return Boolean(kilos) && Boolean(pricePerKg);
+    if (step === 2) return Boolean(kilos) && Boolean(pricePerKg);
     return true;
-  }, [step, departure, arrival, files.length, kilos, pricePerKg, story.length, flightNumber, airline.name, flightNumberError]);
-
-  const onFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files ? Array.from(e.target.files) : [];
-    setFiles((prevFiles) => {
-      const remainingSlots = Math.max(0, 2 - prevFiles.length);
-      const filesToAdd = selected.slice(0, remainingSlots);
-      return [...prevFiles, ...filesToAdd];
-    });
-
-    // Create preview URLs for new images up to the cap
-    setFileUrls((prevUrls) => {
-      const remainingSlots = Math.max(0, 2 - prevUrls.length);
-      const urlsToAdd = selected
-        .slice(0, remainingSlots)
-        .map((file) => URL.createObjectURL(file));
-      return [...prevUrls, ...urlsToAdd];
-    });
-
-    // Reset the input value to allow selecting the same file again
-    e.target.value = "";
-  };
-
-  const removeFile = (index: number) => {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
-    setFileUrls((prevUrls) => {
-      // Revoke the URL to free memory
-      URL.revokeObjectURL(prevUrls[index]);
-      return prevUrls.filter((_, i) => i !== index);
-    });
-  };
+  }, [step, departure, arrival, kilos, pricePerKg, story.length, flightNumber, airline.name, flightNumberError]);
 
   const handleSubmit = async () => {
     if (!travel) return;
@@ -242,8 +207,8 @@ export default function EditAnnounceDialog({
         isSharedWeight: reservationType === "shared",
         isInstant: bookingType === "instant",
         isAllowExtraWeight: allowExtraGrams,
-        feeForLateComer: typeof lateTax === "number" ? lateTax : 0,
-        feeForGloomy: 0,
+        feeForGloomy: typeof lateTax === "number" ? lateTax : 0,
+        punctualityLevel: punctuality === "very-punctual",
         departureAirportId: parseInt(departure.id),
         arrivalAirportId: parseInt(arrival.id),
         pricePerKg: typeof pricePerKg === "number" ? pricePerKg : 0,
@@ -254,10 +219,6 @@ export default function EditAnnounceDialog({
       if (departureDatetime) {
         updateData.departureDatetime = departureDatetime;
       }
-
-      // Add images if provided
-      if (files[0]) updateData.image1 = files[0];
-      if (files[1]) updateData.image2 = files[1];
 
       const result = await updateTravel(travel.id, updateData);
 
@@ -313,7 +274,7 @@ export default function EditAnnounceDialog({
                 <span className="uppercase text-sm md:text-base">
                   Modifier l'annonce de voyage
                 </span>{" "}
-                <span className="text-sm md:text-base">- Step {step} of 4</span>
+                <span className="text-sm md:text-base">- Step {step} of 3</span>
               </h2>
             </header>
 
@@ -519,53 +480,6 @@ export default function EditAnnounceDialog({
               </div>
             )}
 
-            {step === 2 && (
-              <div className="space-y-6">
-                <p className="text-gray-700 dark:text-gray-300 font-medium">
-                  Upload new pictures (optional - leave empty to keep existing images)
-                </p>
-                <label className="block cursor-pointer rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-10 text-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={onFilesSelected}
-                    disabled={files.length >= 2}
-                  />
-                  Click to upload files ({files.length}/2)
-                </label>
-                {files.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {files.map((f, idx) => (
-                      <div
-                        key={idx}
-                        className="relative rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden"
-                      >
-                        <button
-                          onClick={() => removeFile(idx)}
-                          className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg z-10"
-                          title="Remove image"
-                        >
-                          −
-                        </button>
-                        <img
-                          src={fileUrls[idx]}
-                          alt={`Preview ${f.name}`}
-                          className="w-full h-32 object-cover"
-                        />
-                        <div className="p-2">
-                          <div className="text-xs text-gray-600 dark:text-gray-300 truncate">
-                            {f.name}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
             {step === 3 && (
               <div className="space-y-6">
                 <Field label="How many Kilos do you propose ?">
@@ -740,7 +654,7 @@ export default function EditAnnounceDialog({
                   ‹ Back
                 </button>
               </div>
-              {step < 4 ? (
+              {step < 3 ? (
                 <button
                   disabled={!canNext}
                   onClick={() => setStep((s) => (s + 1) as StepKey)}
@@ -820,15 +734,13 @@ function StepsNav({ step }: { step: StepKey }) {
     <div>
       <Item index={1} title="General" subtitle="Select basic settings" />
       <div className="ml-1.5 md:ml-2 h-4 md:h-6 w-px bg-gray-200 dark:bg-gray-800" />
-      <Item index={2} title="Pictures" subtitle="Add 2 photos" />
-      <div className="ml-1.5 md:ml-2 h-4 md:h-6 w-px bg-gray-200 dark:bg-gray-800" />
       <Item
-        index={3}
+        index={2}
         title="Price & Booking"
         subtitle="Specify your preferences"
       />
       <div className="ml-1.5 md:ml-2 h-4 md:h-6 w-px bg-gray-200 dark:bg-gray-800" />
-      <Item index={4} title="Payments" subtitle="Setting up payments" />
+      <Item index={3} title="Payments" subtitle="Setting up payments" />
     </div>
   );
 }

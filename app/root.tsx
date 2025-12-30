@@ -40,6 +40,42 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="color-scheme" content="light dark" />
+        
+        {/* SEO Meta Tags */}
+        <title>GoHappyGo - Transport de bagages entre voyageurs</title>
+        <meta name="description" content="Plateforme de transport de bagages entre voyageurs. Trouvez des transporteurs fiables ou proposez vos services de transport lors de vos voyages." />
+        <meta name="keywords" content="transport bagages, voyage, transporteur, livraison, bagages voyage, transport collaboratif" />
+        <meta name="author" content="GoHappyGo" />
+        <meta name="robots" content="index, follow" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://gohappygo.com/" />
+        <meta property="og:title" content="GoHappyGo - Transport de bagages entre voyageurs" />
+        <meta property="og:description" content="Plateforme de transport de bagages entre voyageurs. Trouvez des transporteurs fiables ou proposez vos services de transport lors de vos voyages." />
+        <meta property="og:image" content="https://gohappygo.com/logo.png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:site_name" content="GoHappyGo" />
+        <meta property="og:locale" content="fr_FR" />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://gohappygo.com/" />
+        <meta property="twitter:title" content="GoHappyGo - Transport de bagages entre voyageurs" />
+        <meta property="twitter:description" content="Plateforme de transport de bagages entre voyageurs. Trouvez des transporteurs fiables ou proposez vos services de transport lors de vos voyages." />
+        <meta property="twitter:image" content="https://gohappygo.com/og-image.jpg" />
+        <meta property="twitter:creator" content="@gohappygo" />
+        
+        {/* Additional Meta Tags */}
+        <meta name="theme-color" content="#2563eb" />
+        <meta name="msapplication-TileColor" content="#2563eb" />
+        <meta name="application-name" content="GoHappyGo" />
+        
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://gohappygo.com/" />
+        
+        {/* Icons */}
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />

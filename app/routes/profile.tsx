@@ -8,6 +8,7 @@ import CreatePackageDialog from "~/components/common/dialog/CreatePackageDialog"
 import EditAnnounceDialog from "~/components/common/dialog/EditAnnounceDialog";
 import EditPackageDialog from "~/components/common/dialog/EditPackageDialog";
 import ConfirmCancelDialog from "~/components/common/dialog/ConfirmCancelDialog";
+import MessageDialog from "~/components/common/dialog/MessageDialog";
 import { useAuth } from "~/hooks/useAuth";
 import TravelCard from "~/components/TravelCard";
 import {
@@ -45,60 +46,6 @@ interface ProfileSection {
   count: number;
 }
 
-const sampleReservations: Reservation[] = [
-  {
-    id: "r1",
-    originCity: "Paris",
-    destinationCity: "New-York",
-    travelDate: "2024-06-24",
-    flightNumber: "XC456Y",
-    weightKg: 18,
-    priceEuro: 198,
-    status: "waiting_payment",
-    imageUrl: "/images/paris.jpg",
-  },
-  {
-    id: "r2",
-    originCity: "Paris",
-    destinationCity: "New-York",
-    travelDate: "2024-06-24",
-    flightNumber: "XC456Y",
-    weightKg: 5,
-    priceEuro: 30,
-    status: "waiting_payment",
-    imageUrl: "/images/paris.jpg",
-  },
-  {
-    id: "r3",
-    originCity: "Paris",
-    destinationCity: "New-York",
-    travelDate: "2024-06-24",
-    flightNumber: "XC456Y",
-    weightKg: 15,
-    priceEuro: 170,
-    status: "waiting_proposal",
-    customer: {
-      name: "Angele . O",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
-    },
-  },
-  {
-    id: "r4",
-    originCity: "Paris",
-    destinationCity: "New-York",
-    travelDate: "2024-06-24",
-    flightNumber: "XC456Y",
-    weightKg: 10,
-    priceEuro: 90,
-    status: "waiting_proposal",
-    customer: {
-      name: "Arthur . O",
-      avatar:
-        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
-    },
-  },
-];
 
 const ReservationsSection = () => {
   const [tab, setTab] = useState<"pending" | "accepted" | "completed">(
@@ -107,6 +54,11 @@ const ReservationsSection = () => {
   const [requests, setRequests] = useState<RequestResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [messageDialogOpen, setMessageDialogOpen] = useState(false);
+  const [selectedRequester, setSelectedRequester] = useState<{
+    name: string;
+    avatar: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -145,6 +97,20 @@ const ReservationsSection = () => {
       console.error("Error completing request:", error);
       setErrorMessage("Erreur lors de la finalisation de la demande");
     }
+  };
+
+  const handleContactRequester = (requesterName: string, requesterAvatar: string) => {
+    setSelectedRequester({
+      name: requesterName,
+      avatar: requesterAvatar
+    });
+    setMessageDialogOpen(true);
+  };
+
+  const handleSendMessage = (message: string) => {
+    // TODO: Implement message sending logic
+    console.log("Sending message:", message, "to:", selectedRequester?.name);
+    // You can add API call here to send the message
   };
 
   const formatDate = (dateString: string) => {
@@ -335,7 +301,9 @@ const ReservationsSection = () => {
                         {requesterName}
                       </span>
                     </div>
-                    <button className="w-full px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                    <button className="w-full px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      onClick={() => handleContactRequester(requesterName, requesterAvatar)}
+                    >
                       Contact
                     </button>
                   </div>
@@ -357,6 +325,21 @@ const ReservationsSection = () => {
           confirmText="OK"
           cancelText=""
           type="danger"
+        />
+      )}
+
+      {/* Message Dialog */}
+      {selectedRequester && (
+        <MessageDialog
+          open={messageDialogOpen}
+          onClose={() => {
+            setMessageDialogOpen(false);
+            setSelectedRequester(null);
+          }}
+          title={`Contacter ${selectedRequester.name}`}
+          hostName={selectedRequester.name}
+          hostAvatar={selectedRequester.avatar}
+          onSend={handleSendMessage}
         />
       )}
     </div>
@@ -671,43 +654,45 @@ const TravelRequestsSection = () => {
                 key={demand.id}
                 className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start gap-4">
-                  {/* Image */}
-                  <div className="flex-shrink-0">
+                <div className="flex h-44 relative gap-4">
+                  {/* Image - Square container with rounded corners */}
+                  <div className=" aspect-square   rounded-xl overflow-hidden">
                     <img
                       src={demand.images?.[0]?.fileUrl || demand.user?.profilePictureUrl || "/favicon.ico"}
                       alt="Demande"
-                      className="w-32 h-32 object-cover rounded-xl"
+                      className="w-full h-full object-cover"
                     />
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {demand.departureAirport?.name} → {demand.arrivalAirport?.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-1">
-                      {demand.deliveryDate && formatDate(demand.deliveryDate)}
-                    </p>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Numéro de vol {demand.flightNumber}
-                    </p>
+                  <div className="flex-1 flex flex-col justify-between min-w-0">
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1 truncate">
+                        {demand.departureAirport?.name} → {demand.arrivalAirport?.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 mb-1">
+                        {demand.deliveryDate && formatDate(demand.deliveryDate)}
+                      </p>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Numéro de vol {demand.flightNumber}
+                      </p>
 
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold">
-                        {demand.weight} Kg
-                      </div>
-                      <div className="text-gray-700 font-semibold">
-                        € {demand.pricePerKg} / Kg
+                      <div className="flex items-center gap-4 mb-2">
+                        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-semibold text-sm">
+                          {demand.weight} Kg
+                        </div>
+                        <div className="text-gray-700 font-semibold">
+                          € {demand.pricePerKg} / Kg
+                        </div>
                       </div>
                     </div>
 
                     {/* Only show edit/cancel buttons for own profile */}
                     {isOwnProfile && (
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 mt-4">
                         <button 
                           onClick={() => setEditingDemand(demand)}
-                          className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                          className="px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
                         >
                           Edit
                         </button>
@@ -716,7 +701,7 @@ const TravelRequestsSection = () => {
                             setDemandToCancel(demand);
                             setCancelConfirmOpen(true);
                           }}
-                          className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                          className="px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors text-sm"
                         >
                           Cancel
                         </button>
@@ -855,43 +840,45 @@ const TravelsSection = () => {
                 key={travel.id}
                 className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
-                <div className="flex items-start gap-4">
-                  {/* Image */}
-                  <div className="flex-shrink-0">
+                <div className="flex h-40 relative gap-4">
+                  {/* Image - Square container with rounded corners */}
+                  <div className=" aspect-square   rounded-xl overflow-hidden">
                     <img
                       src={travel.images?.[0]?.fileUrl || travel.user?.profilePictureUrl || "/favicon.ico"}
                       alt="Voyage"
-                      className="w-32 h-32 object-cover rounded-xl"
+                      className="w-full h-full object-cover"
                     />
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {travel.departureAirport?.name} → {travel.arrivalAirport?.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-1">
-                      {travel.departureDatetime && formatDate(travel.departureDatetime)}
-                    </p>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Numéro de vol {travel.flightNumber}
-                    </p>
+                  <div className="flex-1 flex flex-col justify-between min-w-0">
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-1 truncate">
+                        {travel.departureAirport?.name} → {travel.arrivalAirport?.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 mb-1">
+                        {travel.departureDatetime && formatDate(travel.departureDatetime)}
+                      </p>
+                      <p className="text-sm text-gray-600 mb-3">
+                        Numéro de vol {travel.flightNumber}
+                      </p>
 
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg font-semibold">
-                        {travel.weightAvailable} Kg
-                      </div>
-                      <div className="text-gray-700 font-semibold">
-                        € {travel.pricePerKg} / Kg
+                      <div className="flex items-center gap-4 mb-2">
+                        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-semibold text-sm">
+                          {travel.weightAvailable} Kg
+                        </div>
+                        <div className="text-gray-700 font-semibold">
+                          € {travel.pricePerKg} / Kg
+                        </div>
                       </div>
                     </div>
 
                     {/* Only show edit/cancel buttons for own profile */}
                     {isOwnProfile && (
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 mt-4">
                         <button 
                           onClick={() => setEditingTravel(travel)}
-                          className="px-6 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                          className="px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
                         >
                           Edit
                         </button>
@@ -900,7 +887,7 @@ const TravelsSection = () => {
                             setTravelToCancel(travel);
                             setCancelConfirmOpen(true);
                           }}
-                          className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors"
+                          className="px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors text-sm"
                         >
                           Cancel
                         </button>

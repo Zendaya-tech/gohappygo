@@ -28,13 +28,11 @@ export default function EditPackageDialog({
   const [arrivalAirport, setArrivalAirport] = useState<Airport | null>(null);
   const [baggageDescription, setBaggageDescription] = useState("");
 
-  // Step 2: Photos (now requires 3 images)
-  const [photos, setPhotos] = useState<File[]>([]);
+  // Step 2: Price & Booking (removed photos step)
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Step 3: Price & Booking
   const [weight, setWeight] = useState("");
   const [pricePerKilo, setPricePerKilo] = useState("");
   const [currency, setCurrency] = useState<Currency | null>(null);
@@ -110,30 +108,13 @@ export default function EditPackageDialog({
     setPackageNature(backendPackageKind);
     
     // Reset other states
-    setPhotos([]);
     setSubmitting(false);
     setError(null);
     setSuccess(null);
   }, [open, demand, user?.recentCurrency]);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const selectedFiles = Array.from(e.target.files);
-    setPhotos((prev) => {
-      const remainingSlots = Math.max(0, 3 - prev.length);
-      const filesToAdd = selectedFiles.slice(0, remainingSlots);
-      return [...prev, ...filesToAdd];
-    });
-    // Reset input so same file can be chosen again after removing
-    e.target.value = "";
-  };
-
-  const removePhoto = (index: number) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== index));
-  };
-
   const nextStep = () => {
-    if (currentStep < 3) setCurrentStep(currentStep + 1);
+    if (currentStep < 2) setCurrentStep(currentStep + 1);
   };
 
   const prevStep = () => {
@@ -150,8 +131,6 @@ export default function EditPackageDialog({
           baggageDescription.length <= 500
         );
       case 2:
-        return true; // Images are optional for edit
-      case 3:
         return (
           Boolean(weight) &&
           Boolean(pricePerKilo) &&
@@ -194,11 +173,6 @@ export default function EditPackageDialog({
         currencyId: parseInt(currency.id),
         packageKind: packageNature,
       };
-
-      // Add images if provided
-      if (photos[0]) updateData.image1 = photos[0];
-      if (photos[1]) updateData.image2 = photos[1];
-      if (photos[2]) updateData.image3 = photos[2];
 
       const result = await updateDemand(demand.id, updateData);
 
@@ -244,7 +218,7 @@ export default function EditPackageDialog({
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] min-h-0 flex-1">
           {/* Sidebar steps */}
           <aside className="border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-800 p-4 md:p-6 overflow-y-auto">
-            <StepsNavPackage step={currentStep as 1 | 2 | 3} />
+            <StepsNavPackage step={currentStep as 1 | 2} />
           </aside>
 
           {/* Content */}
@@ -254,7 +228,7 @@ export default function EditPackageDialog({
                 <span className="uppercase text-sm md:text-base">
                   Modifier la demande de voyage
                 </span>
-                <span className="text-sm md:text-base"> - {t("common.step")} {currentStep} {t("common.of")} 3</span>
+                <span className="text-sm md:text-base"> - {t("common.step")} {currentStep} {t("common.of")} 2</span>
               </h2>
             </header>
 
@@ -375,53 +349,6 @@ export default function EditPackageDialog({
 
             {currentStep === 2 && (
               <div className="space-y-6">
-                <p className="text-gray-700 dark:text-gray-300 font-medium">
-                  Upload new pictures (optional - leave empty to keep existing images)
-                </p>
-                <label className="block cursor-pointer rounded-2xl border border-dashed border-gray-300 dark:border-gray-700 p-10 text-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={handleFileUpload}
-                    disabled={photos.length >= 3}
-                  />
-                  {t("common.upload")} ({photos.length}/3)
-                </label>
-                {photos.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {photos.map((photo, idx) => (
-                      <div
-                        key={idx}
-                        className="relative rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden"
-                      >
-                        <button
-                          onClick={() => removePhoto(idx)}
-                          className="absolute top-2 right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-lg z-10"
-                          title="Remove image"
-                        >
-                          −
-                        </button>
-                        <img
-                          src={URL.createObjectURL(photo)}
-                          alt={`Preview ${idx + 1}`}
-                          className="w-full h-32 object-cover"
-                        />
-                        <div className="p-2">
-                          <div className="text-xs text-gray-600 dark:text-gray-300 truncate">
-                            {photo.name}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {currentStep === 3 && (
-              <div className="space-y-6">
                 <Field label={t("dialogs.createAnnounce.weight")}>
                   <input
                     type="number"
@@ -476,7 +403,7 @@ export default function EditPackageDialog({
                   ‹ {t("common.back")}
                 </button>
               </div>
-              {currentStep < 3 ? (
+              {currentStep < 2 ? (
                 <button
                   disabled={!canProceedToNext()}
                   onClick={nextStep}
@@ -509,13 +436,13 @@ export default function EditPackageDialog({
   );
 }
 
-function StepsNavPackage({ step }: { step: 1 | 2 | 3 }) {
+function StepsNavPackage({ step }: { step: 1 | 2 }) {
   const Item = ({
     index,
     title,
     subtitle,
   }: {
-    index: 1 | 2 | 3;
+    index: 1 | 2;
     title: string;
     subtitle: string;
   }) => (
@@ -556,10 +483,8 @@ function StepsNavPackage({ step }: { step: 1 | 2 | 3 }) {
     <div>
       <Item index={1} title="General" subtitle="Select basic settings" />
       <div className="ml-2 h-6 w-px bg-gray-200 dark:bg-gray-800" />
-      <Item index={2} title="Pictures" subtitle="Add 3 photos" />
-      <div className="ml-2 h-6 w-px bg-gray-200 dark:bg-gray-800" />
       <Item
-        index={3}
+        index={2}
         title="Price & Booking"
         subtitle="Specify your preferences"
       />

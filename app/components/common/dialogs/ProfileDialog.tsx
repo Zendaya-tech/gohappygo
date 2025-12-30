@@ -299,17 +299,19 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
                       onChange={(phone) =>
                         handleInputChange("phoneNumber", phone)
                       }
-                      inputClassName="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      inputClassName="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-100 cursor-not-allowed"
                       countrySelectorStyleProps={{
                         className:
-                          "border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                          "border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-100 cursor-not-allowed",
                       }}
                       inputProps={{
                         placeholder: "Numéro de téléphone",
+                        disabled: true,
                       }}
+                      disabled
                     />
                     <p className="text-xs text-gray-500 mt-1">
-                      (Nous vous enverrons un code pour confirmer votre numéro.)
+                      (Le numéro de téléphone ne peut pas être modifié)
                     </p>
                   </div>
 
