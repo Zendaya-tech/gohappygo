@@ -199,6 +199,46 @@ export default function AnnounceDetail() {
     fetchAnnounce();
   }, [id, type]);
 
+  // Update meta tags dynamically when listing data is loaded
+  useEffect(() => {
+    if (listing && typeof document !== 'undefined') {
+      const title = `${listing.departureAirport?.name || "Départ"} → ${listing.arrivalAirport?.name || "Arrivée"} - ${listing.pricePerKg}€/kg - GoHappyGo`;
+      const description = `${type === "travel" ? "Voyage" : "Demande"} de ${userName} : ${listing.description || "Transport de bagages disponible"}`;
+      const imageUrl = listing.images?.[0]?.fileUrl || listing.user?.profilePictureUrl || "https://gohappygo.com/og-image.jpg";
+      const url = window.location.href;
+
+      // Update document title
+      document.title = title;
+
+      // Update or create meta tags
+      const updateMetaTag = (selector: string, content: string) => {
+        let meta = document.querySelector(selector) as HTMLMetaElement;
+        if (meta) {
+          meta.content = content;
+        } else {
+          meta = document.createElement('meta');
+          if (selector.includes('property=')) {
+            meta.setAttribute('property', selector.match(/property="([^"]+)"/)?.[1] || '');
+          } else {
+            meta.setAttribute('name', selector.match(/name="([^"]+)"/)?.[1] || '');
+          }
+          meta.content = content;
+          document.head.appendChild(meta);
+        }
+      };
+
+      // Update meta tags
+      updateMetaTag('meta[name="description"]', description);
+      updateMetaTag('meta[property="og:title"]', title);
+      updateMetaTag('meta[property="og:description"]', description);
+      updateMetaTag('meta[property="og:image"]', imageUrl);
+      updateMetaTag('meta[property="og:url"]', url);
+      updateMetaTag('meta[name="twitter:title"]', title);
+      updateMetaTag('meta[name="twitter:description"]', description);
+      updateMetaTag('meta[name="twitter:image"]', imageUrl);
+    }
+  }, [listing, type, userName]);
+
   useEffect(() => {
     const loadQuotes = async () => {
       const res = await getRandomQuotes();
@@ -1267,53 +1307,40 @@ export default function AnnounceDetail() {
   );
 }
 
-export const meta: Route.MetaFunction = async ({ params, location }) => {
+export const meta: Route.MetaFunction = ({ location }) => {
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get("id") || "unknown";
   const type = searchParams.get("type") || "travel";
   
-  try {
-    // Fetch the announce data for meta tags
-    const announce = await getAnnounceByIdAndType(id, type);
-    
-    if (announce) {
-      const title = `${announce.departureAirport?.name || "Départ"} → ${announce.arrivalAirport?.name || "Arrivée"} - ${announce.pricePerKg}€/kg`;
-      const description = `${type === "travel" ? "Voyage" : "Demande"} de ${announce.user?.fullName || "Voyageur"} : ${announce.description || "Transport de bagages disponible"}`;
-      const imageUrl = announce.images?.[0]?.fileUrl || announce.user?.profilePictureUrl || "https://gohappygo.com/og-image.jpg";
-      const url = `https://gohappygo.com/announces/${id}?type=${type}`;
-      
-      return [
-        { title: `${title} - GoHappyGo` },
-        { name: "description", content: description },
-        
-        // Open Graph
-        { property: "og:title", content: title },
-        { property: "og:description", content: description },
-        { property: "og:image", content: imageUrl },
-        { property: "og:url", content: url },
-        { property: "og:type", content: "website" },
-        { property: "og:site_name", content: "GoHappyGo" },
-        
-        // Twitter
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: title },
-        { name: "twitter:description", content: description },
-        { name: "twitter:image", content: imageUrl },
-        
-        // Additional meta
-        { name: "keywords", content: `transport bagages, voyage, ${announce.departureAirport?.name}, ${announce.arrivalAirport?.name}, ${type === "travel" ? "transporteur" : "demande"}` },
-      ];
-    }
-  } catch (error) {
-    console.error("Error fetching announce for meta tags:", error);
-  }
+  // Create dynamic meta tags based on URL parameters
+  const title = `${type === "travel" ? "Voyage" : "Demande"} #${id} - GoHappyGo`;
+  const description = `Découvrez cette ${type === "travel" ? "annonce de voyage" : "demande de transport"} sur GoHappyGo. Transport de bagages entre voyageurs.`;
+  const url = `https://gohappygo.com${location.pathname}${location.search}`;
+  const imageUrl = "https://gohappygo.com/og-image.jpg";
   
-  // Fallback meta tags
   return [
-    { title: `Annonce #${id} - GoHappyGo` },
-    { name: "description", content: "Découvrez cette annonce de transport de bagages sur GoHappyGo." },
-    { property: "og:title", content: `Annonce #${id} - GoHappyGo` },
-    { property: "og:description", content: "Découvrez cette annonce de transport de bagages sur GoHappyGo." },
-    { property: "og:image", content: "https://gohappygo.com/og-image.jpg" },
+    { title },
+    { name: "description", content: description },
+    
+    // Open Graph
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:image", content: imageUrl },
+    { property: "og:url", content: url },
+    { property: "og:type", content: "website" },
+    { property: "og:site_name", content: "GoHappyGo" },
+    { property: "og:locale", content: "fr_FR" },
+    
+    // Twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: imageUrl },
+    { name: "twitter:creator", content: "@gohappygo" },
+    
+    // Additional meta
+    { name: "keywords", content: `transport bagages, voyage, ${type === "travel" ? "transporteur" : "demande"}, GoHappyGo` },
+    { name: "robots", content: "index, follow" },
+    { name: "author", content: "GoHappyGo" },
   ];
 };
