@@ -83,7 +83,11 @@ export default function ShareDialog({ open, onClose, listing }: ShareDialogProps
                     <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.57V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z" />
                 </svg>
             ),
-            action: () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`)
+            action: () => {
+                // Facebook utilise les métadonnées Open Graph de la page
+                // Le texte viendra automatiquement des métadonnées og:title et og:description
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`)
+            }
         },
         {
             name: "Twitter",

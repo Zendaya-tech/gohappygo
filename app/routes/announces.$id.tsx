@@ -1267,11 +1267,53 @@ export default function AnnounceDetail() {
   );
 }
 
-export const meta: Route.MetaFunction = ({ location }) => {
+export const meta: Route.MetaFunction = async ({ params, location }) => {
   const searchParams = new URLSearchParams(location.search);
   const id = searchParams.get("id") || "unknown";
+  const type = searchParams.get("type") || "travel";
+  
+  try {
+    // Fetch the announce data for meta tags
+    const announce = await getAnnounceByIdAndType(id, type);
+    
+    if (announce) {
+      const title = `${announce.departureAirport?.name || "Départ"} → ${announce.arrivalAirport?.name || "Arrivée"} - ${announce.pricePerKg}€/kg`;
+      const description = `${type === "travel" ? "Voyage" : "Demande"} de ${announce.user?.fullName || "Voyageur"} : ${announce.description || "Transport de bagages disponible"}`;
+      const imageUrl = announce.images?.[0]?.fileUrl || announce.user?.profilePictureUrl || "https://gohappygo.com/og-image.jpg";
+      const url = `https://gohappygo.com/announces/${id}?type=${type}`;
+      
+      return [
+        { title: `${title} - GoHappyGo` },
+        { name: "description", content: description },
+        
+        // Open Graph
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:image", content: imageUrl },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "website" },
+        { property: "og:site_name", content: "GoHappyGo" },
+        
+        // Twitter
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: imageUrl },
+        
+        // Additional meta
+        { name: "keywords", content: `transport bagages, voyage, ${announce.departureAirport?.name}, ${announce.arrivalAirport?.name}, ${type === "travel" ? "transporteur" : "demande"}` },
+      ];
+    }
+  } catch (error) {
+    console.error("Error fetching announce for meta tags:", error);
+  }
+  
+  // Fallback meta tags
   return [
     { title: `Annonce #${id} - GoHappyGo` },
-    { name: "description", content: "Détails de l'annonce de voyage." },
+    { name: "description", content: "Découvrez cette annonce de transport de bagages sur GoHappyGo." },
+    { property: "og:title", content: `Annonce #${id} - GoHappyGo` },
+    { property: "og:description", content: "Découvrez cette annonce de transport de bagages sur GoHappyGo." },
+    { property: "og:image", content: "https://gohappygo.com/og-image.jpg" },
   ];
 };
