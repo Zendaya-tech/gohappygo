@@ -255,7 +255,7 @@ export default function AnnounceDetail() {
   // Calculate pricing when weight or listing changes
   useEffect(() => {
     const calculatePrice = async () => {
-      if (!listing || kilos <= 0 || type !== "travel") {
+      if (!listing || type !== "travel") {
         setPricingData(null);
         return;
       }
@@ -926,17 +926,29 @@ export default function AnnounceDetail() {
                     <input
                       type="number"
                       min={0}
-                      value={kilos}
-                      onChange={(e) => setKilos(Number(e.target.value))}
+                      value={kilos === 0 ? "" : kilos}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === "" || value === "0") {
+                          setKilos(0);
+                        } else {
+                          // Remove leading zeros and convert to number
+                          const cleanValue = value.replace(/^0+/, '') || '0';
+                          const numValue = Number(cleanValue);
+                          if (!isNaN(numValue) && numValue >= 0) {
+                            setKilos(numValue);
+                          }
+                        }
+                      }}
                       placeholder="0"
                       className="mb-6 w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
 
-                    {pricingLoading && kilos > 0 ? (
+                    {pricingLoading ? (
                       <div className="flex items-center justify-center py-8">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                       </div>
-                    ) : pricingData && kilos > 0 ? (
+                    ) : pricingData ? (
                       <>
                         <div className="space-y-3 text-sm">
                           <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
@@ -1032,11 +1044,11 @@ export default function AnnounceDetail() {
                           </div>
                         </div>
                       </>
-                    ) : kilos > 0 ? (
+                    ) : (
                       <div className="text-center py-4 text-gray-500 text-sm">
-                        Entrez un poids pour voir le calcul des prix
+                        Chargement du calcul des prix...
                       </div>
-                    ) : null}
+                    )}
                   </>
                 ) : (
                   <>
