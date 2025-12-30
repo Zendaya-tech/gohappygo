@@ -43,34 +43,61 @@ export function Layout({ children }: { children: React.ReactNode }) {
         
         {/* SEO Meta Tags */}
         <title>GoHappyGo - Transport de bagages entre voyageurs</title>
-        <meta name="description" content="Plateforme de transport de bagages entre voyageurs. Trouvez des transporteurs fiables ou proposez vos services de transport lors de vos voyages." />
-        <meta name="keywords" content="transport bagages, voyage, transporteur, livraison, bagages voyage, transport collaboratif" />
+        <meta name="description" content="GoHappyGo est la plateforme de référence pour le transport de bagages entre voyageurs. Trouvez des transporteurs fiables pour vos colis ou proposez vos services de transport lors de vos voyages. Économique, sécurisé et écologique." />
+        <meta name="keywords" content="transport bagages, voyage, transporteur, livraison, bagages voyage, transport collaboratif, colis voyage, transporteur bagages, livraison internationale, GoHappyGo" />
         <meta name="author" content="GoHappyGo" />
         <meta name="robots" content="index, follow" />
+        <meta name="language" content="French" />
+        <meta name="revisit-after" content="7 days" />
+        <meta name="distribution" content="global" />
+        <meta name="rating" content="general" />
         
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://gohappygo.com/" />
         <meta property="og:title" content="GoHappyGo - Transport de bagages entre voyageurs" />
-        <meta property="og:description" content="Plateforme de transport de bagages entre voyageurs. Trouvez des transporteurs fiables ou proposez vos services de transport lors de vos voyages." />
+        <meta property="og:description" content="🧳 Transportez vos bagages en toute sécurité avec GoHappyGo ! Trouvez des transporteurs fiables ou proposez vos services lors de vos voyages. Solution économique et écologique pour vos envois internationaux. ✈️" />
         <meta property="og:image" content="https://gohappygo.com/logo.png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="GoHappyGo - Plateforme de transport de bagages" />
         <meta property="og:site_name" content="GoHappyGo" />
         <meta property="og:locale" content="fr_FR" />
+        <meta property="og:locale:alternate" content="en_US" />
         
         {/* Twitter */}
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content="https://gohappygo.com/" />
         <meta property="twitter:title" content="GoHappyGo - Transport de bagages entre voyageurs" />
-        <meta property="twitter:description" content="Plateforme de transport de bagages entre voyageurs. Trouvez des transporteurs fiables ou proposez vos services de transport lors de vos voyages." />
+        <meta property="twitter:description" content="🧳 Transportez vos bagages en toute sécurité avec GoHappyGo ! Solution économique et écologique pour vos envois internationaux. ✈️" />
         <meta property="twitter:image" content="https://gohappygo.com/og-image.jpg" />
+        <meta property="twitter:image:alt" content="GoHappyGo - Plateforme de transport de bagages" />
         <meta property="twitter:creator" content="@gohappygo" />
+        <meta property="twitter:site" content="@gohappygo" />
         
         {/* Additional Meta Tags */}
         <meta name="theme-color" content="#2563eb" />
         <meta name="msapplication-TileColor" content="#2563eb" />
         <meta name="application-name" content="GoHappyGo" />
+        <meta name="apple-mobile-web-app-title" content="GoHappyGo" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        
+        {/* Business/Contact Information */}
+        <meta name="contact" content="contact@gohappygo.com" />
+        <meta name="copyright" content="© 2024 GoHappyGo. Tous droits réservés." />
+        
+        {/* Geo Tags */}
+        <meta name="geo.region" content="FR" />
+        <meta name="geo.placename" content="France" />
+        
+        {/* Additional SEO */}
+        <meta name="category" content="Transport, Voyage, Logistique" />
+        <meta name="coverage" content="Worldwide" />
+        <meta name="target" content="all" />
+        <meta name="HandheldFriendly" content="True" />
+        <meta name="MobileOptimized" content="320" />
         
         {/* Canonical URL */}
         <link rel="canonical" href="https://gohappygo.com/" />
