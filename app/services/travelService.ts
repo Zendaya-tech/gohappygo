@@ -131,3 +131,84 @@ export const updateTravel = async (travelId: number, data: UpdateTravelData) => 
     throw error;
   }
 };
+
+export interface TravelItem {
+  id: number;
+  description: string;
+  flightNumber: string;
+  isSharedWeight: boolean;
+  isInstant: boolean;
+  isAllowExtraWeight: boolean;
+  punctualityLevel: boolean;
+  feeForGloomy: number;
+  departureDatetime: string;
+  pricePerKg: number;
+  totalWeightAllowance: number;
+  weightAvailable: number;
+  isEditable: boolean;
+  departureAirport: {
+    id: number;
+    name: string;
+    municipality: string;
+    isoCountry: string;
+  };
+  arrivalAirport: {
+    id: number;
+    name: string;
+    municipality: string;
+    isoCountry: string;
+  };
+  airline?: {
+    id: number;
+    name: string;
+    logoUrl: string;
+  };
+  currency: {
+    id: number;
+    symbol: string;
+    code: string;
+  };
+  images: Array<{
+    id: number;
+    fileUrl: string;
+  }>;
+  user: {
+    id: number;
+    fullName: string;
+    profilePictureUrl?: string;
+    isVerified: boolean;
+  };
+}
+
+export interface GetTravelsResponse {
+  items: TravelItem[];
+  totalCount: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export const getUserTravels = async (userId?: number): Promise<GetTravelsResponse> => {
+  try {
+    const params: any = {};
+    if (userId) {
+      params.userId = userId;
+    }
+
+    const response = await api.get("/travel", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user travels:", error);
+    throw error;
+  }
+};
+
+export const deleteTravel = async (travelId: number) => {
+  try {
+    const response = await api.delete(`/travel/${travelId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting travel:", error);
+    throw error;
+  }
+};

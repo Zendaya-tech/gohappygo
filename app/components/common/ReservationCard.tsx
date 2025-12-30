@@ -44,7 +44,7 @@ export default function ReservationCard({ reservation, onApprove, onReject, onCo
                         {reservation.weightKg.toString().padStart(2, '0')} Kg
                     </span>
                     <span className="inline-flex items-center justify-center px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm">
-                        € {reservation.priceEuro}
+                        {reservation.priceEuro} €
                     </span>
                 </div>
 

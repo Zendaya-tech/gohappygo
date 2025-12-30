@@ -30,10 +30,10 @@ import {
   type BookmarkItem,
   getDemandAndTravel,
   getUserDemandsAndTravels,
-  deleteTravel,
   deleteDemand,
   type DemandTravelItem,
 } from "~/services/announceService";
+import { getUserTravels, deleteTravel, type TravelItem } from "~/services/travelService";
 import { removeBookmark } from "~/services/bookmarkService";
 import { getReviews, type Review } from "~/services/reviewService";
 import { getRequests, acceptRequest, completeRequest, type RequestResponse } from "~/services/requestService";
@@ -250,7 +250,7 @@ const ReservationsSection = () => {
                           {weight} Kg
                         </div>
                         <div className="text-gray-900 font-bold text-lg">
-                          € {price}
+                          {price} €
                         </div>
                       </div>
 
@@ -682,7 +682,7 @@ const TravelRequestsSection = () => {
                           {demand.weight} Kg
                         </div>
                         <div className="text-gray-700 font-semibold">
-                          € {demand.pricePerKg} / Kg
+                          {demand.pricePerKg} €/Kg
                         </div>
                       </div>
                     </div>
@@ -746,11 +746,11 @@ const TravelRequestsSection = () => {
 };
 
 const TravelsSection = () => {
-  const [travels, setTravels] = useState<DemandTravelItem[]>([]);
+  const [travels, setTravels] = useState<TravelItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingTravel, setEditingTravel] = useState<DemandTravelItem | null>(null);
+  const [editingTravel, setEditingTravel] = useState<TravelItem | null>(null);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
-  const [travelToCancel, setTravelToCancel] = useState<DemandTravelItem | null>(null);
+  const [travelToCancel, setTravelToCancel] = useState<TravelItem | null>(null);
   const { user: currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
@@ -763,9 +763,8 @@ const TravelsSection = () => {
     if (!targetUserId) return;
     
     try {
-      const response = await getUserDemandsAndTravels(Number(targetUserId), "travel");
-      const items = Array.isArray(response) ? response : response?.items ?? [];
-      setTravels(items);
+      const response = await getUserTravels(Number(targetUserId));
+      setTravels(response.items || []);
     } catch (error) {
       console.error("Error fetching travels:", error);
     } finally {
@@ -840,11 +839,11 @@ const TravelsSection = () => {
                 key={travel.id}
                 className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow"
               >
-                <div className="flex h-40 relative gap-4">
+                <div className="flex h-44 relative gap-4">
                   {/* Image - Square container with rounded corners */}
                   <div className=" aspect-square   rounded-xl overflow-hidden">
                     <img
-                      src={travel.images?.[0]?.fileUrl || travel.user?.profilePictureUrl || "/favicon.ico"}
+                      src={travel.images?.[0]?.fileUrl || travel.airline?.logoUrl || travel.user?.profilePictureUrl || "/favicon.ico"}
                       alt="Voyage"
                       className="w-full h-full object-cover"
                     />
@@ -868,20 +867,22 @@ const TravelsSection = () => {
                           {travel.weightAvailable} Kg
                         </div>
                         <div className="text-gray-700 font-semibold">
-                          € {travel.pricePerKg} / Kg
+                          {travel.pricePerKg} {travel.currency?.symbol || "€"}/Kg
                         </div>
                       </div>
                     </div>
 
-                    {/* Only show edit/cancel buttons for own profile */}
+                    {/* Only show edit/cancel buttons for own profile and if travel is editable */}
                     {isOwnProfile && (
                       <div className="flex items-center gap-3 mt-4">
-                        <button 
-                          onClick={() => setEditingTravel(travel)}
-                          className="px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
-                        >
-                          Edit
-                        </button>
+                        {travel.isEditable && (
+                          <button 
+                            onClick={() => setEditingTravel(travel)}
+                            className="px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
+                          >
+                            Edit
+                          </button>
+                        )}
                         <button 
                           onClick={() => {
                             setTravelToCancel(travel);
@@ -901,8 +902,8 @@ const TravelsSection = () => {
         )}
       </div>
       
-      {/* Edit Announce Dialog - Only show for own profile */}
-      {isOwnProfile && editingTravel && (
+      {/* Edit Announce Dialog - Only show for own profile and editable travels */}
+      {isOwnProfile && editingTravel && editingTravel.isEditable && (
         <EditAnnounceDialog
           open={!!editingTravel}
           onClose={() => setEditingTravel(null)}

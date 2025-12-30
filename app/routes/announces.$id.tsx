@@ -202,7 +202,7 @@ export default function AnnounceDetail() {
   // Update meta tags dynamically when listing data is loaded
   useEffect(() => {
     if (listing && typeof document !== 'undefined') {
-      const title = `${listing.departureAirport?.name || "Départ"} → ${listing.arrivalAirport?.name || "Arrivée"} - ${listing.pricePerKg}€/kg - GoHappyGo`;
+      const title = `${listing.departureAirport?.name || "Départ"} → ${listing.arrivalAirport?.name || "Arrivée"} - ${listing.pricePerKg} €/kg - GoHappyGo`;
       const description = `${type === "travel" ? "Voyage" : "Demande"} de ${userName} : ${listing.description || "Transport de bagages disponible"}`;
       const imageUrl = listing.images?.[0]?.fileUrl || listing.user?.profilePictureUrl || "https://gohappygo.com/og-image.jpg";
       const url = window.location.href;
@@ -716,8 +716,7 @@ export default function AnnounceDetail() {
                 </div>
                 <div className="md:col-span-3 text-left md:text-right mt-2 md:mt-0">
                   <div className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                    {currencySymbol}{listing.pricePerKg}
-                    <span className="text-base font-semibold">/Kilo</span>
+                    {listing.pricePerKg} {currencySymbol}/Kilo
                   </div>
                 </div>
               </div>
@@ -913,8 +912,7 @@ export default function AnnounceDetail() {
                 {type === "travel" ? (
                   <>
                     <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {currencySymbol}{listing.pricePerKg}
-                      <span className="text-base font-semibold">/Kilo</span>
+                      {listing.pricePerKg} {currencySymbol}/Kilo
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mb-6">
                       Prix par kilogramme
@@ -954,7 +952,7 @@ export default function AnnounceDetail() {
                           <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
                             <span>Frais de service</span>
                             <div className="flex items-center gap-2">
-                              <span>{currencySymbol}{pricingData.fee.toFixed(2)}</span>
+                              <span>{pricingData.fee.toFixed(2)} {currencySymbol}</span>
                               <div className="relative">
                                 <button 
                                   className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100"
@@ -976,7 +974,7 @@ export default function AnnounceDetail() {
                           <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
                             <span>TVA 20%</span>
                             <div className="flex items-center gap-2">
-                              <span>{currencySymbol}{pricingData.tvaAmount.toFixed(2)}</span>
+                              <span>{pricingData.tvaAmount.toFixed(2)} {currencySymbol}</span>
                               <div className="relative">
                                 <button 
                                   className="w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-xs text-gray-500 hover:bg-gray-100"
@@ -1039,7 +1037,7 @@ export default function AnnounceDetail() {
                               Total with taxes
                             </span>
                             <span className="font-bold text-lg text-gray-900 dark:text-white">
-                              {currencySymbol}{pricingData.totalAmount.toFixed(2)}
+                              {pricingData.totalAmount.toFixed(2)} {currencySymbol}
                             </span>
                           </div>
                         </div>
@@ -1107,7 +1105,7 @@ export default function AnnounceDetail() {
                         : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
                   >
-                    {isOwnAnnounce ? "Votre voyage" : `Payer ${currencySymbol}${total.toFixed(2)}`}
+                    {isOwnAnnounce ? "Votre voyage" : `Payer ${total.toFixed(2)} ${currencySymbol}`}
                   </button>
                 ) : (
                   !isOwnAnnounce && (

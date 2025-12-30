@@ -116,7 +116,7 @@ export default function TravelCard({
         {departure && (
           <div className="flex items-center justify-between">
             <span className="font-semibold text-gray-900 dark:text-white">
-              {price} € / kg
+              {price} €/kg
             </span>
             <div className="flex items-center space-x-1">
               <svg

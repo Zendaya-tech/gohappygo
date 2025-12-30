@@ -124,7 +124,7 @@ function CheckoutForm({
                             : "bg-blue-600 hover:bg-blue-700"
                     }`}
                 >
-                    {isSubmitting ? "Traitement..." : `Payer ${currencySymbol}${amount.toFixed(2)}`}
+                    {isSubmitting ? "Traitement..." : `Payer ${amount.toFixed(2)} ${currencySymbol}`}
                 </button>
             </div>
         </form>

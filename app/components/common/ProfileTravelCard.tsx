@@ -61,7 +61,7 @@ export default function ProfileTravelCard({
             )}
             {typeof travel.pricePerKg === "number" && (
               <span className="inline-flex items-center justify-center px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 text-sm">
-                € {travel.pricePerKg} / Kg
+                {travel.pricePerKg} €/Kg
               </span>
             )}
           </div>
