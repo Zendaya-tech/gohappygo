@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Airport } from "~/services/airportService";
-import { searchAirports } from "~/services/airportService";
+import { searchAirports, getAirportById } from "~/services/airportService";
 
 type AirportComboBoxProps = {
     label: string;
-    value?: string; // airport code
+    value?: Airport | null | string; // Accept Airport object, null, or string ID for backward compatibility
     onChange: (airport: Airport | null) => void;
     placeholder?: string;
 };
@@ -25,12 +25,47 @@ export default function AirportComboBox({ label, value, onChange, placeholder }:
     const [cursor, setCursor] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const [selectedAirport, setSelectedAirport] = useState<Airport | null>(null);
+    const [loadingInitial, setLoadingInitial] = useState(false);
     const listRef = useRef<HTMLDivElement | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const requestIdRef = useRef(0);
     const [activeIndex, setActiveIndex] = useState<number>(-1);
 
     const debouncedQuery = useDebouncedValue(query, 300);
+
+    // Load airport by ID if value is a string
+    useEffect(() => {
+        const loadAirportById = async (id: string) => {
+            setLoadingInitial(true);
+            try {
+                const airport = await getAirportById(parseInt(id));
+                if (airport) {
+                    setSelectedAirport(airport);
+                    setQuery(airport.name);
+                } else {
+                    setSelectedAirport(null);
+                    setQuery("");
+                }
+            } catch (error) {
+                console.error("Error loading airport:", error);
+                setSelectedAirport(null);
+                setQuery("");
+            } finally {
+                setLoadingInitial(false);
+            }
+        };
+
+        if (typeof value === "string" && value) {
+            loadAirportById(value);
+        } else if (value && typeof value === "object") {
+            setSelectedAirport(value);
+            setQuery(value.name);
+        } else {
+            setSelectedAirport(null);
+            setQuery("");
+        }
+    }, [value]);
 
     const load = async (reset: boolean) => {
         if (loading) return;
@@ -88,13 +123,32 @@ export default function AirportComboBox({ label, value, onChange, placeholder }:
     }, [open, sentinelRef.current, cursor, hasMore]);
 
     const onPick = (airport: Airport) => {
+        setSelectedAirport(airport);
         onChange(airport);
-        setQuery(`${airport.name}`);
+        setQuery(airport.name);
         setOpen(false);
     };
 
-    // If parent passes a code as value, reflect as input display when closed
-    const displayValue = useMemo(() => query, [query]);
+    // Handle input changes
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newQuery = e.target.value;
+        setQuery(newQuery);
+        setOpen(true);
+        
+        // If user clears the input, clear the selection
+        if (newQuery === "") {
+            setSelectedAirport(null);
+            onChange(null);
+        }
+    };
+
+    // Display value based on selected airport or query
+    const displayValue = useMemo(() => {
+        if (selectedAirport && !open) {
+            return selectedAirport.name;
+        }
+        return query;
+    }, [selectedAirport, query, open]);
 
     return (
         <div>
@@ -103,8 +157,9 @@ export default function AirportComboBox({ label, value, onChange, placeholder }:
                 <input
                     ref={inputRef}
                     value={displayValue}
-                    onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+                    onChange={handleInputChange}
                     onFocus={() => setOpen(true)}
+                    disabled={loadingInitial}
                     onKeyDown={(e) => {
                         if (!open && (e.key === "ArrowDown" || e.key === "Enter")) { setOpen(true); return; }
                         if (!open) return;
@@ -121,8 +176,8 @@ export default function AirportComboBox({ label, value, onChange, placeholder }:
                             setOpen(false);
                         }
                     }}
-                    placeholder={placeholder}
-                    className="w-full text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl pl-3 pr-9 py-2 outline-none"
+                    placeholder={loadingInitial ? "Chargement..." : placeholder}
+                    className="w-full text-sm text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl pl-3 pr-9 py-2 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <button
                     type="button"
@@ -145,8 +200,8 @@ export default function AirportComboBox({ label, value, onChange, placeholder }:
                                 onClick={() => onPick(a)}
                                 className={`w-full text-left px-3 py-2 text-sm text-gray-800 dark:text-gray-100 ${idx === activeIndex ? "bg-gray-100 dark:bg-gray-800" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
                             >
-                                <div className="font-medium">{a.name} <span className="text-gray-500">({a.iataCode})</span></div>
-                                <div className="text-xs text-gray-500">{[a.city, a.country].filter(Boolean).join(", ")}</div>
+                                <div className="font-medium">{a.name} <span className="text-gray-500">({a.iataCode || a.code})</span></div>
+                                <div className="text-xs text-gray-500">{[a.municipality || a.city, a.isoCountry || a.country].filter(Boolean).join(", ")}</div>
                             </button>
                         ))}
                         <div ref={sentinelRef} />

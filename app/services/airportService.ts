@@ -1,11 +1,14 @@
 import api from "./Api";
 
 export type Airport = {
-    id: string;
+    id: number;
     code: string; // e.g. CDG
+    iataCode?: string; // IATA code
     name: string; // e.g. Paris Charles de Gaulle
     city?: string;
     country?: string;
+    municipality?: string;
+    isoCountry?: string;
 };
 
 export type AirportSearchResponse = {
@@ -25,6 +28,16 @@ export async function searchAirports(params: { name: string; cursor?: string; li
         return { items: data.items, nextCursor: data.nextCursor ?? null };
     }
     return { items: [], nextCursor: null };
+}
+
+export async function getAirportById(id: number): Promise<Airport | null> {
+    try {
+        const response = await api.get(`/airports/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching airport by ID:", error);
+        return null;
+    }
 }
 
 

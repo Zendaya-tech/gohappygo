@@ -979,20 +979,20 @@ export default function AnnounceDetail() {
                             </div>
                           </div>
                           <div className="flex items-center justify-between text-gray-700 dark:text-gray-300">
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col">
                                 <span>Assurance Protection</span>
-                                <img 
-                                  src="/images/axa-logo.svg" 
-                                  alt="AXA" 
-                                  className="h-6 w-6 rounded object-contain"
-                                  onError={(e) => {
-                                    // Fallback if image doesn't exist
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                />
+                                <span>Juridique Internationale</span>
                               </div>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">Juridique Internationale</span>
+                              <img 
+                                src="/images/axa-logo.svg" 
+                                alt="AXA" 
+                                className="h-6 w-6 rounded object-contain"
+                                onError={(e) => {
+                                  // Fallback if image doesn't exist
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-green-600 font-semibold">Offert !</span>

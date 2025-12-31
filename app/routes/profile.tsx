@@ -1459,20 +1459,22 @@ const FavoritesSection = () => {
 export default function Profile() {
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user"); // Get user ID from query params
-  const [activeSection, setActiveSection] = useState<string>("reservations");
+  const { user: currentUser, isAuthenticated } = useAuth();
+  
+  // Determine if this is the current user's profile or another user's profile
+  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
+  
+  // Set default section based on profile type
+  const [activeSection, setActiveSection] = useState<string>(isOwnProfile ? "reservations" : "reviews");
   const [profileDialogOpen, setProfileDialogOpen] = useState<boolean>(false);
   const [createAnnounceDialogOpen, setCreateAnnounceDialogOpen] =
     useState<boolean>(false);
   const [createPackageDialogOpen, setCreatePackageDialogOpen] =
     useState<boolean>(false);
-  const { user: currentUser, isAuthenticated } = useAuth();
   const [profileUser, setProfileUser] = useState<GetMeResponse | null>(null);
   const [profileStats, setProfileStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [processingOnboarding, setProcessingOnboarding] = useState(false);
-
-  // Determine if this is the current user's profile or another user's profile
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
 
   // Fetch profile data
   useEffect(() => {
