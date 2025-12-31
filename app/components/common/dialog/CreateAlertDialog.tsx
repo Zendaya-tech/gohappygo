@@ -23,15 +23,11 @@ export default function CreateAlertDialog({
   onSuccess,
 }: CreateAlertDialogProps) {
   const [formData, setFormData] = useState({
-    alertType: "BOTH" as "DEMAND" | "TRAVEL" | "BOTH",
+    alertType: "TRAVEL" as "DEMAND" | "TRAVEL" | "BOTH",
     departureAirport: null as Airport | null,
     arrivalAirport: null as Airport | null,
-    travelDate: "",
+    travelDateTime: "",
     flightNumber: "",
-    minPricePerKg: "",
-    maxPricePerKg: "",
-    minWeight: "",
-    maxWeight: "",
   });
   
   const [loading, setLoading] = useState(false);
@@ -41,9 +37,21 @@ export default function CreateAlertDialog({
   // Initialize form with initial data
   useEffect(() => {
     if (open && initialData) {
+      // Convert date to datetime-local format if provided
+      let dateTimeValue = "";
+      if (initialData.date) {
+        try {
+          const date = new Date(initialData.date);
+          // Format to datetime-local (YYYY-MM-DDTHH:MM)
+          dateTimeValue = date.toISOString().slice(0, 16);
+        } catch (error) {
+          console.error("Error parsing date:", error);
+        }
+      }
+      
       setFormData(prev => ({
         ...prev,
-        travelDate: initialData.date || "",
+        travelDateTime: dateTimeValue,
         flightNumber: initialData.flight || "",
       }));
     }
@@ -56,16 +64,18 @@ export default function CreateAlertDialog({
     setSuccess(null);
 
     try {
+      // Validation: Both airports are required
+      if (!formData.departureAirport || !formData.arrivalAirport) {
+        setError("Les aéroports de départ et d'arrivée sont obligatoires.");
+        return;
+      }
+
       const alertData: CreateAlertData = {
         alertType: formData.alertType,
-        departureAirportId: formData.departureAirport?.id,
-        arrivalAirportId: formData.arrivalAirport?.id,
-        travelDate: formData.travelDate || undefined,
+        departureAirportId: formData.departureAirport.id,
+        arrivalAirportId: formData.arrivalAirport.id,
+        travelDateTime: formData.travelDateTime ? new Date(formData.travelDateTime).toISOString() : undefined,
         flightNumber: formData.flightNumber || undefined,
-        minPricePerKg: formData.minPricePerKg ? parseFloat(formData.minPricePerKg) : undefined,
-        maxPricePerKg: formData.maxPricePerKg ? parseFloat(formData.maxPricePerKg) : undefined,
-        minWeight: formData.minWeight ? parseFloat(formData.minWeight) : undefined,
-        maxWeight: formData.maxWeight ? parseFloat(formData.maxWeight) : undefined,
       };
 
       await createAlert(alertData);
@@ -76,15 +86,11 @@ export default function CreateAlertDialog({
         onClose();
         // Reset form
         setFormData({
-          alertType: "BOTH",
+          alertType: "TRAVEL",
           departureAirport: null,
           arrivalAirport: null,
-          travelDate: "",
+          travelDateTime: "",
           flightNumber: "",
-          minPricePerKg: "",
-          maxPricePerKg: "",
-          minWeight: "",
-          maxWeight: "",
         });
         setSuccess(null);
       }, 2000);
@@ -141,16 +147,16 @@ export default function CreateAlertDialog({
                   onChange={(e) => setFormData(prev => ({ ...prev, alertType: e.target.value as any }))}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="BOTH">Voyages et demandes</option>
                   <option value="TRAVEL">Voyages uniquement</option>
                   <option value="DEMAND">Demandes uniquement</option>
+                  <option value="BOTH">Voyages et demandes</option>
                 </select>
               </div>
 
               {/* Departure Airport */}
               <div>
                 <AirportComboBox
-                  label="Aéroport de départ"
+                  label="Aéroport de départ *"
                   value={formData.departureAirport}
                   onChange={(airport) => setFormData(prev => ({ ...prev, departureAirport: airport }))}
                   placeholder="Rechercher un aéroport de départ"
@@ -160,7 +166,7 @@ export default function CreateAlertDialog({
               {/* Arrival Airport */}
               <div>
                 <AirportComboBox
-                  label="Aéroport d'arrivée"
+                  label="Aéroport d'arrivée *"
                   value={formData.arrivalAirport}
                   onChange={(airport) => setFormData(prev => ({ ...prev, arrivalAirport: airport }))}
                   placeholder="Rechercher un aéroport d'arrivée"
@@ -173,9 +179,9 @@ export default function CreateAlertDialog({
                   Date de voyage (optionnel)
                 </label>
                 <input
-                  type="date"
-                  value={formData.travelDate}
-                  onChange={(e) => setFormData(prev => ({ ...prev, travelDate: e.target.value }))}
+                  type="datetime-local"
+                  value={formData.travelDateTime}
+                  onChange={(e) => setFormData(prev => ({ ...prev, travelDateTime: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -192,52 +198,6 @@ export default function CreateAlertDialog({
                   onChange={(e) => setFormData(prev => ({ ...prev, flightNumber: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 />
-              </div>
-
-              {/* Price Range */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Fourchette de prix (€/kg)
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="number"
-                    placeholder="Prix min"
-                    value={formData.minPricePerKg}
-                    onChange={(e) => setFormData(prev => ({ ...prev, minPricePerKg: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Prix max"
-                    value={formData.maxPricePerKg}
-                    onChange={(e) => setFormData(prev => ({ ...prev, maxPricePerKg: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Weight Range */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Fourchette de poids (kg)
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="number"
-                    placeholder="Poids min"
-                    value={formData.minWeight}
-                    onChange={(e) => setFormData(prev => ({ ...prev, minWeight: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Poids max"
-                    value={formData.maxWeight}
-                    onChange={(e) => setFormData(prev => ({ ...prev, maxWeight: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
               </div>
 
               {/* Submit Button */}

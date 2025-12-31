@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '~/hooks/useAuth';
-import SupportDialog from './common/dialog/SupportDialog';
 import { createSupportRequest } from '~/services/supportService';
 
 export default function SupportSection() {
     const { t } = useTranslation();
     const { isAuthenticated } = useAuth();
-    const [supportDialogOpen, setSupportDialogOpen] = useState(false);
     const [quickFormData, setQuickFormData] = useState({
         email: '',
         message: ''
@@ -79,12 +77,12 @@ export default function SupportSection() {
                     <div className="bg-blue-600 flex flex-col justify-between text-white p-8 rounded-2xl min-h-[220px]">
                         <h3 className="text-xl font-bold mb-4">{t('home.supportSection.support247.title')}</h3>
                         <p className="text-blue-100 text-2xl mb-6">{t('home.supportSection.support247.description')}</p>
-                        <button 
-                            onClick={() => setSupportDialogOpen(true)}
-                            className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                        <a 
+                            href="/support"
+                            className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-center"
                         >
                             {t('home.supportSection.support247.cta')}
-                        </button>
+                        </a>
                     </div>
 
                     <div className="bg-gray-900 flex flex-col justify-between text-white p-8 rounded-2xl min-h-[220px]">
@@ -153,13 +151,12 @@ export default function SupportSection() {
                                 </div>
                                 
                                 <div className="mt-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setSupportDialogOpen(true)}
+                                    <a
+                                        href="/support"
                                         className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
                                     >
-                                        Besoin d'aide détaillée ? Ouvrir le formulaire complet →
-                                    </button>
+                                        Besoin d'aide détaillée ? En savoir plus sur notre support →
+                                    </a>
                                 </div>
                             </form>
                         )}

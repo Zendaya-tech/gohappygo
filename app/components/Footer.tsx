@@ -170,14 +170,6 @@ export default function Footer() {
                   </a>
                 </li>
                 <li>
-                  <button
-                    onClick={() => setSupportDialogOpen(true)}
-                    className="hover:text-gray-900 dark:hover:text-gray-100 text-left"
-                  >
-                    Contacter le support
-                  </button>
-                </li>
-                <li>
                   <a
                     href="mailto:support@gohappygo.fr"
                     className="hover:text-gray-900 dark:hover:text-gray-100"

@@ -1,28 +1,20 @@
 import api from "./Api";
 
 export interface CreateAlertData {
-  alertType: "DEMAND" | "TRAVEL" | "BOTH";
-  departureAirportId?: number;
-  arrivalAirportId?: number;
-  travelDate?: string;
+  alertType?: "DEMAND" | "TRAVEL" | "BOTH";
+  departureAirportId: number;
+  arrivalAirportId: number;
+  travelDateTime?: string;
   flightNumber?: string;
-  minPricePerKg?: number;
-  maxPricePerKg?: number;
-  minWeight?: number;
-  maxWeight?: number;
 }
 
 export interface Alert {
   id: number;
   alertType: "DEMAND" | "TRAVEL" | "BOTH";
-  departureAirportId?: number;
-  arrivalAirportId?: number;
-  travelDate?: string;
+  departureAirportId: number;
+  arrivalAirportId: number;
+  travelDateTime?: string;
   flightNumber?: string;
-  minPricePerKg?: number;
-  maxPricePerKg?: number;
-  minWeight?: number;
-  maxWeight?: number;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
