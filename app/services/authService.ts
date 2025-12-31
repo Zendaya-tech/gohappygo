@@ -64,7 +64,7 @@ export const updateProfile = async (data: UpdateProfileData) => {
     if (data.profilePicture)
       formData.append("profilePicture", data.profilePicture);
 
-    const response = await api.put(`/user/update-profile`, formData, {
+    const response = await api.patch(`/user/update-profile`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -78,7 +78,7 @@ export const updateProfile = async (data: UpdateProfileData) => {
 
 export const changePassword = async (data: ChangePasswordData) => {
   try {
-    const response = await api.put(`/user/change-password`, {
+    const response = await api.patch(`/user/change-password`, {
       currentPassword: data.currentPassword,
       newPassword: data.newPassword,
     });
@@ -133,6 +133,8 @@ export type LoginResponse = {
     recentCurrency?: any;
     createdAt?: string;
     profileStats?: ProfileStats;
+    stripeAccountId?: string | null;
+    stripeAccountStatus?: 'uninitiated' | 'pending' | 'active' | 'restricted';
   };
 };
 
@@ -197,6 +199,7 @@ export type GetMeResponse = {
   email: string;
   firstName?: string;
   lastName?: string;
+  fullName?: string;
   phone?: string;
   username?: string;
   profilePictureUrl?: string;
@@ -215,4 +218,6 @@ export type GetMeResponse = {
   createdAt: string;
   updatedAt: string;
   profileStats?: ProfileStats;
+  stripeAccountId?: string | null;
+  stripeAccountStatus?: 'uninitiated' | 'pending' | 'active' | 'restricted';
 };

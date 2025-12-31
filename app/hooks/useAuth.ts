@@ -51,6 +51,8 @@ export const useAuth = () => {
               recentCurrency: res.user.recentCurrency,
               createdAt: res.user.createdAt ? new Date(res.user.createdAt) : undefined,
               profileStats: res.user.profileStats,
+              stripeAccountId: res.user.stripeAccountId,
+              stripeAccountStatus: res.user.stripeAccountStatus,
             }
           : {
               id: "me",
@@ -140,6 +142,8 @@ export const useAuth = () => {
             recentCurrency: res.user.recentCurrency,
             createdAt: res.user.createdAt ? new Date(res.user.createdAt) : undefined,
             profileStats: res.user.profileStats,
+            stripeAccountId: res.user.stripeAccountId,
+            stripeAccountStatus: res.user.stripeAccountStatus,
           };
 
           // Stocker le token dans localStorage
@@ -208,6 +212,8 @@ export const useAuth = () => {
           recentCurrency: userData.recentCurrency,
           createdAt: new Date(userData.createdAt),
           profileStats: userData.profileStats,
+          stripeAccountId: userData.stripeAccountId,
+          stripeAccountStatus: userData.stripeAccountStatus,
         };
 
         storeLogin(token!, composedUser);

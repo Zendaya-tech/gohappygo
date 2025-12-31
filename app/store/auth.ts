@@ -35,6 +35,7 @@ export type AuthState = {
     email?: string;
     firstName?: string;
     lastName?: string;
+    fullName?: string;
     phone?: string;
     profilePictureUrl?: string;
     bio?: string;
@@ -45,6 +46,8 @@ export type AuthState = {
     recentCurrency?: Currency | null;
     createdAt?: Date;
     profileStats?: ProfileStats;
+    stripeAccountId?: string | null;
+    stripeAccountStatus?: 'uninitiated' | 'pending' | 'active' | 'restricted';
   } | null;
   token?: string | null;
   login: (

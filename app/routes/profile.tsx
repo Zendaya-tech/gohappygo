@@ -39,6 +39,7 @@ import { getReviews, type Review } from "~/services/reviewService";
 import { getRequests, acceptRequest, completeRequest, type RequestResponse } from "~/services/requestService";
 import { getMe, type GetMeResponse } from "~/services/authService";
 import { getTransactions, releaseFunds, getBalance, type Transaction, type Balance } from "~/services/transactionService";
+import { getOnboardingLink } from "~/services/stripeService";
 
 interface ProfileSection {
   id: string;
@@ -1468,6 +1469,7 @@ export default function Profile() {
   const [profileUser, setProfileUser] = useState<GetMeResponse | null>(null);
   const [profileStats, setProfileStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [processingOnboarding, setProcessingOnboarding] = useState(false);
 
   // Determine if this is the current user's profile or another user's profile
   const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
@@ -1563,6 +1565,20 @@ export default function Profile() {
     : profileSections.filter(section => 
         !['reservations', 'messages', 'favorites', 'payments'].includes(section.id)
       );
+
+  const handleStripeOnboarding = async () => {
+    setProcessingOnboarding(true);
+    try {
+      const response = await getOnboardingLink();
+      // Open the Stripe onboarding URL in a new tab
+      window.open(response.url, '_blank');
+    } catch (error) {
+      console.error("Error getting onboarding link:", error);
+      // You could show an error message here
+    } finally {
+      setProcessingOnboarding(false);
+    }
+  };
 
   const renderContent = () => {
     switch (activeSection) {
@@ -1858,6 +1874,39 @@ export default function Profile() {
                   </button>
                 )}
               </div>
+
+              {/* Stripe Account Alert - Show for users with pending Stripe account */}
+              {(displayUser?.stripeAccountStatus === "pending"  ||  !displayUser?.stripeAccountId) && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 md:p-6">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-semibold text-yellow-800 mb-2">
+                        Stripe Account
+                      </h3>
+                      <p className="text-sm text-yellow-700 mb-4">
+                        Registering a Stripe account is necessary to start selling your services on the marketplace
+                      </p>
+                      <div className="bg-yellow-100 rounded-lg p-3 mb-4">
+                        <p className="text-sm text-yellow-800">
+                          You haven't registered for a Stripe account yet. Please do so by clicking the button.
+                        </p>
+                      </div>
+                      <button 
+                        onClick={handleStripeOnboarding}
+                        disabled={processingOnboarding}
+                        className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {processingOnboarding ? "Ouverture..." : "Register"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Navigation */}
               <div className="bg-white rounded-2xl border border-gray-200 p-3 md:p-4">

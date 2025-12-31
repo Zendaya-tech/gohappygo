@@ -145,8 +145,8 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
 
       setSuccess("Profil mis à jour avec succès!");
       setTimeout(() => {
-        onClose();
-      }, 1500);
+        setSuccess(null);
+      }, 4000);
     } catch (err: any) {
       setError(err.message || "Erreur lors de la mise à jour du profil");
     } finally {
@@ -367,8 +367,8 @@ export default function ProfileDialog({ open, onClose }: ProfileDialogProps) {
                       confirmPassword: "",
                     });
                     setTimeout(() => {
-                      onClose();
-                    }, 1500);
+                      setSuccess(null);
+                    }, 4000);
                   } catch (err: any) {
                     setError(
                       err.message || "Erreur lors du changement de mot de passe"

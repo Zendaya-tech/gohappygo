@@ -1261,7 +1261,13 @@ export default function AnnounceDetail() {
               <img
                 src={galleryImages[currentImageIndex]}
                 alt={`Image ${currentImageIndex + 1}`}
-                className="max-w-full max-h-full w-full h-full object-cover"
+                className={`max-w-full max-h-full w-full h-full ${
+                  type === "travel" && 
+                  currentImageIndex === 0 && 
+                  galleryImages[0] === listing.airline?.logoUrl 
+                    ? "object-contain p-8" 
+                    : "object-cover"
+                }`}
               />
             </div>
 

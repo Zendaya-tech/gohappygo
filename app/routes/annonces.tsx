@@ -10,6 +10,8 @@ import { getDemandAndTravel } from "~/services/announceService";
 import AirlineComboBox from "~/components/common/AirlineComboBox";
 import type { Airline } from "~/services/airlineService";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
+import CreateAlertDialog from "~/components/common/dialog/CreateAlertDialog";
+import { useAuthStore } from "~/store/auth";
 
 export default function Annonces() {
   const location = useLocation();
@@ -36,7 +38,9 @@ export default function Annonces() {
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [weightRange, setWeightRange] = useState({ min: "", max: "" });
   const [selectedAirline, setSelectedAirline] = useState<string | null>(null);
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -205,6 +209,14 @@ export default function Annonces() {
         ? prev.filter((id) => id !== filterId)
         : [...prev, filterId]
     );
+  };
+
+  const handleAlertClick = () => {
+    if (!isLoggedIn) {
+      navigate("/login");
+      return;
+    }
+    setAlertDialogOpen(true);
   };
 
   const clearAllFilters = () => {
@@ -449,7 +461,10 @@ export default function Annonces() {
                   </p>
 
                   {/* Alert button */}
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-colors">
+                  <button 
+                    onClick={handleAlertClick}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
+                  >
                     Activer une alerte
                   </button>
                 </div>
@@ -556,6 +571,22 @@ export default function Annonces() {
           </div>
         </div>
       </main>
+
+      {/* Create Alert Dialog */}
+      <CreateAlertDialog
+        open={alertDialogOpen}
+        onClose={() => setAlertDialogOpen(false)}
+        initialData={{
+          from: searchParams.from,
+          to: searchParams.to,
+          date: searchParams.date,
+          flight: searchParams.flight,
+        }}
+        onSuccess={() => {
+          // Optionally refresh results or show a success message
+          console.log("Alert created successfully");
+        }}
+      />
 
       {/* Quotes section (does not change the existing layout) */}
       {(quotes.length > 0 || quotesError) && (
