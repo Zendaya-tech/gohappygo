@@ -271,7 +271,7 @@ export default function Annonces() {
               {results.length === 0 && (
                 <div className="mb-3 md:mb-4">
                   <button className="w-full text-left px-3 md:px-4 py-2 text-xs md:text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-                    Filtrer non disponible
+                    Filtre non disponible
                   </button>
                 </div>
               )}
@@ -461,7 +461,7 @@ export default function Annonces() {
                   </p>
 
                   {/* Alert button */}
-                  <button 
+                  <button
                     onClick={handleAlertClick}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg text-sm md:text-base font-medium transition-colors"
                   >
@@ -489,7 +489,7 @@ export default function Annonces() {
                     const route = `${originName} - ${destName}`;
                     const pricePerKg = item.pricePerKg ?? 0;
                     const rating = item.user.rating; // Default rating since it's not in the new structure
-                    
+
                     // Pour les transporteurs (travel), utiliser le logo de la compagnie
                     // Pour les voyageurs (demand), utiliser l'avatar de l'utilisateur
                     const image =
