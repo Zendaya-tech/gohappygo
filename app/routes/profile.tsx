@@ -230,12 +230,12 @@ const ReservationsSection = () => {
                   <div className="flex gap-6">
                     {/* Airline Logo */}
                     <div className="flex-shrink-0">
-                      <div className="w-24 h-16 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center p-2">
+                      <div className="w-32 h-32 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center p-2">
                         {travel?.airline?.logoUrl ? (
                           <img
                             src={travel.airline.logoUrl}
                             alt={travel.airline.name || "Airline"}
-                            className="max-w-full max-h-full object-contain"
+                            className="max-w-full max-h-full w-full h-full object-contain"
                             onError={(e) => {
                               // Fallback to plane icon if logo fails to load
                               e.currentTarget.style.display = "none";
