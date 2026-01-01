@@ -256,9 +256,11 @@ export default function Annonces() {
           <div className="w-full lg:w-64 flex-shrink-0">
             <div className="lg:sticky lg:top-24 bg-gray-100 dark:bg-gray-900 rounded-2xl p-4 md:p-6 border border-gray-200 dark:border-gray-800 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
               <div className="flex items-center justify-between mb-4 md:mb-6">
-                <button className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium">
-                  Filtrer par
-                </button>
+                {results.length > 0 && (
+                  <button className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 md:px-4 py-2 rounded-lg text-xs md:text-sm font-medium">
+                    Filtrer par
+                  </button>
+                )}
                 <button
                   onClick={clearAllFilters}
                   className="text-xs md:text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -268,52 +270,54 @@ export default function Annonces() {
               </div>
 
               {/* Filtrer non disponible button */}
-              {results.length === 0 && (
+              {results.length === 0 ? (
                 <div className="mb-3 md:mb-4">
                   <button className="w-full text-left px-3 md:px-4 py-2 text-xs md:text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
                     Filtre non disponible
                   </button>
                 </div>
+              ) : (
+                <>
+                  <div className="space-y-2 md:space-y-3">
+                    {filters.map((filter) => {
+                      // Si c'est le filtre "airline", afficher le combobox au lieu du checkbox
+                      if (filter.id === "airline") {
+                        return (
+                          <div key={filter.id} className="mt-3 md:mt-4">
+                            <AirlineComboBox
+                              label={filter.label}
+                              value={selectedAirline || ""}
+                              onChange={(airline: Airline | null) => {
+                                setSelectedAirline(
+                                  airline ? String(airline.id) : null
+                                );
+                              }}
+                              placeholder="Rechercher une compagnie"
+                            />
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <label
+                          key={filter.id}
+                          className="flex items-center space-x-2 md:space-x-3 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedFilters.includes(filter.id)}
+                            onChange={() => handleFilterChange(filter.id)}
+                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 rounded"
+                          />
+                          <span className="text-xs md:text-sm text-gray-700 dark:text-gray-300">
+                            {filter.label}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </>
               )}
-
-              <div className="space-y-2 md:space-y-3">
-                {filters.map((filter) => {
-                  // Si c'est le filtre "airline", afficher le combobox au lieu du checkbox
-                  if (filter.id === "airline") {
-                    return (
-                      <div key={filter.id} className="mt-3 md:mt-4">
-                        <AirlineComboBox
-                          label={filter.label}
-                          value={selectedAirline || ""}
-                          onChange={(airline: Airline | null) => {
-                            setSelectedAirline(
-                              airline ? String(airline.id) : null
-                            );
-                          }}
-                          placeholder="Rechercher une compagnie"
-                        />
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <label
-                      key={filter.id}
-                      className="flex items-center space-x-2 md:space-x-3 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedFilters.includes(filter.id)}
-                        onChange={() => handleFilterChange(filter.id)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 rounded"
-                      />
-                      <span className="text-xs md:text-sm text-gray-700 dark:text-gray-300">
-                        {filter.label}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
 
               {/* Price Range Filter */}
               <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-700">
