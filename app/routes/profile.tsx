@@ -33,12 +33,27 @@ import {
   deleteDemand,
   type DemandTravelItem,
 } from "~/services/announceService";
-import { getUserTravels, deleteTravel, type TravelItem } from "~/services/travelService";
+import {
+  getUserTravels,
+  deleteTravel,
+  type TravelItem,
+} from "~/services/travelService";
 import { removeBookmark } from "~/services/bookmarkService";
 import { getReviews, type Review } from "~/services/reviewService";
-import { getRequests, acceptRequest, completeRequest, type RequestResponse } from "~/services/requestService";
+import {
+  getRequests,
+  acceptRequest,
+  completeRequest,
+  type RequestResponse,
+} from "~/services/requestService";
 import { getMe, type GetMeResponse } from "~/services/authService";
-import { getTransactions, releaseFunds, getBalance, type Transaction, type Balance } from "~/services/transactionService";
+import {
+  getTransactions,
+  releaseFunds,
+  getBalance,
+  type Transaction,
+  type Balance,
+} from "~/services/transactionService";
 import { getOnboardingLink } from "~/services/stripeService";
 
 interface ProfileSection {
@@ -47,7 +62,6 @@ interface ProfileSection {
   icon: React.ReactNode;
   count: number;
 }
-
 
 const ReservationsSection = () => {
   const [tab, setTab] = useState<"pending" | "accepted" | "completed">(
@@ -101,10 +115,13 @@ const ReservationsSection = () => {
     }
   };
 
-  const handleContactRequester = (requesterName: string, requesterAvatar: string) => {
+  const handleContactRequester = (
+    requesterName: string,
+    requesterAvatar: string
+  ) => {
     setSelectedRequester({
       name: requesterName,
-      avatar: requesterAvatar
+      avatar: requesterAvatar,
     });
     setMessageDialogOpen(true);
   };
@@ -152,7 +169,7 @@ const ReservationsSection = () => {
               : "text-gray-500"
           }`}
         >
-          | En attente
+          | Waiting for proposal
         </button>
         <button
           onClick={() => setTab("accepted")}
@@ -162,7 +179,7 @@ const ReservationsSection = () => {
               : "text-gray-500"
           }`}
         >
-          | Acceptées
+          | Waiting for payment
         </button>
         <button
           onClick={() => setTab("completed")}
@@ -172,7 +189,7 @@ const ReservationsSection = () => {
               : "text-gray-500"
           }`}
         >
-          | Terminées
+          | Archived reservations
         </button>
       </div>
 
@@ -213,21 +230,23 @@ const ReservationsSection = () => {
                   <div className="flex gap-6">
                     {/* Airline Logo */}
                     <div className="flex-shrink-0">
-                      <div className="w-24 h-16 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center p-2">
+                      <div className="w-32 h-32 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-center p-2">
                         {travel?.airline?.logoUrl ? (
                           <img
                             src={travel.airline.logoUrl}
                             alt={travel.airline.name || "Airline"}
-                            className="max-w-full max-h-full object-contain"
+                            className="max-w-full max-h-full w-full h-full object-contain"
                             onError={(e) => {
                               // Fallback to plane icon if logo fails to load
-                              e.currentTarget.style.display = 'none';
-                              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              e.currentTarget.style.display = "none";
+                              e.currentTarget.nextElementSibling?.classList.remove(
+                                "hidden"
+                              );
                             }}
                           />
                         ) : null}
                         <svg
-                          className={`w-8 h-8 text-blue-600 ${travel?.airline?.logoUrl ? 'hidden' : ''}`}
+                          className={`w-8 h-8 text-blue-600 ${travel?.airline?.logoUrl ? "hidden" : ""}`}
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -248,7 +267,7 @@ const ReservationsSection = () => {
 
                       {/* Weight and Price */}
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">
+                        <div className="text-gray-900 font-bold text-lg">
                           {weight} Kg
                         </div>
                         <div className="text-gray-900 font-bold text-lg">
@@ -303,8 +322,11 @@ const ReservationsSection = () => {
                         {requesterName}
                       </span>
                     </div>
-                    <button className="w-full px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                      onClick={() => handleContactRequester(requesterName, requesterAvatar)}
+                    <button
+                      className="w-full px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                      onClick={() =>
+                        handleContactRequester(requesterName, requesterAvatar)
+                      }
                     >
                       Contact
                     </button>
@@ -315,7 +337,7 @@ const ReservationsSection = () => {
           })}
         </div>
       )}
-      
+
       {/* Error Modal */}
       {errorMessage && (
         <ConfirmCancelDialog
@@ -355,8 +377,9 @@ const ReviewsSection = () => {
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
   const { user: currentUser } = useAuth();
-  
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
+
+  const isOwnProfile =
+    !userId || (currentUser && userId === currentUser.id?.toString());
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -364,8 +387,11 @@ const ReviewsSection = () => {
       try {
         // For other users' profiles, only show received reviews
         // For own profile, allow switching between received and given
-        const asReviewer = isOwnProfile ? (tab === "given") : false;
-        const response = await getReviews(asReviewer, userId ? Number(userId) : undefined);
+        const asReviewer = isOwnProfile ? tab === "given" : false;
+        const response = await getReviews(
+          asReviewer,
+          userId ? Number(userId) : undefined
+        );
         setReviews(response.items || []);
       } catch (error) {
         console.error("Error fetching reviews:", error);
@@ -432,19 +458,18 @@ const ReviewsSection = () => {
           <div className="text-center">
             <StarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
-              {isOwnProfile 
-                ? (tab === "received" ? "Aucun avis reçu" : "Aucun avis donné")
-                : "Aucun avis reçu"
-              }
+              {isOwnProfile
+                ? tab === "received"
+                  ? "Aucun avis reçu"
+                  : "Aucun avis donné"
+                : "Aucun avis reçu"}
             </p>
             <p className="text-gray-400 text-sm mt-2">
-              {isOwnProfile 
-                ? (tab === "received" 
-                    ? "Les avis de vos voyageurs apparaîtront ici"
-                    : "Les avis que vous avez donnés apparaîtront ici"
-                  )
-                : "Cet utilisateur n'a pas encore reçu d'avis"
-              }
+              {isOwnProfile
+                ? tab === "received"
+                  ? "Les avis de vos voyageurs apparaîtront ici"
+                  : "Les avis que vous avez donnés apparaîtront ici"
+                : "Cet utilisateur n'a pas encore reçu d'avis"}
             </p>
           </div>
         </div>
@@ -452,10 +477,12 @@ const ReviewsSection = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
-              {isOwnProfile 
-                ? (tab === "received" ? "Avis reçus" : "Avis donnés")
-                : "Avis reçus"
-              } ({reviews.length})
+              {isOwnProfile
+                ? tab === "received"
+                  ? "Avis reçus"
+                  : "Avis donnés"
+                : "Avis reçus"}{" "}
+              ({reviews.length})
             </h3>
             {(tab === "received" || !isOwnProfile) && (
               <div className="flex items-center gap-2">
@@ -483,8 +510,11 @@ const ReviewsSection = () => {
             {reviews.map((review) => {
               // For received reviews, show the reviewer (who gave the review)
               // For given reviews, show the reviewee (who received the review)
-              const displayUser = (isOwnProfile && tab === "given") ? review.reviewee : review.reviewer;
-              const displayName = displayUser 
+              const displayUser =
+                isOwnProfile && tab === "given"
+                  ? review.reviewee
+                  : review.reviewer;
+              const displayName = displayUser
                 ? `${displayUser.firstName} ${displayUser.lastName.charAt(0)}.`
                 : "Utilisateur";
               const displayAvatar =
@@ -512,10 +542,11 @@ const ReviewsSection = () => {
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <h4 className="text-sm font-semibold text-gray-900">
-                            {isOwnProfile 
-                              ? (tab === "received" ? `Avis de ${displayName}` : `Avis pour ${displayName}`)
-                              : `Avis de ${displayName}`
-                            }
+                            {isOwnProfile
+                              ? tab === "received"
+                                ? `Avis de ${displayName}`
+                                : `Avis pour ${displayName}`
+                              : `Avis de ${displayName}`}
                           </h4>
                           {review.request?.travel && (
                             <p className="text-xs text-gray-500">
@@ -564,23 +595,33 @@ const ReviewsSection = () => {
 const TravelRequestsSection = () => {
   const [demands, setDemands] = useState<DemandTravelItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingDemand, setEditingDemand] = useState<DemandTravelItem | null>(null);
+  const [editingDemand, setEditingDemand] = useState<DemandTravelItem | null>(
+    null
+  );
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
-  const [demandToCancel, setDemandToCancel] = useState<DemandTravelItem | null>(null);
+  const [demandToCancel, setDemandToCancel] = useState<DemandTravelItem | null>(
+    null
+  );
   const { user: currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
-  
+
   // Use the profile user ID or current user ID
   const targetUserId = userId || currentUser?.id;
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
+  const isOwnProfile =
+    !userId || (currentUser && userId === currentUser.id?.toString());
 
   const fetchDemands = async () => {
     if (!targetUserId) return;
-    
+
     try {
-      const response = await getUserDemandsAndTravels(Number(targetUserId), "demand");
-      const items = Array.isArray(response) ? response : response?.items ?? [];
+      const response = await getUserDemandsAndTravels(
+        Number(targetUserId),
+        "demand"
+      );
+      const items = Array.isArray(response)
+        ? response
+        : (response?.items ?? []);
       setDemands(items);
     } catch (error) {
       console.error("Error fetching demands:", error);
@@ -639,13 +680,14 @@ const TravelRequestsSection = () => {
             <div className="text-center">
               <QuestionMarkCircleIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">
-                {isOwnProfile ? "Aucune demande de voyage" : "Aucune demande de voyage publique"}
+                {isOwnProfile
+                  ? "Aucune demande de voyage"
+                  : "Aucune demande de voyage publique"}
               </p>
               <p className="text-gray-400 text-sm mt-2">
-                {isOwnProfile 
+                {isOwnProfile
                   ? "Créez une demande pour trouver un transporteur"
-                  : "Cet utilisateur n'a pas encore publié de demandes"
-                }
+                  : "Cet utilisateur n'a pas encore publié de demandes"}
               </p>
             </div>
           </div>
@@ -660,7 +702,11 @@ const TravelRequestsSection = () => {
                   {/* Image - Square container with rounded corners */}
                   <div className=" aspect-square   rounded-xl overflow-hidden">
                     <img
-                      src={demand.images?.[0]?.fileUrl || demand.user?.profilePictureUrl || "/favicon.ico"}
+                      src={
+                        demand.images?.[0]?.fileUrl ||
+                        demand.user?.profilePictureUrl ||
+                        "/favicon.ico"
+                      }
                       alt="Demande"
                       className="w-full h-full object-cover"
                     />
@@ -670,7 +716,8 @@ const TravelRequestsSection = () => {
                   <div className="flex-1 flex flex-col justify-between min-w-0">
                     <div>
                       <h3 className="text-lg font-bold text-gray-900 mb-1 truncate">
-                        {demand.departureAirport?.name} → {demand.arrivalAirport?.name}
+                        {demand.departureAirport?.name} →{" "}
+                        {demand.arrivalAirport?.name}
                       </h3>
                       <p className="text-sm text-gray-500 mb-1">
                         {demand.deliveryDate && formatDate(demand.deliveryDate)}
@@ -692,13 +739,13 @@ const TravelRequestsSection = () => {
                     {/* Only show edit/cancel buttons for own profile */}
                     {isOwnProfile && (
                       <div className="flex items-center gap-3 mt-4">
-                        <button 
+                        <button
                           onClick={() => setEditingDemand(demand)}
-                          className="px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
+                          className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
                         >
                           Edit
                         </button>
-                        <button 
+                        <button
                           onClick={() => {
                             setDemandToCancel(demand);
                             setCancelConfirmOpen(true);
@@ -716,7 +763,7 @@ const TravelRequestsSection = () => {
           </div>
         )}
       </div>
-      
+
       {/* Edit Package Dialog - Only show for own profile */}
       {isOwnProfile && editingDemand && (
         <EditPackageDialog
@@ -756,14 +803,15 @@ const TravelsSection = () => {
   const { user: currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
-  
+
   // Use the profile user ID or current user ID
   const targetUserId = userId || currentUser?.id;
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
+  const isOwnProfile =
+    !userId || (currentUser && userId === currentUser.id?.toString());
 
   const fetchTravels = async () => {
     if (!targetUserId) return;
-    
+
     try {
       const response = await getUserTravels(Number(targetUserId));
       setTravels(response.items || []);
@@ -827,10 +875,9 @@ const TravelsSection = () => {
                 {isOwnProfile ? "Aucun voyage" : "Aucun voyage public"}
               </p>
               <p className="text-gray-400 text-sm mt-2">
-                {isOwnProfile 
+                {isOwnProfile
                   ? "Publiez une annonce de voyage pour transporter des baggage"
-                  : "Cet utilisateur n'a pas encore publié de voyages"
-                }
+                  : "Cet utilisateur n'a pas encore publié de voyages"}
               </p>
             </div>
           </div>
@@ -845,7 +892,12 @@ const TravelsSection = () => {
                   {/* Image - Square container with rounded corners */}
                   <div className=" aspect-square   rounded-xl overflow-hidden">
                     <img
-                      src={travel.images?.[0]?.fileUrl || travel.airline?.logoUrl || travel.user?.profilePictureUrl || "/favicon.ico"}
+                      src={
+                        travel.images?.[0]?.fileUrl ||
+                        travel.airline?.logoUrl ||
+                        travel.user?.profilePictureUrl ||
+                        "/favicon.ico"
+                      }
                       alt="Voyage"
                       className="w-full h-full object-cover"
                     />
@@ -855,10 +907,12 @@ const TravelsSection = () => {
                   <div className="flex-1 flex flex-col justify-between min-w-0">
                     <div>
                       <h3 className="text-lg font-bold text-gray-900 mb-1 truncate">
-                        {travel.departureAirport?.name} → {travel.arrivalAirport?.name}
+                        {travel.departureAirport?.name} →{" "}
+                        {travel.arrivalAirport?.name}
                       </h3>
                       <p className="text-sm text-gray-500 mb-1">
-                        {travel.departureDatetime && formatDate(travel.departureDatetime)}
+                        {travel.departureDatetime &&
+                          formatDate(travel.departureDatetime)}
                       </p>
                       <p className="text-sm text-gray-600 mb-3">
                         Numéro de vol {travel.flightNumber}
@@ -869,7 +923,8 @@ const TravelsSection = () => {
                           {travel.weightAvailable} Kg
                         </div>
                         <div className="text-gray-700 font-semibold">
-                          {travel.pricePerKg} {travel.currency?.symbol || "€"}/Kg
+                          {travel.pricePerKg} {travel.currency?.symbol || "€"}
+                          /Kg
                         </div>
                       </div>
                     </div>
@@ -878,14 +933,14 @@ const TravelsSection = () => {
                     {isOwnProfile && (
                       <div className="flex items-center gap-3 mt-4">
                         {travel.isEditable && (
-                          <button 
+                          <button
                             onClick={() => setEditingTravel(travel)}
                             className="px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
                           >
                             Edit
                           </button>
                         )}
-                        <button 
+                        <button
                           onClick={() => {
                             setTravelToCancel(travel);
                             setCancelConfirmOpen(true);
@@ -903,7 +958,7 @@ const TravelsSection = () => {
           </div>
         )}
       </div>
-      
+
       {/* Edit Announce Dialog - Only show for own profile and editable travels */}
       {isOwnProfile && editingTravel && editingTravel.isEditable && (
         <EditAnnounceDialog
@@ -934,9 +989,10 @@ const TravelsSection = () => {
   );
 };
 
-
 const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
-  const [tab, setTab] = useState<"balance" | "transactions" | "earnings">("balance");
+  const [tab, setTab] = useState<"balance" | "transactions" | "earnings">(
+    "balance"
+  );
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState<Balance | null>(null);
   const [loading, setLoading] = useState(true);
@@ -970,7 +1026,7 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
     try {
       const nextPage = page + 1;
       const transactionData = await getTransactions(nextPage, 10);
-      setTransactions(prev => [...prev, ...transactionData.items]);
+      setTransactions((prev) => [...prev, ...transactionData.items]);
       setPage(nextPage);
       setHasMore(transactionData.items.length === 10);
     } catch (error) {
@@ -1084,7 +1140,9 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
             {/* Available Balance */}
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium opacity-90">Solde disponible</h3>
+                <h3 className="text-sm font-medium opacity-90">
+                  Solde disponible
+                </h3>
                 <CurrencyDollarIcon className="h-6 w-6 opacity-75" />
               </div>
               <div className="text-2xl font-bold">
@@ -1096,9 +1154,15 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
             {/* Pending Balance */}
             <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-6 text-white">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium opacity-90">Solde en attente</h3>
-                <svg className="h-6 w-6 opacity-75" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <h3 className="text-sm font-medium opacity-90">
+                  Solde en attente
+                </h3>
+                <svg
+                  className="h-6 w-6 opacity-75"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                 </svg>
               </div>
               <div className="text-2xl font-bold">
@@ -1111,12 +1175,17 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
             <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-medium opacity-90">Solde total</h3>
-                <svg className="h-6 w-6 opacity-75" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
+                <svg
+                  className="h-6 w-6 opacity-75"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" />
                 </svg>
               </div>
               <div className="text-2xl font-bold">
-                {(balance.available + balance.pending).toFixed(2)} {balance.currency.toUpperCase()}
+                {(balance.available + balance.pending).toFixed(2)}{" "}
+                {balance.currency.toUpperCase()}
               </div>
               <p className="text-xs opacity-75 mt-1">Disponible + En attente</p>
             </div>
@@ -1142,7 +1211,8 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
               Historique des transactions
             </h3>
             <div className="text-sm text-gray-500">
-              {transactions.length} transaction{transactions.length > 1 ? 's' : ''}
+              {transactions.length} transaction
+              {transactions.length > 1 ? "s" : ""}
             </div>
           </div>
 
@@ -1169,21 +1239,25 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
                           </h4>
                           {transaction.request && (
                             <p className="text-sm text-gray-500">
-                              Demande #{transaction.request.id} - {transaction.request.weight}kg
+                              Demande #{transaction.request.id} -{" "}
+                              {transaction.request.weight}kg
                             </p>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
                         <span>{formatDate(transaction.createdAt)}</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(transaction.status)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(transaction.status)}`}
+                        >
                           {getStatusText(transaction.status)}
                         </span>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-semibold text-gray-900">
-                        {transaction.amount.toFixed(2)} {transaction.currencyCode.toUpperCase()}
+                        {transaction.amount.toFixed(2)}{" "}
+                        {transaction.currencyCode.toUpperCase()}
                       </div>
                       {transaction.status.toLowerCase() === "paid" && (
                         <button
@@ -1191,7 +1265,9 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
                           disabled={releasingFunds === transaction.id}
                           className="mt-2 text-sm bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {releasingFunds === transaction.id ? "..." : "Libérer"}
+                          {releasingFunds === transaction.id
+                            ? "..."
+                            : "Libérer"}
                         </button>
                       )}
                     </div>
@@ -1223,8 +1299,12 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
             {/* Earnings Chart Placeholder */}
             <div className="bg-gray-50 rounded-xl p-6 h-64 flex items-center justify-center">
               <div className="text-center text-gray-500">
-                <svg className="h-12 w-12 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L3.5 15.9l.01 2.59z"/>
+                <svg
+                  className="h-12 w-12 mx-auto mb-4"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L3.5 15.9l.01 2.59z" />
                 </svg>
                 <p>Graphique des gains</p>
                 <p className="text-sm">Bientôt disponible</p>
@@ -1234,15 +1314,20 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
             {/* Earnings Summary */}
             <div className="space-y-4">
               <div className="bg-blue-50 rounded-xl p-4">
-                <h4 className="font-medium text-blue-900 mb-2">Solde disponible</h4>
+                <h4 className="font-medium text-blue-900 mb-2">
+                  Solde disponible
+                </h4>
                 <div className="text-2xl font-bold text-blue-600">
-                  {balance.available.toFixed(2)} {balance.currency.toUpperCase()}
+                  {balance.available.toFixed(2)}{" "}
+                  {balance.currency.toUpperCase()}
                 </div>
                 <p className="text-sm text-blue-700">Prêt à être retiré</p>
               </div>
 
               <div className="bg-green-50 rounded-xl p-4">
-                <h4 className="font-medium text-green-900 mb-2">Solde en attente</h4>
+                <h4 className="font-medium text-green-900 mb-2">
+                  Solde en attente
+                </h4>
                 <div className="text-2xl font-bold text-green-600">
                   {balance.pending.toFixed(2)} {balance.currency.toUpperCase()}
                 </div>
@@ -1250,11 +1335,16 @@ const PaymentsSection = ({ profileStats }: { profileStats: any }) => {
               </div>
 
               <div className="bg-purple-50 rounded-xl p-4">
-                <h4 className="font-medium text-purple-900 mb-2">Solde total</h4>
+                <h4 className="font-medium text-purple-900 mb-2">
+                  Solde total
+                </h4>
                 <div className="text-2xl font-bold text-purple-600">
-                  {(balance.available + balance.pending).toFixed(2)} {balance.currency.toUpperCase()}
+                  {(balance.available + balance.pending).toFixed(2)}{" "}
+                  {balance.currency.toUpperCase()}
                 </div>
-                <p className="text-sm text-purple-700">Disponible + En attente</p>
+                <p className="text-sm text-purple-700">
+                  Disponible + En attente
+                </p>
               </div>
             </div>
           </div>
@@ -1460,12 +1550,15 @@ export default function Profile() {
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user"); // Get user ID from query params
   const { user: currentUser, isAuthenticated } = useAuth();
-  
+
   // Determine if this is the current user's profile or another user's profile
-  const isOwnProfile = !userId || (currentUser && userId === currentUser.id?.toString());
-  
+  const isOwnProfile =
+    !userId || (currentUser && userId === currentUser.id?.toString());
+
   // Set default section based on profile type
-  const [activeSection, setActiveSection] = useState<string>(isOwnProfile ? "reservations" : "reviews");
+  const [activeSection, setActiveSection] = useState<string>(
+    isOwnProfile ? "reservations" : "reviews"
+  );
   const [profileDialogOpen, setProfileDialogOpen] = useState<boolean>(false);
   const [createAnnounceDialogOpen, setCreateAnnounceDialogOpen] =
     useState<boolean>(false);
@@ -1562,10 +1655,13 @@ export default function Profile() {
   ];
 
   // Filter sections based on whether it's own profile or not
-  const visibleSections = isOwnProfile 
-    ? profileSections 
-    : profileSections.filter(section => 
-        !['reservations', 'messages', 'favorites', 'payments'].includes(section.id)
+  const visibleSections = isOwnProfile
+    ? profileSections
+    : profileSections.filter(
+        (section) =>
+          !["reservations", "messages", "favorites", "payments"].includes(
+            section.id
+          )
       );
 
   const handleStripeOnboarding = async () => {
@@ -1573,7 +1669,7 @@ export default function Profile() {
     try {
       const response = await getOnboardingLink();
       // Open the Stripe onboarding URL in a new tab
-      window.open(response.url, '_blank');
+      window.open(response.url, "_blank");
     } catch (error) {
       console.error("Error getting onboarding link:", error);
       // You could show an error message here
@@ -1848,8 +1944,7 @@ export default function Profile() {
                 <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">
                   {displayUser?.fullName
                     ? `${displayUser.fullName}`
-                    : displayUser?.email || "Utilisateur"
-                  }
+                    : displayUser?.email || "Utilisateur"}
                 </h3>
 
                 {/* User Bio */}
@@ -1861,8 +1956,7 @@ export default function Profile() {
                   <p className="text-gray-500 text-sm mb-4">
                     {isOwnProfile
                       ? "Ajoutez une bio pour vous présenter aux autres utilisateurs"
-                      : "Aucune bio disponible"
-                    }
+                      : "Aucune bio disponible"}
                   </p>
                 )}
 
@@ -1878,12 +1972,17 @@ export default function Profile() {
               </div>
 
               {/* Stripe Account Alert - Show for users with pending Stripe account */}
-              {(displayUser?.stripeAccountStatus === "pending"  ||  !displayUser?.stripeAccountId) && (
+              {(displayUser?.stripeAccountStatus === "pending" ||
+                !displayUser?.stripeAccountId) && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 md:p-6">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0">
-                      <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                      <svg
+                        className="w-6 h-6 text-yellow-600"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                       </svg>
                     </div>
                     <div className="flex-1 min-w-0">
@@ -1891,14 +1990,16 @@ export default function Profile() {
                         Stripe Account
                       </h3>
                       <p className="text-sm text-yellow-700 mb-4">
-                        Registering a Stripe account is necessary to start selling your services on the marketplace
+                        Registering a Stripe account is necessary to start
+                        selling your services on the marketplace
                       </p>
                       <div className="bg-yellow-100 rounded-lg p-3 mb-4">
                         <p className="text-sm text-yellow-800">
-                          You haven't registered for a Stripe account yet. Please do so by clicking the button.
+                          You haven't registered for a Stripe account yet.
+                          Please do so by clicking the button.
                         </p>
                       </div>
-                      <button 
+                      <button
                         onClick={handleStripeOnboarding}
                         disabled={processingOnboarding}
                         className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

@@ -120,10 +120,10 @@ export default function MessageDialog({
               </div>
 
               {/* French Safety Text */}
-              <div className="space-y-6 text-[15px] leading-relaxed text-gray-800">
+              <div className="space-y-6 text-[15px] leading-relaxed text-gray-800 font-semibold">
                 <p>
                   Pour garantir votre sécurité, restez toujours sur{" "}
-                  <span className="font-medium text-blue-600 hover:underline cursor-pointer">
+                  <span className="font-semibold text-blue-600 hover:underline cursor-pointer">
                     GoHappyGo
                   </span>{" "}
                   jusqu'au bout de votre voyage.
