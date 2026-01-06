@@ -55,7 +55,7 @@ import {
   type Balance,
 } from "~/services/transactionService";
 import { getOnboardingLink } from "~/services/stripeService";
-import TravelRequestCard from "~/components/TravelRequestCard";
+import ActionCard from "~/components/ActionCard";
 
 interface ProfileSection {
   id: string;
@@ -199,7 +199,7 @@ const ReservationsSection = () => {
           Aucune réservation dans cette catégorie
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((request) => {
             const travel = request.travel;
             const requester = request.requester;
@@ -228,22 +228,67 @@ const ReservationsSection = () => {
               (requester as any)?.profilePictureUrl || "/favicon.ico";
 
             return (
-              <TravelRequestCard
+              // <TravelRequestCard
+              //   key={request.id}
+              //   request={request}
+              //   travel={travel}
+              //   departureCity={departureCity}
+              //   arrivalCity={arrivalCity}
+              //   travelDate={travelDate}
+              //   flightNumber={flightNumber}
+              //   weight={weight}
+              //   price={price}
+              //   requesterName={requesterName}
+              //   requesterAvatar={requesterAvatar}
+              //   handleAcceptRequest={handleAcceptRequest}
+              //   handleCompleteRequest={handleCompleteRequest}
+              //   handleContactRequester={handleContactRequester}
+              //   // Optional: handleRejectRequest={handleRejectRequest}
+              // />
+              <ActionCard
                 key={request.id}
-                request={request}
-                travel={travel}
-                departureCity={departureCity}
-                arrivalCity={arrivalCity}
-                travelDate={travelDate}
+                id={request.id}
+                user={{
+                  name: requesterName,
+                  avatar: requesterAvatar,
+                }}
+                image={request.travel.airline?.logoUrl}
+                title={`${departureCity} → ${arrivalCity}`}
+                subtitle="Espace réservé"
+                dateLabel={travelDate}
                 flightNumber={flightNumber}
                 weight={weight}
                 price={price}
-                requesterName={requesterName}
-                requesterAvatar={requesterAvatar}
-                handleAcceptRequest={handleAcceptRequest}
-                handleCompleteRequest={handleCompleteRequest}
-                handleContactRequester={handleContactRequester}
-                // Optional: handleRejectRequest={handleRejectRequest}
+                // Logic for Status Badges vs Buttons
+                statusBadge={
+                  request.currentStatus?.status === "COMPLETED"
+                    ? "Terminé"
+                    : undefined
+                }
+                primaryAction={
+                  request.currentStatus?.status === "NEGOTIATING"
+                    ? {
+                        label: "Approve",
+                        onClick: () => handleAcceptRequest(request.id),
+                      }
+                    : request.currentStatus?.status === "ACCEPTED"
+                      ? {
+                          label: "Terminer",
+                          onClick: () => handleCompleteRequest(request.id),
+                          color: "green",
+                        }
+                      : undefined
+                }
+                secondaryAction={
+                  request.currentStatus?.status === "NEGOTIATING"
+                    ? {
+                        label: "Rejeter",
+                        onClick: () => {},
+                        // onClick: () => handleRejectRequest(request.id),
+                        color: "red",
+                      }
+                    : undefined
+                }
               />
             );
           })}
@@ -604,73 +649,45 @@ const TravelRequestsSection = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {demands.map((demand) => (
-              <div
+              <ActionCard
                 key={demand.id}
-                className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex h-44 relative gap-4">
-                  {/* Image - Square container with rounded corners */}
-                  <div className=" aspect-square   rounded-xl overflow-hidden">
-                    <img
-                      src={
-                        demand.images?.[0]?.fileUrl ||
-                        demand.user?.profilePictureUrl ||
-                        "/favicon.ico"
+                id={demand.id}
+                image={
+                  demand.images?.[0]?.fileUrl || demand.user?.profilePictureUrl
+                }
+                title={`${demand.departureAirport?.name} → ${demand.arrivalAirport?.name}`}
+                subtitle="Poids requis"
+                dateLabel={
+                  demand.deliveryDate ? formatDate(demand.deliveryDate) : "—"
+                }
+                flightNumber={demand.flightNumber}
+                weight={demand.weight || 0}
+                price={demand.pricePerKg}
+                priceSubtext="€/Kg"
+                // Buttons for Demands
+                primaryAction={
+                  isOwnProfile
+                    ? {
+                        label: "Edit",
+                        onClick: () => setEditingDemand(demand),
                       }
-                      alt="Demande"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 flex flex-col justify-between min-w-0">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-1 truncate">
-                        {demand.departureAirport?.name} →{" "}
-                        {demand.arrivalAirport?.name}
-                      </h3>
-                      <p className="text-sm text-gray-500 mb-1">
-                        {demand.deliveryDate && formatDate(demand.deliveryDate)}
-                      </p>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Numéro de vol {demand.flightNumber}
-                      </p>
-
-                      <div className="flex items-center gap-4 mb-2">
-                        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-semibold text-sm">
-                          {demand.weight} Kg
-                        </div>
-                        <div className="text-gray-700 font-semibold">
-                          {demand.pricePerKg} €/Kg
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Only show edit/cancel buttons for own profile */}
-                    {isOwnProfile && (
-                      <div className="flex items-center gap-3 mt-4">
-                        <button
-                          onClick={() => setEditingDemand(demand)}
-                          className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            setDemandToCancel(demand);
-                            setCancelConfirmOpen(true);
-                          }}
-                          className="px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors text-sm"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+                    : undefined
+                }
+                secondaryAction={
+                  isOwnProfile
+                    ? {
+                        label: "Cancel",
+                        onClick: () => {
+                          setDemandToCancel(demand);
+                          setCancelConfirmOpen(true);
+                        },
+                        color: "red",
+                      }
+                    : undefined
+                }
+              />
             ))}
           </div>
         )}
@@ -794,78 +811,62 @@ const TravelsSection = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {travels.map((travel) => (
-              <div
+              <ActionCard
                 key={travel.id}
-                className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-md transition-shadow"
-              >
-                <div className="flex h-44 relative gap-4">
-                  {/* Image - Square container with rounded corners */}
-                  <div className=" aspect-square   rounded-xl overflow-hidden">
-                    <img
-                      src={
-                        travel.images?.[0]?.fileUrl ||
-                        travel.airline?.logoUrl ||
-                        travel.user?.profilePictureUrl ||
-                        "/favicon.ico"
+                id={travel.id}
+                // Image Priority: Travel Upload -> Airline Logo -> User Avatar -> Default
+                image={
+                  travel.images?.[0]?.fileUrl ||
+                  travel.airline?.logoUrl ||
+                  travel.user?.profilePictureUrl ||
+                  "/favicon.ico"
+                }
+                title={`${travel.departureAirport?.municipality || "N/A"} → ${travel.arrivalAirport?.municipality || "N/A"}`}
+                subtitle="Espace disponible"
+                weight={travel.weightAvailable || 0}
+                dateLabel={
+                  travel.departureDatetime
+                    ? formatDate(travel.departureDatetime)
+                    : ""
+                }
+                flightNumber={travel.flightNumber || "N/A"}
+                price={travel.pricePerKg}
+                priceSubtext={`${travel.currency?.symbol || "€"}/Kg`}
+                // Optional: Include user info if viewing someone else's profile
+                user={
+                  !isOwnProfile
+                    ? {
+                        name: travel.user?.fullName || "Utilisateur",
+                        avatar:
+                          travel.user?.profilePictureUrl || "/favicon.ico",
                       }
-                      alt="Voyage"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 flex flex-col justify-between min-w-0">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-1 truncate">
-                        {travel.departureAirport?.name} →{" "}
-                        {travel.arrivalAirport?.name}
-                      </h3>
-                      <p className="text-sm text-gray-500 mb-1">
-                        {travel.departureDatetime &&
-                          formatDate(travel.departureDatetime)}
-                      </p>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Numéro de vol {travel.flightNumber}
-                      </p>
-
-                      <div className="flex items-center gap-4 mb-2">
-                        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-lg font-semibold text-sm">
-                          {travel.weightAvailable} Kg
-                        </div>
-                        <div className="text-gray-700 font-semibold">
-                          {travel.pricePerKg} {travel.currency?.symbol || "€"}
-                          /Kg
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Only show edit/cancel buttons for own profile and if travel is editable */}
-                    {isOwnProfile && (
-                      <div className="flex items-center gap-3 mt-4">
-                        {travel.isEditable && (
-                          <button
-                            onClick={() => setEditingTravel(travel)}
-                            className="px-4 py-2 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
-                          >
-                            Edit
-                          </button>
-                        )}
-                        <button
-                          onClick={() => {
-                            setTravelToCancel(travel);
-                            setCancelConfirmOpen(true);
-                          }}
-                          className="px-4 py-2 border-2 border-red-500 text-red-500 rounded-lg font-medium hover:bg-red-50 transition-colors text-sm"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+                    : undefined
+                }
+                // Actions for your own travels
+                primaryAction={
+                  isOwnProfile && travel.isEditable
+                    ? {
+                        label: "Edit",
+                        onClick: () => setEditingTravel(travel),
+                        color: "blue",
+                      }
+                    : undefined
+                }
+                secondaryAction={
+                  isOwnProfile
+                    ? {
+                        label: "Cancel",
+                        onClick: () => {
+                          setTravelToCancel(travel);
+                          setCancelConfirmOpen(true);
+                        },
+                        color: "red",
+                      }
+                    : undefined
+                }
+              />
             ))}
           </div>
         )}
