@@ -26,6 +26,10 @@ interface ActionCardProps {
     color?: "red" | "outline";
   };
   statusBadge?: string;
+  messageAction?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
 const ActionCard: React.FC<ActionCardProps> = ({
@@ -41,6 +45,7 @@ const ActionCard: React.FC<ActionCardProps> = ({
   primaryAction,
   secondaryAction,
   statusBadge,
+  messageAction,
 }) => {
   return (
     <div className="bg-white border border-gray-100 rounded-[2.5rem] p-5 shadow-sm w-full transition-all hover:shadow-md">
@@ -65,7 +70,10 @@ const ActionCard: React.FC<ActionCardProps> = ({
             />
             <span className="font-bold text-gray-800 text-sm">{user.name}</span>
           </div>
-          <button className="px-5 py-2 border-2 border-blue-600 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-50">
+          <button
+            className="px-5 py-2 border-2 border-blue-600 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-50"
+            onClick={messageAction?.onClick}
+          >
             Message
           </button>
         </div>

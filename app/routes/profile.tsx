@@ -289,6 +289,18 @@ const ReservationsSection = () => {
                       }
                     : undefined
                 }
+                messageAction={
+                  request.currentStatus?.status === "NEGOTIATING"
+                    ? {
+                        label: "Message",
+                        onClick: () =>
+                          handleContactRequester(
+                            requesterName,
+                            requesterAvatar
+                          ),
+                      }
+                    : undefined
+                }
               />
             );
           })}
