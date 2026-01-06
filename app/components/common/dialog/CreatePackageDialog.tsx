@@ -32,7 +32,9 @@ export default function CreatePackageDialog({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({});
 
   // Step 3: Price & Booking
   const [weight, setWeight] = useState("");
@@ -43,6 +45,8 @@ export default function CreatePackageDialog({
   const [packageNature, setPackageNature] = useState<
     "FRAGILE" | "URGENT" | "STANDARD" | "MORE_THAN_3000"
   >("STANDARD");
+
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     if (!open) return;
@@ -90,33 +94,43 @@ export default function CreatePackageDialog({
 
   const validateCurrentStep = () => {
     const errors: Record<string, string> = {};
-    
+
     switch (currentStep) {
       case 1:
-        if (!departureAirport) errors.departure = "Veuillez sélectionner un aéroport de départ";
-        if (!arrivalAirport) errors.arrival = "Veuillez sélectionner un aéroport d'arrivée";
-        if (!baggageDescription.trim()) errors.description = "Veuillez décrire votre baggage";
-        if (baggageDescription.length > 500) errors.description = "La description ne peut pas dépasser 500 caractères";
-        if (!flightNumber.trim()) errors.flightNumber = "Veuillez saisir le numéro de vol";
-        if (!travelDate) errors.travelDate = "Veuillez sélectionner une date de voyage";
+        if (!departureAirport)
+          errors.departure = "Veuillez sélectionner un aéroport de départ";
+        if (!arrivalAirport)
+          errors.arrival = "Veuillez sélectionner un aéroport d'arrivée";
+        if (!baggageDescription.trim())
+          errors.description = "Veuillez décrire votre baggage";
+        if (baggageDescription.length > 500)
+          errors.description =
+            "La description ne peut pas dépasser 500 caractères";
+        if (!flightNumber.trim())
+          errors.flightNumber = "Veuillez saisir le numéro de vol";
+        if (!travelDate)
+          errors.travelDate = "Veuillez sélectionner une date de voyage";
         break;
       case 2:
-        if (photos.length < 3) errors.photos = "Veuillez ajouter 3 images de votre baggage";
+        if (photos.length < 3)
+          errors.photos = "Veuillez ajouter 3 images de votre baggage";
         break;
       case 3:
-        if (!weight || parseFloat(weight) <= 0) errors.weight = "Veuillez saisir un poids valide";
-        if (!pricePerKilo || parseFloat(pricePerKilo) <= 0) errors.price = "Veuillez saisir un prix valide";
+        if (!weight || parseFloat(weight) <= 0)
+          errors.weight = "Veuillez saisir un poids valide";
+        if (!pricePerKilo || parseFloat(pricePerKilo) <= 0)
+          errors.price = "Veuillez saisir un prix valide";
         if (!currency) errors.currency = "Veuillez sélectionner une devise";
         break;
     }
-    
+
     return errors;
   };
 
   const nextStep = () => {
     const errors = validateCurrentStep();
     setValidationErrors(errors);
-    
+
     if (Object.keys(errors).length === 0) {
       if (currentStep < 3) setCurrentStep(currentStep + 1);
     }
@@ -137,7 +151,7 @@ export default function CreatePackageDialog({
   const handleSubmit = async () => {
     const errors = validateCurrentStep();
     setValidationErrors(errors);
-    
+
     if (Object.keys(errors).length > 0) {
       return;
     }
@@ -167,8 +181,8 @@ export default function CreatePackageDialog({
       const demandData = {
         flightNumber,
         description: baggageDescription,
-        departureAirportId: parseInt(departureAirport.id),
-        arrivalAirportId: parseInt(arrivalAirport.id),
+        departureAirportId: departureAirport.id,
+        arrivalAirportId: arrivalAirport.id,
         travelDate,
         weight: parseFloat(weight),
         pricePerKg: parseFloat(pricePerKilo),
@@ -239,7 +253,10 @@ export default function CreatePackageDialog({
                 <span className="uppercase text-sm md:text-base">
                   {t("dialogs.createPackage.title")}
                 </span>
-                <span className="text-sm md:text-base"> - {t("common.step")} {currentStep} {t("common.of")} 3</span>
+                <span className="text-sm md:text-base">
+                  {" "}
+                  - {t("common.step")} {currentStep} {t("common.of")} 3
+                </span>
               </h2>
             </header>
 
@@ -265,10 +282,12 @@ export default function CreatePackageDialog({
                     placeholder={t("dialogs.createAnnounce.departure")}
                   />
                   {validationErrors.departure && (
-                    <p className="mt-1 text-sm text-red-600">{validationErrors.departure}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {validationErrors.departure}
+                    </p>
                   )}
                 </div>
-                
+
                 <div>
                   <AirportComboBox
                     label={t("dialogs.createAnnounce.arrival")}
@@ -277,7 +296,9 @@ export default function CreatePackageDialog({
                     placeholder={t("dialogs.createAnnounce.arrival")}
                   />
                   {validationErrors.arrival && (
-                    <p className="mt-1 text-sm text-red-600">{validationErrors.arrival}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {validationErrors.arrival}
+                    </p>
                   )}
                 </div>
 
@@ -287,29 +308,39 @@ export default function CreatePackageDialog({
                     onChange={(e) => setFlightNumber(e.target.value)}
                     placeholder={t("dialogs.createAnnounce.flightNumber")}
                     className={`w-full uppercase rounded-xl border ${
-                      validationErrors.flightNumber 
-                        ? "border-red-500 focus:ring-red-500" 
+                      validationErrors.flightNumber
+                        ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
                   {validationErrors.flightNumber && (
-                    <p className="mt-1 text-sm text-red-600">{validationErrors.flightNumber}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {validationErrors.flightNumber}
+                    </p>
                   )}
                 </Field>
-                
+
                 <Field label={t("dialogs.createAnnounce.travelDate")}>
                   <input
                     type="date"
                     value={travelDate}
                     onChange={(e) => setTravelDate(e.target.value)}
+                    min={today} // This prevents selecting past dates
                     className={`w-full rounded-xl border ${
-                      validationErrors.travelDate 
-                        ? "border-red-500 focus:ring-red-500" 
+                      validationErrors.travelDate
+                        ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
                   {validationErrors.travelDate && (
-                    <p className="mt-1 text-sm text-red-600">{validationErrors.travelDate}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {validationErrors.travelDate}
+                    </p>
+                  )}
+                  {travelDate && travelDate < today && (
+                    <p className="mt-1 text-xs text-red-500 font-medium">
+                      La date ne peut pas être dans le passé.
+                    </p>
                   )}
                 </Field>
 
@@ -324,7 +355,8 @@ export default function CreatePackageDialog({
                     rows={5}
                     placeholder={t("dialogs.createAnnounce.story")}
                     className={`w-full resize-none rounded-xl border ${
-                      validationErrors.description || baggageDescription.length > 500
+                      validationErrors.description ||
+                      baggageDescription.length > 500
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
@@ -334,14 +366,16 @@ export default function CreatePackageDialog({
                       baggageDescription.length > 500
                         ? "text-red-500 font-semibold"
                         : baggageDescription.length > 450
-                        ? "text-orange-500"
-                        : "text-gray-400"
+                          ? "text-orange-500"
+                          : "text-gray-400"
                     }`}
                   >
                     {baggageDescription.length}/500 caractères
                   </div>
                   {validationErrors.description && (
-                    <p className="mt-1 text-sm text-red-600">{validationErrors.description}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {validationErrors.description}
+                    </p>
                   )}
                 </Field>
 
@@ -404,7 +438,9 @@ export default function CreatePackageDialog({
                   {t("common.upload")} ({photos.length}/3)
                 </label>
                 {validationErrors.photos && (
-                  <p className="text-sm text-red-600">{validationErrors.photos}</p>
+                  <p className="text-sm text-red-600">
+                    {validationErrors.photos}
+                  </p>
                 )}
                 {photos.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -448,13 +484,15 @@ export default function CreatePackageDialog({
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder={t("dialogs.createAnnounce.weight")}
                     className={`w-full rounded-xl border ${
-                      validationErrors.weight 
-                        ? "border-red-500 focus:ring-red-500" 
+                      validationErrors.weight
+                        ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
                   {validationErrors.weight && (
-                    <p className="mt-1 text-sm text-red-600">{validationErrors.weight}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {validationErrors.weight}
+                    </p>
                   )}
                 </Field>
                 <div>
@@ -468,13 +506,15 @@ export default function CreatePackageDialog({
                         onChange={(e) => setPricePerKilo(e.target.value)}
                         placeholder={t("dialogs.createAnnounce.pricePerKilo")}
                         className={`w-full rounded-xl border ${
-                          validationErrors.price 
-                            ? "border-red-500 focus:ring-red-500" 
+                          validationErrors.price
+                            ? "border-red-500 focus:ring-red-500"
                             : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                         } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                       />
                       {validationErrors.price && (
-                        <p className="mt-1 text-sm text-red-600">{validationErrors.price}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {validationErrors.price}
+                        </p>
                       )}
                     </Field>
                     <div className="w-32">
@@ -489,7 +529,9 @@ export default function CreatePackageDialog({
                         compact
                       />
                       {validationErrors.currency && (
-                        <p className="mt-1 text-sm text-red-600">{validationErrors.currency}</p>
+                        <p className="mt-1 text-sm text-red-600">
+                          {validationErrors.currency}
+                        </p>
                       )}
                     </div>
                   </div>

@@ -299,8 +299,8 @@ export default function CreateAnnounceDialog({
         isAllowExtraWeight: allowExtraGrams,
         punctualityLevel: punctuality === "very-punctual", // false = punctual, true = very punctual
         feeForGloomy: 0,
-        departureAirportId: parseInt(departure.id),
-        arrivalAirportId: parseInt(arrival.id),
+        departureAirportId: departure.id,
+        arrivalAirportId: arrival.id,
         departureDatetime,
         pricePerKg: typeof pricePerKg === "number" ? pricePerKg : 0,
         currencyId: parseInt(currency.id),
