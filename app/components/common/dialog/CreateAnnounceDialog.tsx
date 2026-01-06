@@ -253,6 +253,26 @@ export default function CreateAnnounceDialog({
     });
   };
 
+  const isStepComplete = () => {
+    switch (step) {
+      case 1:
+        return (
+          !!departure &&
+          !!arrival &&
+          !!flightNumber.trim() &&
+          !!travelDate &&
+          !!story.trim() &&
+          story.length <= 500
+        );
+      case 2:
+        return files.length >= 2;
+      case 3:
+        return Number(kilos) > 0 && Number(pricePerKg) > 0 && !!currency;
+      default:
+        return false;
+    }
+  };
+
   const handleSubmit = async () => {
     const errors = validateCurrentStep();
     setValidationErrors(errors);
@@ -820,16 +840,22 @@ export default function CreateAnnounceDialog({
                       setStep((s) => (s + 1) as StepKey);
                     }
                   }}
-                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700"
+                  disabled={!isStepComplete()}
+                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white transition-colors ${
+                    isStepComplete()
+                      ? "bg-indigo-600 hover:bg-indigo-700"
+                      : "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
+                  }`}
                 >
                   Next ›
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
-                  disabled={submitting}
+                  //Button is disabled if submitting OR step 3 is incomplete
+                  disabled={submitting || !isStepComplete()}
                   className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white ${
-                    submitting
+                    submitting && isStepComplete()
                       ? "bg-gray-300 cursor-not-allowed"
                       : "bg-indigo-600 hover:bg-indigo-700"
                   }`}

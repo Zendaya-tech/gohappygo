@@ -148,6 +148,32 @@ export default function CreatePackageDialog({
     return true;
   };
 
+  const isStepComplete = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          !!departureAirport &&
+          !!arrivalAirport &&
+          !!flightNumber.trim() &&
+          !!travelDate &&
+          !!baggageDescription.trim() &&
+          baggageDescription.length <= 500
+        );
+      case 2:
+        return photos.length === 3;
+      case 3:
+        return (
+          !!weight &&
+          parseFloat(weight) > 0 &&
+          !!pricePerKilo &&
+          parseFloat(pricePerKilo) > 0 &&
+          !!currency
+        );
+      default:
+        return false;
+    }
+  };
+
   const handleSubmit = async () => {
     const errors = validateCurrentStep();
     setValidationErrors(errors);
@@ -558,16 +584,23 @@ export default function CreatePackageDialog({
               {currentStep < 3 ? (
                 <button
                   onClick={nextStep}
-                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700"
+                  // Button is disabled if step is not complete
+                  disabled={!isStepComplete()}
+                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white transition-colors ${
+                    isStepComplete()
+                      ? "bg-indigo-600 hover:bg-indigo-700"
+                      : "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
+                  }`}
                 >
                   {t("common.next")} ›
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
-                  disabled={submitting}
+                  // Button is disabled if submitting OR step 3 is incomplete
+                  disabled={submitting || !isStepComplete()}
                   className={`inline-flex items-center gap-2 rounded-xl px-5 py-2 text-sm font-semibold text-white ${
-                    !submitting
+                    !submitting && isStepComplete()
                       ? "bg-indigo-600 hover:bg-indigo-700"
                       : "bg-gray-300 cursor-not-allowed"
                   }`}
