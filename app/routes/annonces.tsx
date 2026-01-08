@@ -316,74 +316,74 @@ export default function Annonces() {
                       );
                     })}
                   </div>
+
+                  {/* Price Range Filter */}
+                  <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <h4 className="text-xs md:text-sm font-medium text-gray-900 dark:text-white mb-2 md:mb-3">
+                      Prix par kg (€)
+                    </h4>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        placeholder="Min"
+                        value={priceRange.min}
+                        onChange={(e) =>
+                          setPriceRange((prev) => ({
+                            ...prev,
+                            min: e.target.value,
+                          }))
+                        }
+                        className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        value={priceRange.max}
+                        onChange={(e) =>
+                          setPriceRange((prev) => ({
+                            ...prev,
+                            max: e.target.value,
+                          }))
+                        }
+                        className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Weight Range Filter */}
+                  <div className="mt-3 md:mt-4">
+                    <h4 className="text-xs md:text-sm font-medium text-gray-900 dark:text-white mb-2 md:mb-3">
+                      Poids (kg)
+                    </h4>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        placeholder="Min"
+                        value={weightRange.min}
+                        onChange={(e) =>
+                          setWeightRange((prev) => ({
+                            ...prev,
+                            min: e.target.value,
+                          }))
+                        }
+                        className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Max"
+                        value={weightRange.max}
+                        onChange={(e) =>
+                          setWeightRange((prev) => ({
+                            ...prev,
+                            max: e.target.value,
+                          }))
+                        }
+                        className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
                 </>
               )}
-
-              {/* Price Range Filter */}
-              <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h4 className="text-xs md:text-sm font-medium text-gray-900 dark:text-white mb-2 md:mb-3">
-                  Prix par kg (€)
-                </h4>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={priceRange.min}
-                    onChange={(e) =>
-                      setPriceRange((prev) => ({
-                        ...prev,
-                        min: e.target.value,
-                      }))
-                    }
-                    className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={priceRange.max}
-                    onChange={(e) =>
-                      setPriceRange((prev) => ({
-                        ...prev,
-                        max: e.target.value,
-                      }))
-                    }
-                    className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Weight Range Filter */}
-              <div className="mt-3 md:mt-4">
-                <h4 className="text-xs md:text-sm font-medium text-gray-900 dark:text-white mb-2 md:mb-3">
-                  Poids (kg)
-                </h4>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={weightRange.min}
-                    onChange={(e) =>
-                      setWeightRange((prev) => ({
-                        ...prev,
-                        min: e.target.value,
-                      }))
-                    }
-                    className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    value={weightRange.max}
-                    onChange={(e) =>
-                      setWeightRange((prev) => ({
-                        ...prev,
-                        max: e.target.value,
-                      }))
-                    }
-                    className="w-full px-2 md:px-3 py-2 text-xs md:text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
             </div>
           </div>
 

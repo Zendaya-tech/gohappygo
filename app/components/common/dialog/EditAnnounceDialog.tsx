@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   updateTravel,
   getAirlineFromFlightNumber,
+  type TravelItem,
 } from "../../../services/travelService";
 import AirportComboBox from "../AirportComboBox";
 import CurrencyComboBox from "../CurrencyComboBox";
@@ -11,7 +12,7 @@ import type { Currency } from "../../../services/currencyService";
 import { useAuth } from "../../../hooks/useAuth";
 import type { DemandTravelItem } from "../../../services/announceService";
 
-type StepKey = 1 | 2 | 3;
+type StepKey = 1 | 2 | 3 | 4;
 
 export default function EditAnnounceDialog({
   open,
@@ -21,13 +22,13 @@ export default function EditAnnounceDialog({
 }: {
   open: boolean;
   onClose: () => void;
-  travel: DemandTravelItem | null;
+  travel: DemandTravelItem | null | TravelItem;
   onSuccess?: () => void;
 }) {
   const [step, setStep] = useState<StepKey>(1);
   const { t } = useTranslation();
   const { user } = useAuth();
-  
+
   // Form state
   const [departure, setDeparture] = useState<Airport | null>(null);
   const [arrival, setArrival] = useState<Airport | null>(null);
@@ -37,21 +38,29 @@ export default function EditAnnounceDialog({
   const [currency, setCurrency] = useState<Currency | null>(null);
   const [lateTax, setLateTax] = useState<number | "">(0);
   const [allowExtraGrams, setAllowExtraGrams] = useState<boolean>(false);
-  const [punctuality, setPunctuality] = useState<"punctual" | "very-punctual">("punctual");
-  
+  const [punctuality, setPunctuality] = useState<"punctual" | "very-punctual">(
+    "punctual"
+  );
+
   // Supplementary info for Step 1
   const [flightNumber, setFlightNumber] = useState("");
   const [airline, setAirline] = useState<{ name?: string }>({});
   const [travelDate, setTravelDate] = useState("");
   const [fetchingAirline, setFetchingAirline] = useState(false);
-  const [flightNumberError, setFlightNumberError] = useState<string | null>(null);
-  
+  const [flightNumberError, setFlightNumberError] = useState<string | null>(
+    null
+  );
+
   // API integration state
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [reservationType, setReservationType] = useState<"single" | "shared">("single");
-  const [bookingType, setBookingType] = useState<"instant" | "non-instant">("instant");
+  const [reservationType, setReservationType] = useState<"single" | "shared">(
+    "single"
+  );
+  const [bookingType, setBookingType] = useState<"instant" | "non-instant">(
+    "instant"
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -99,58 +108,65 @@ export default function EditAnnounceDialog({
   // Initialize form with travel data
   useEffect(() => {
     if (!open || !travel) return;
-    
+
     setStep(1);
-    
+
     // Set airports - convert from backend format to frontend format
     if (travel.departureAirport) {
       setDeparture({
-        id: travel.departureAirportId.toString(),
-        code: travel.departureAirport.name.split(' ')[0] || "", // Use first word as code fallback
+        // Use the ID from the airport object itself to satisfy both interfaces
+        id: travel.departureAirport.id,
+        code: travel.departureAirport.name.split(" ")[0] || "",
         name: travel.departureAirport.name,
         city: travel.departureAirport.municipality || "",
         country: travel.departureAirport.isoCountry || "",
       });
     }
-    
+
     if (travel.arrivalAirport) {
       setArrival({
-        id: travel.arrivalAirportId.toString(),
-        code: travel.arrivalAirport.name.split(' ')[0] || "", // Use first word as code fallback
+        // Use the ID from the airport object itself to satisfy both interfaces
+        id: travel.arrivalAirport.id,
+        code: travel.arrivalAirport.name.split(" ")[0] || "",
         name: travel.arrivalAirport.name,
         city: travel.arrivalAirport.municipality || "",
         country: travel.arrivalAirport.isoCountry || "",
       });
     }
-    
+
     // Set other fields
     setStory(travel.description || "");
     setKilos(travel.weightAvailable || travel.totalWeightAllowance || "");
-    const priceValue = typeof travel.pricePerKg === 'string' ? parseFloat(travel.pricePerKg) : travel.pricePerKg;
+    const priceValue =
+      typeof travel.pricePerKg === "string"
+        ? parseFloat(travel.pricePerKg)
+        : travel.pricePerKg;
     setPricePerKg(priceValue || "");
-    
+
     // Set currency - use user's recent currency as fallback since travel doesn't have currency info
-    const defaultCurrency = user?.recentCurrency ? {
-      ...user.recentCurrency,
-      id: user.recentCurrency.id.toString(),
-      country: ""
-    } : null;
+    const defaultCurrency = user?.recentCurrency
+      ? {
+          ...user.recentCurrency,
+          id: user.recentCurrency.id.toString(),
+          country: "",
+        }
+      : null;
     setCurrency(defaultCurrency);
-    
+
     setLateTax(travel.feeForGloomy || 0);
     setAllowExtraGrams(Boolean(travel.isAllowExtraWeight));
     setPunctuality("punctual"); // Default value since not stored in backend yet
     setFlightNumber(travel.flightNumber || "");
-    
+
     // Set travel date
     if (travel.departureDatetime) {
       const date = new Date(travel.departureDatetime);
-      setTravelDate(date.toISOString().split('T')[0]);
+      setTravelDate(date.toISOString().split("T")[0]);
     }
-    
+
     setReservationType(travel.isSharedWeight ? "shared" : "single");
     setBookingType(travel.isInstant ? "instant" : "non-instant");
-    
+
     // Reset other states
     setFlightNumberError(null);
     setSubmitting(false);
@@ -160,22 +176,33 @@ export default function EditAnnounceDialog({
 
   const canNext = useMemo(() => {
     if (step === 1) {
-      const hasValidFlightNumber = !flightNumber || (flightNumber && airline.name && !flightNumberError);
+      const hasValidFlightNumber =
+        !flightNumber || (flightNumber && airline.name && !flightNumberError);
       return (
-        departure !== null && 
-        arrival !== null && 
-        story.trim().length > 0 && 
-        story.length <= 500 && 
+        departure !== null &&
+        arrival !== null &&
+        story.trim().length > 0 &&
+        story.length <= 500 &&
         hasValidFlightNumber
       );
     }
     if (step === 2) return Boolean(kilos) && Boolean(pricePerKg);
     return true;
-  }, [step, departure, arrival, kilos, pricePerKg, story.length, flightNumber, airline.name, flightNumberError]);
+  }, [
+    step,
+    departure,
+    arrival,
+    kilos,
+    pricePerKg,
+    story.length,
+    flightNumber,
+    airline.name,
+    flightNumberError,
+  ]);
 
   const handleSubmit = async () => {
     if (!travel) return;
-    
+
     if (!departure || !arrival) {
       setError("Veuillez sélectionner les aéroports de départ et d'arrivée");
       return;
@@ -209,8 +236,8 @@ export default function EditAnnounceDialog({
         isAllowExtraWeight: allowExtraGrams,
         feeForGloomy: typeof lateTax === "number" ? lateTax : 0,
         punctualityLevel: punctuality === "very-punctual",
-        departureAirportId: parseInt(departure.id),
-        arrivalAirportId: parseInt(arrival.id),
+        departureAirportId: departure.id,
+        arrivalAirportId: arrival.id,
         pricePerKg: typeof pricePerKg === "number" ? pricePerKg : 0,
         currencyId: parseInt(currency.id),
         totalWeightAllowance: typeof kilos === "number" ? kilos : 0,
@@ -229,12 +256,16 @@ export default function EditAnnounceDialog({
           onClose();
         }, 2000);
       } else {
-        setError("Erreur lors de la mise à jour de l'annonce. Veuillez réessayer.");
+        setError(
+          "Erreur lors de la mise à jour de l'annonce. Veuillez réessayer."
+        );
       }
     } catch (err: any) {
       // Check if it's a 401 error (user not authenticated)
       if (err?.response?.status === 401 || err?.status === 401) {
-        setError("Vous devez être connecté pour modifier une annonce. Veuillez vous connecter.");
+        setError(
+          "Vous devez être connecté pour modifier une annonce. Veuillez vous connecter."
+        );
       } else {
         // Handle validation errors from backend
         if (err?.response?.data?.message) {
@@ -244,7 +275,9 @@ export default function EditAnnounceDialog({
             setError(err.response.data.message);
           }
         } else {
-          setError("Erreur lors de la mise à jour de l'annonce. Veuillez réessayer.");
+          setError(
+            "Erreur lors de la mise à jour de l'annonce. Veuillez réessayer."
+          );
         }
       }
     } finally {
@@ -325,8 +358,8 @@ export default function EditAnnounceDialog({
                     onChange={(e) => setFlightNumber(e.target.value)}
                     placeholder="Add numero de vol sur votre billet d'avion"
                     className={`w-full rounded-xl uppercase border ${
-                      flightNumberError 
-                        ? "border-red-500 focus:ring-red-500" 
+                      flightNumberError
+                        ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
@@ -354,8 +387,8 @@ export default function EditAnnounceDialog({
                         fetchingAirline
                           ? "Recherche en cours..."
                           : flightNumber
-                          ? "Détectée automatiquement"
-                          : "Entrez d'abord le numéro de vol"
+                            ? "Détectée automatiquement"
+                            : "Entrez d'abord le numéro de vol"
                       }
                       className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-3 text-sm text-gray-600 dark:text-gray-400 cursor-not-allowed"
                     />
@@ -403,8 +436,8 @@ export default function EditAnnounceDialog({
                       story.length > 500
                         ? "border-red-500 focus:ring-red-500"
                         : story.trim().length === 0
-                        ? "border-red-300 focus:ring-red-400"
-                        : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
+                          ? "border-red-300 focus:ring-red-400"
+                          : "border-gray-300 dark:border-gray-700 focus:ring-indigo-500"
                     } bg-white dark:bg-gray-800 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2`}
                   />
                   <div
@@ -412,10 +445,10 @@ export default function EditAnnounceDialog({
                       story.length > 500
                         ? "text-red-500 font-semibold"
                         : story.length > 450
-                        ? "text-orange-500"
-                        : story.trim().length === 0
-                        ? "text-red-400"
-                        : "text-gray-400"
+                          ? "text-orange-500"
+                          : story.trim().length === 0
+                            ? "text-red-400"
+                            : "text-gray-400"
                     }`}
                   >
                     {story.length}/500 caractères
@@ -581,7 +614,8 @@ export default function EditAnnounceDialog({
 
                 <div>
                   <div className="mb-2 text-sm font-semibold text-gray-900 dark:text-white">
-                    Quelle ponctualité attendez-vous lors de la rencontre avec votre HappyVoyageur ?
+                    Quelle ponctualité attendez-vous lors de la rencontre avec
+                    votre HappyVoyageur ?
                   </div>
                   <div className="flex items-center gap-6 text-sm text-gray-700 dark:text-gray-300">
                     <label className="inline-flex items-center gap-2">
@@ -706,7 +740,11 @@ function StepsNav({ step }: { step: StepKey }) {
         }`}
       >
         {index <= step ? (
-          <svg className="h-2.5 w-2.5 md:h-3 md:w-3" viewBox="0 0 20 20" fill="currentColor">
+          <svg
+            className="h-2.5 w-2.5 md:h-3 md:w-3"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
             <path
               fillRule="evenodd"
               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -725,7 +763,9 @@ function StepsNav({ step }: { step: StepKey }) {
         >
           {title}
         </div>
-        <div className="text-xs md:text-sm text-gray-400 truncate">{subtitle}</div>
+        <div className="text-xs md:text-sm text-gray-400 truncate">
+          {subtitle}
+        </div>
       </div>
     </div>
   );

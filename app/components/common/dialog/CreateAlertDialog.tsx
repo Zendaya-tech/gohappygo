@@ -29,7 +29,7 @@ export default function CreateAlertDialog({
     travelDateTime: "",
     flightNumber: "",
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -48,8 +48,8 @@ export default function CreateAlertDialog({
           console.error("Error parsing date:", error);
         }
       }
-      
-      setFormData(prev => ({
+
+      setFormData((prev) => ({
         ...prev,
         travelDateTime: dateTimeValue,
         flightNumber: initialData.flight || "",
@@ -74,13 +74,17 @@ export default function CreateAlertDialog({
         alertType: formData.alertType,
         departureAirportId: formData.departureAirport.id,
         arrivalAirportId: formData.arrivalAirport.id,
-        travelDateTime: formData.travelDateTime ? new Date(formData.travelDateTime).toISOString() : undefined,
+        travelDateTime: formData.travelDateTime
+          ? new Date(formData.travelDateTime).toISOString()
+          : undefined,
         flightNumber: formData.flightNumber || undefined,
       };
 
       await createAlert(alertData);
-      setSuccess("Alerte créée avec succès ! Vous serez notifié dès qu'une offre correspond.");
-      
+      setSuccess(
+        "Alerte créée avec succès ! Vous serez notifié dès qu'une offre correspond."
+      );
+
       setTimeout(() => {
         onSuccess?.();
         onClose();
@@ -106,8 +110,11 @@ export default function CreateAlertDialog({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-        
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={onClose}
+        />
+
         <div className="relative w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-xl">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
@@ -129,7 +136,7 @@ export default function CreateAlertDialog({
                 {error}
               </div>
             )}
-            
+
             {success && (
               <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-lg text-sm">
                 {success}
@@ -144,7 +151,12 @@ export default function CreateAlertDialog({
                 </label>
                 <select
                   value={formData.alertType}
-                  onChange={(e) => setFormData(prev => ({ ...prev, alertType: e.target.value as any }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      alertType: e.target.value as any,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="TRAVEL">Voyages uniquement</option>
@@ -157,8 +169,13 @@ export default function CreateAlertDialog({
               <div>
                 <AirportComboBox
                   label="Aéroport de départ *"
-                  value={formData.departureAirport}
-                  onChange={(airport) => setFormData(prev => ({ ...prev, departureAirport: airport }))}
+                  value={formData.departureAirport?.code}
+                  onChange={(airport) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      departureAirport: airport,
+                    }))
+                  }
                   placeholder="Rechercher un aéroport de départ"
                 />
               </div>
@@ -167,8 +184,13 @@ export default function CreateAlertDialog({
               <div>
                 <AirportComboBox
                   label="Aéroport d'arrivée *"
-                  value={formData.arrivalAirport}
-                  onChange={(airport) => setFormData(prev => ({ ...prev, arrivalAirport: airport }))}
+                  value={formData.arrivalAirport?.code}
+                  onChange={(airport) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      arrivalAirport: airport,
+                    }))
+                  }
                   placeholder="Rechercher un aéroport d'arrivée"
                 />
               </div>
@@ -181,7 +203,12 @@ export default function CreateAlertDialog({
                 <input
                   type="datetime-local"
                   value={formData.travelDateTime}
-                  onChange={(e) => setFormData(prev => ({ ...prev, travelDateTime: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      travelDateTime: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -195,7 +222,12 @@ export default function CreateAlertDialog({
                   type="text"
                   placeholder="Ex: AF123"
                   value={formData.flightNumber}
-                  onChange={(e) => setFormData(prev => ({ ...prev, flightNumber: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      flightNumber: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
                 />
               </div>

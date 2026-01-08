@@ -57,6 +57,7 @@ export type DemandAndTravelFilters = {
 };
 
 export interface Airport {
+  id: number;
   name: string;
   municipality: any;
   isoCountry: any;
