@@ -412,9 +412,8 @@ const ReviewsSection = () => {
     const fetchReviews = async () => {
       setLoading(true);
       try {
-        // For other users' profiles, only show received reviews
-        // For own profile, allow switching between received and given
-        const asReviewer = isOwnProfile ? tab === "given" : false;
+        // For both own profile and public profiles, allow switching between received and given
+        const asReviewer = tab === "given";
         const response = await getReviews(
           asReviewer,
           userId ? Number(userId) : undefined
@@ -428,7 +427,7 @@ const ReviewsSection = () => {
     };
 
     fetchReviews();
-  }, [tab, userId, isOwnProfile]);
+  }, [tab, userId]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -450,31 +449,29 @@ const ReviewsSection = () => {
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-6">
-      {/* Tabs - Only show for own profile */}
-      {isOwnProfile && (
-        <div className="flex items-center gap-6 mb-6">
-          <button
-            onClick={() => setTab("received")}
-            className={`text-sm font-semibold ${
-              tab === "received"
-                ? "text-gray-900 dark:text-white"
-                : "text-gray-500"
-            }`}
-          >
-            | Mes avis reçus
-          </button>
-          <button
-            onClick={() => setTab("given")}
-            className={`text-sm font-semibold ${
-              tab === "given"
-                ? "text-gray-900 dark:text-white"
-                : "text-gray-500"
-            }`}
-          >
-            | Mes avis donnés
-          </button>
-        </div>
-      )}
+      {/* Tabs - Show for both own profile and public profiles */}
+      <div className="flex items-center gap-6 mb-6">
+        <button
+          onClick={() => setTab("received")}
+          className={`text-sm font-semibold ${
+            tab === "received"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | {isOwnProfile ? "Mes avis reçus" : "Avis reçus"}
+        </button>
+        <button
+          onClick={() => setTab("given")}
+          className={`text-sm font-semibold ${
+            tab === "given"
+              ? "text-gray-900 dark:text-white"
+              : "text-gray-500"
+          }`}
+        >
+          | {isOwnProfile ? "Mes avis donnés" : "Avis donnés"}
+        </button>
+      </div>
 
       {loading ? (
         <div className="text-center text-gray-500 py-8">
@@ -485,18 +482,16 @@ const ReviewsSection = () => {
           <div className="text-center">
             <StarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
-              {isOwnProfile
-                ? tab === "received"
-                  ? "Aucun avis reçu"
-                  : "Aucun avis donné"
-                : "Aucun avis reçu"}
+              {tab === "received" ? "Aucun avis reçu" : "Aucun avis donné"}
             </p>
             <p className="text-gray-400 text-sm mt-2">
               {isOwnProfile
                 ? tab === "received"
                   ? "Les avis de vos voyageurs apparaîtront ici"
                   : "Les avis que vous avez donnés apparaîtront ici"
-                : "Cet utilisateur n'a pas encore reçu d'avis"}
+                : tab === "received"
+                ? "Cet utilisateur n'a pas encore reçu d'avis"
+                : "Cet utilisateur n'a pas encore donné d'avis"}
             </p>
           </div>
         </div>
@@ -504,14 +499,9 @@ const ReviewsSection = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
-              {isOwnProfile
-                ? tab === "received"
-                  ? "Avis reçus"
-                  : "Avis donnés"
-                : "Avis reçus"}{" "}
-              ({reviews.length})
+              {tab === "received" ? "Avis reçus" : "Avis donnés"} ({reviews.length})
             </h3>
-            {(tab === "received" || !isOwnProfile) && (
+            {tab === "received" && (
               <div className="flex items-center gap-2">
                 <div className="flex items-center">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -537,10 +527,7 @@ const ReviewsSection = () => {
             {reviews.map((review) => {
               // For received reviews, show the reviewer (who gave the review)
               // For given reviews, show the reviewee (who received the review)
-              const displayUser =
-                isOwnProfile && tab === "given"
-                  ? review.reviewee
-                  : review.reviewer;
+              const displayUser = tab === "given" ? review.reviewee : review.reviewer;
               const displayName = displayUser
                 ? `${displayUser.firstName} ${displayUser.lastName.charAt(0)}.`
                 : "Utilisateur";
@@ -569,11 +556,9 @@ const ReviewsSection = () => {
                       <div className="flex items-center justify-between mb-2">
                         <div>
                           <h4 className="text-sm font-semibold text-gray-900">
-                            {isOwnProfile
-                              ? tab === "received"
-                                ? `Avis de ${displayName}`
-                                : `Avis pour ${displayName}`
-                              : `Avis de ${displayName}`}
+                            {tab === "received"
+                              ? `Avis de ${displayName}`
+                              : `Avis pour ${displayName}`}
                           </h4>
                           {review.request?.travel && (
                             <p className="text-xs text-gray-500">
