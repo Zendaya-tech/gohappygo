@@ -574,6 +574,7 @@ const TravelRequestsSection = () => {
   const { user: currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
+  const type = "traveler"; // Puisqu'on récupère que les demands
 
   // Use the profile user ID or current user ID
   const targetUserId = userId || currentUser?.id;
@@ -677,6 +678,7 @@ const TravelRequestsSection = () => {
                 flightNumber={demand.flightNumber}
                 weight={demand.weight || 0}
                 price={demand.pricePerKg}
+                type={type}
                 priceSubtext="€/Kg"
                 // Buttons for Demands
                 primaryAction={
@@ -744,6 +746,7 @@ const TravelsSection = () => {
   const { user: currentUser } = useAuth();
   const [searchParams] = useSearchParams();
   const userId = searchParams.get("user");
+  const type = "transporter"; // Puisqu'on récupère que les voyages
 
   // Use the profile user ID or current user ID
   const targetUserId = userId || currentUser?.id;
@@ -837,6 +840,7 @@ const TravelsSection = () => {
                 }
                 title={`${travel.departureAirport?.municipality || "N/A"} → ${travel.arrivalAirport?.municipality || "N/A"}`}
                 subtitle="Espace disponible"
+                type={type}
                 weight={travel.weightAvailable || 0}
                 dateLabel={
                   travel.departureDatetime

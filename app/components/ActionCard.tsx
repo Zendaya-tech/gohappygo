@@ -4,6 +4,7 @@ interface ActionCardProps {
   id: string | number;
   image: string;
   title: string;
+  type?: "traveler" | "transporter";
   subtitle: string;
   dateLabel: string;
   flightNumber: string;
@@ -43,20 +44,32 @@ const ActionCard: React.FC<ActionCardProps> = ({
   priceSubtext,
   user,
   primaryAction,
+  type,
   secondaryAction,
   statusBadge,
   messageAction,
 }) => {
   return (
-    <div className="bg-white border border-gray-100 rounded-[2.5rem] p-5 shadow-sm w-full transition-all hover:shadow-md">
+    <div className="bg-white  rounded-2xl overflow-hidden px-2 py-3 shadow-lg hover:shadow-xl transition-shadow border border-gray-200">
       {/* 1. Main Visual (Image or Logo) */}
-      <div className="bg-gray-50 rounded-[2rem] aspect-square flex items-center justify-center p-6 mb-5 overflow-hidden">
+      <div className="relative items-center  justify-center flex overflow-hidden rounded-2xl bg-gray-100   border border-gray-200 h-64 mb-6">
         <img
           src={image || "/favicon.ico"}
           alt={title}
           className="w-full h-full object-cover rounded-lg"
           onError={(e) => (e.currentTarget.src = "/favicon.ico")}
         />
+        {type && (
+          <div
+            className={`absolute bottom-4 left-4 px-3 py-1 rounded-full text-xs font-medium ${
+              type === "transporter"
+                ? "bg-blue-500/90 text-white"
+                : "bg-orange-500/90 text-white"
+            }`}
+          >
+            {type === "transporter" ? "Voyage" : "Demande"}
+          </div>
+        )}
       </div>
 
       {/* 2. User Row (If provided) */}
