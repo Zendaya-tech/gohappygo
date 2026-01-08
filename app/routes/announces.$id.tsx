@@ -683,13 +683,17 @@ export default function AnnounceDetail() {
                       {listing.departureAirport?.name || "Départ"} → {listing.arrivalAirport?.name || "Arrivée"}
                     </span>
                     <span>Départ: {formatDate(listing.departureDatetime || listing.travelDate || listing.deliveryDate || new Date().toISOString())}</span>
-                    <span className="font-medium">
-                      Vol N° {listing.flightNumber}
-                    </span>
-                    {listing.airline?.name && (
-                      <span className="text-gray-600 dark:text-gray-400">
-                        {listing.airline.name}
-                      </span>
+                    {type === "travel" && (
+                      <>
+                        <span className="font-medium">
+                          Vol N° {listing.flightNumber}
+                        </span>
+                        {listing.airline?.name && (
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {listing.airline.name}
+                          </span>
+                        )}
+                      </>
                     )}
                     <span className="text-blue-600">
                       {type === "travel"
@@ -713,62 +717,64 @@ export default function AnnounceDetail() {
                 </p>
               </div>
 
-              {/* Badges - Grid 2x2 */}
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                {/* Reservation type badge */}
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <img 
-                    src="/images/badges/multiple.jpeg" 
-                    alt="Type de réservation" 
-                    className="h-8 w-8 rounded-full object-cover flex-shrink-0"
-                  />
-                  <span className="flex-1">
-                    {listing.isSharedWeight 
-                      ? "peut prendre des kilos de plusieurs voyageurs" 
-                      : "accepte qu'une personne pour tous les kilos"
-                    }
-                  </span>
-                </div>
+              {/* Badges - Grid 2x2 - Only show for travels */}
+              {type === "travel" && (
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  {/* Reservation type badge */}
+                  <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                    <img 
+                      src="/images/badges/multiple.jpeg" 
+                      alt="Type de réservation" 
+                      className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                    />
+                    <span className="flex-1">
+                      {listing.isSharedWeight 
+                        ? "peut prendre des kilos de plusieurs voyageurs" 
+                        : "accepte qu'une personne pour tous les kilos"
+                      }
+                    </span>
+                  </div>
 
-                {/* Punctuality badge */}
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <img 
-                    src="/images/badges/ponctuel.jpeg" 
-                    alt="Ponctualité" 
-                    className="h-8 w-8 rounded-full object-cover flex-shrink-0"
-                  />
-                  <span className="flex-1">
-                    {listing.punctualityLevel ? "très ponctuel" : "ponctuel"}
-                  </span>
-                </div>
+                  {/* Punctuality badge */}
+                  <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                    <img 
+                      src="/images/badges/ponctuel.jpeg" 
+                      alt="Ponctualité" 
+                      className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                    />
+                    <span className="flex-1">
+                      {listing.punctualityLevel ? "très ponctuel" : "ponctuel"}
+                    </span>
+                  </div>
 
-                {/* Extra weight badge */}
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <img 
-                    src="/images/badges/kilos_trop.jpeg" 
-                    alt="Poids supplémentaire" 
-                    className="h-8 w-8 rounded-full object-cover flex-shrink-0"
-                  />
-                  <span className="flex-1">
-                    {listing.isAllowExtraWeight 
-                      ? "accepte quelques grammes en trop" 
-                      : "n'accepte pas de grammes en trop"
-                    }
-                  </span>
-                </div>
+                  {/* Extra weight badge */}
+                  <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                    <img 
+                      src="/images/badges/kilos_trop.jpeg" 
+                      alt="Poids supplémentaire" 
+                      className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                    />
+                    <span className="flex-1">
+                      {listing.isAllowExtraWeight 
+                        ? "accepte quelques grammes en trop" 
+                        : "n'accepte pas de grammes en trop"
+                      }
+                    </span>
+                  </div>
 
-                {/* Booking type badge */}
-                <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
-                  <img 
-                    src="/images/badges/reservation.jpeg" 
-                    alt="Type de confirmation" 
-                    className="h-8 w-8 rounded-full object-cover flex-shrink-0"
-                  />
-                  <span className="flex-1">
-                    la réservation sera confirmée {listing.isInstant ? "instantanément" : "par l'HappyVoyageur"}
-                  </span>
+                  {/* Booking type badge */}
+                  <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                    <img 
+                      src="/images/badges/reservation.jpeg" 
+                      alt="Type de confirmation" 
+                      className="h-8 w-8 rounded-full object-cover flex-shrink-0"
+                    />
+                    <span className="flex-1">
+                      la réservation sera confirmée {listing.isInstant ? "instantanément" : "par l'HappyVoyageur"}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Capacity bar */}
               {/* <div className="mt-6 space-y-2">

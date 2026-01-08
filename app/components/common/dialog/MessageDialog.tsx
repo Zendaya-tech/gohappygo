@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { sendMessage, type SendMessageDto } from "~/services/messageService";
 
 export default function MessageDialog({
   open,
@@ -6,6 +7,7 @@ export default function MessageDialog({
   title,
   hostName,
   hostAvatar,
+  requestId,
   onSend,
 }: {
   open: boolean;
@@ -13,9 +15,12 @@ export default function MessageDialog({
   title: string;
   hostName: string;
   hostAvatar: string;
-  onSend: (message: string) => void;
+  requestId?: number;
+  onSend?: (message: string) => void;
 }) {
   const [message, setMessage] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -29,9 +34,38 @@ export default function MessageDialog({
   useEffect(() => {
     if (!open) return;
     setMessage("");
+    setError(null);
   }, [open]);
 
   if (!open) return null;
+
+  const handleSendMessage = async () => {
+    if (!message.trim()) return;
+    
+    setSending(true);
+    setError(null);
+    
+    try {
+      if (requestId) {
+        // Use API to send message
+        const dto: SendMessageDto = {
+          requestId,
+          content: message.trim()
+        };
+        await sendMessage(dto);
+      }
+      
+      // Call the callback if provided
+      onSend?.(message.trim());
+      setMessage("");
+      onClose();
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+      setError(error?.response?.data?.message || "Erreur lors de l'envoi du message");
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -63,18 +97,21 @@ export default function MessageDialog({
               placeholder="Your message here ..."
               rows={6}
               className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-600"
+              disabled={sending}
             />
 
+            {error && (
+              <div className="mt-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+                {error}
+              </div>
+            )}
+
             <button
-              onClick={() => {
-                if (message.trim()) {
-                  onSend(message.trim());
-                  onClose();
-                }
-              }}
-              className="mt-6 w-full rounded-lg bg-[#2d6a74] py-3 text-white font-semibold hover:bg-[#25575f] transition-colors"
+              onClick={handleSendMessage}
+              disabled={!message.trim() || sending}
+              className="mt-6 w-full rounded-lg bg-[#2d6a74] py-3 text-white font-semibold hover:bg-[#25575f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Send message
+              {sending ? "Envoi..." : "Send message"}
             </button>
           </div>
 
