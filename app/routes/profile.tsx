@@ -322,7 +322,8 @@ const ReservationsSection = () => {
                         onClick: () =>
                           handleContactRequester(
                             requesterName,
-                            requesterAvatar
+                            requesterAvatar,
+                            request.id
                           ),
                       }
                     : undefined
@@ -433,9 +434,7 @@ const ReviewsSection = () => {
         <button
           onClick={() => setTab("given")}
           className={`text-sm font-semibold ${
-            tab === "given"
-              ? "text-gray-900 dark:text-white"
-              : "text-gray-500"
+            tab === "given" ? "text-gray-900 dark:text-white" : "text-gray-500"
           }`}
         >
           | {isOwnProfile ? "Mes avis donnés" : "Avis donnés"}
@@ -459,8 +458,8 @@ const ReviewsSection = () => {
                   ? "Les avis de vos voyageurs apparaîtront ici"
                   : "Les avis que vous avez donnés apparaîtront ici"
                 : tab === "received"
-                ? "Cet utilisateur n'a pas encore reçu d'avis"
-                : "Cet utilisateur n'a pas encore donné d'avis"}
+                  ? "Cet utilisateur n'a pas encore reçu d'avis"
+                  : "Cet utilisateur n'a pas encore donné d'avis"}
             </p>
           </div>
         </div>
@@ -468,7 +467,8 @@ const ReviewsSection = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">
-              {tab === "received" ? "Avis reçus" : "Avis donnés"} ({reviews.length})
+              {tab === "received" ? "Avis reçus" : "Avis donnés"} (
+              {reviews.length})
             </h3>
             {tab === "received" && (
               <div className="flex items-center gap-2">
@@ -496,7 +496,8 @@ const ReviewsSection = () => {
             {reviews.map((review) => {
               // For received reviews, show the reviewer (who gave the review)
               // For given reviews, show the reviewee (who received the review)
-              const displayUser = tab === "given" ? review.reviewee : review.reviewer;
+              const displayUser =
+                tab === "given" ? review.reviewee : review.reviewer;
               const displayName = displayUser
                 ? `${displayUser.firstName} ${displayUser.lastName.charAt(0)}.`
                 : "Utilisateur";
@@ -1619,47 +1620,61 @@ export default function Profile() {
     }
   };
 
-const MessagesSection = () => {
-  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const MessagesSection = () => {
+    const [selectedConversation, setSelectedConversation] =
+      useState<Conversation | null>(null);
 
-  return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-      <div className="flex flex-col md:flex-row h-auto md:h-[600px]">
-        {/* Conversations List */}
-        <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-gray-200 max-h-[300px] md:max-h-none">
-          <ConversationList
-            onSelectConversation={setSelectedConversation}
-            selectedConversationId={selectedConversation?.id}
-          />
-        </div>
-
-        {/* Chat Area */}
-        <div className="flex-1 flex flex-col">
-          {selectedConversation ? (
-            <Chat
-              requestId={selectedConversation.requestId}
-              otherUser={selectedConversation.otherUser}
+    return (
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="flex flex-col md:flex-row h-auto md:h-[600px]">
+          {/* Conversations List */}
+          <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-gray-200 max-h-[300px] md:max-h-none">
+            <ConversationList
+              onSelectConversation={setSelectedConversation}
+              selectedConversationId={selectedConversation?.id}
             />
-          ) : (
-            <div className="flex-1 flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                <div className="text-gray-400 mb-4">
-                  <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
+          </div>
+
+          {/* Chat Area */}
+          <div className="flex-1 flex flex-col">
+            {selectedConversation ? (
+              <Chat
+                requestId={selectedConversation.requestId}
+                otherUser={selectedConversation.otherUser}
+              />
+            ) : (
+              <div className="flex-1 flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                  <div className="text-gray-400 mb-4">
+                    <svg
+                      className="w-12 h-12 mx-auto"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-lg">
+                    Sélectionnez une conversation
+                  </p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    Choisissez une conversation dans la liste pour commencer à
+                    discuter
+                  </p>
                 </div>
-                <p className="text-gray-500 text-lg">Sélectionnez une conversation</p>
-                <p className="text-gray-400 text-sm mt-2">
-                  Choisissez une conversation dans la liste pour commencer à discuter
-                </p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
   const renderContent = () => {
     switch (activeSection) {
