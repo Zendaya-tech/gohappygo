@@ -495,11 +495,11 @@ export default function Annonces() {
                     const rating = item.user.rating; // Default rating since it's not in the new structure
 
                     // Pour les transporteurs (travel), utiliser le logo de la compagnie
-                    // Pour les voyageurs (demand), utiliser l'avatar de l'utilisateur
+                    // Pour les voyageurs (demand), utiliser la première image de l'annonce
                     const image =
                       item.type === "travel"
                         ? item.airline?.logoUrl || avatar
-                        : avatar;
+                        : item.images?.[0]?.fileUrl || avatar;
 
                     const featured = Boolean(item.user?.isVerified);
 
