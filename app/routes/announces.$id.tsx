@@ -719,11 +719,7 @@ export default function AnnounceDetail() {
 
               {/* Badges - Grid 2x2 - Only show for travels */}
               {type === "travel" && (
-<<<<<<< Updated upstream
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-=======
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
->>>>>>> Stashed changes
                   {/* Reservation type badge */}
                   <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
                     <img 
