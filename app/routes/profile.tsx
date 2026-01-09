@@ -285,6 +285,7 @@ const ReservationsSection = () => {
                 flightNumber={flightNumber}
                 weight={weight}
                 price={price}
+                type="transporter" // For the proper airline logo styling
                 // Logic for Status Badges vs Buttons
                 statusBadge={
                   request.currentStatus?.status === "COMPLETED"
@@ -845,12 +846,7 @@ const TravelsSection = () => {
                 key={travel.id}
                 id={travel.id}
                 // Image Priority: Travel Upload -> Airline Logo -> User Avatar -> Default
-                image={
-                  travel.images?.[0]?.fileUrl ||
-                  travel.airline?.logoUrl ||
-                  travel.user?.profilePictureUrl ||
-                  "/favicon.ico"
-                }
+                image={travel.airline?.logoUrl || "/favicon.ico"}
                 title={`${travel.departureAirport?.municipality || "N/A"} → ${travel.arrivalAirport?.municipality || "N/A"}`}
                 subtitle="Espace disponible"
                 type={type}

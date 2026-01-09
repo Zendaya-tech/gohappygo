@@ -56,7 +56,11 @@ const ActionCard: React.FC<ActionCardProps> = ({
         <img
           src={image || "/favicon.ico"}
           alt={title}
-          className="w-full h-full object-cover rounded-lg"
+          className={`${
+            type === "transporter"
+              ? "max-h-full h-52 p-5 object-contain max-w-full "
+              : "object-cover min-w-100 min-h-100 "
+          } m-auto  `}
           onError={(e) => (e.currentTarget.src = "/favicon.ico")}
         />
         {type && (
@@ -96,7 +100,7 @@ const ActionCard: React.FC<ActionCardProps> = ({
 
         {/* 3. Text Info */}
         <div className="space-y-4 mb-6">
-          <h3 className="text-lg font-black text-gray-900 leading-tight">
+          <h3 className="text-lg font-black text-gray-900 leading-tight font-medium">
             {title}
           </h3>
 
